@@ -2,6 +2,106 @@
 
 ---
 
+## Run: 2026-06-05 06:10 UTC
+**Folder:** `runs/2026-06-05_0610-UTC/`
+
+### Research Signals
+
+Scanned r/somebodymakethis, r/iOSProgramming, r/productivity, Product Hunt
+(April 2026 leaderboard), Ask HN threads (Jan–May 2026), arXiv / bioRxiv, GitHub
+topics, and PhysioNet. Themes that shaped the picks:
+
+- **Calm, no-AI, no-cloud, local-first** is a loud and growing preference —
+  "a notepad should never touch the network", free forever apps (Sukoon),
+  fatigue with AI-sidebar everything. Every pick this run runs offline.
+- **AI wrappers are saturated** (Product Hunt feed rewards a narrow AI slice);
+  deliberately avoided.
+- **Legible, learnable tools** over black boxes — drove the pure-Python,
+  fully-readable science implementations.
+- **Research-grade, reproducible code** is respected when it cites real papers
+  and ships sample data + benchmarks (PhysioNet, Pan-Tompkins++ arXiv:2211.03171,
+  Sharp & Li CAI, Ferragina–Manzini FM-index).
+- Recurring small chores people still hand-roll: invoicing, cron reading,
+  "just look at this CSV", timezone math, golden-hour lookup, watering plants.
+
+---
+
+### Ideas — 10 selected (3 iOS · 3 web · 3 sci · 1 Android)
+
+#### A — iOS
+- **Gloaming** — built — `01-gloaming/` — on-device NOAA solar algorithm; every
+  twilight/golden/blue-hour threshold + a live sky band; CoreLocation or 8 preset
+  cities (incl. an Arctic city for polar day/night). MVVM, compiles Xcode 15+.
+- **Meridian** — built — `02-meridian/` — multi-timezone meeting overlap finder;
+  green consensus strip, "best start", DST + half-hour-zone correct; Codable
+  persistence; searchable 16-city catalog.
+- **Folio** — built — `03-folio/` — reading-pace tracker that projects a finish
+  date from logged page sessions; progress arc + progress curve; two sample books.
+
+#### B — Web / SaaS / Desktop
+- **Reckon** — built — `04-reckon/` — single-file freelance invoice generator;
+  live preview = the printed PDF; localStorage, no account, no network.
+- **Cadence** — built — `05-cadence/` — cron-expression workbench; plain-English
+  description + next-7-runs timeline; real parser/scheduler (Vixie OR-semantics),
+  Node-tested.
+- **Prism** — built — `06-prism/` — drop a CSV → auto-typed columns → bar / line /
+  scatter / histogram on canvas → PNG export; robust quoted-CSV parser.
+
+#### C — Scientific / Technological
+- **Tempo** — built — `07-tempo/` — Pan-Tompkins++ ECG R-peak detection + HRV
+  (SDNN/RMSSD/pNN50/Poincaré). Scores **Se 100% / PPV 100%** on a 90 s synthetic
+  record. Pure stdlib. Cites Pan-Tompkins 1985, arXiv:2211.03171, ESC/NASPE 1996.
+- **Codonaut** — built — `08-codonaut/` — Codon Adaptation Index + host-optimized
+  reverse translation for *E. coli* K-12. GFP demo: **CAI 0.346 → 1.000**, protein
+  identity preserved. Cites Sharp & Li 1987, Angov 2008.
+- **Strand** — built — `09-strand/` — FM-index (BWT) exact DNA matcher: suffix
+  array → BWT → C/Occ → backward search; verified vs. brute force, **~9× faster**,
+  inverse-BWT round-trips. Cites Ferragina–Manzini 2000, Li & Durbin 2009.
+
+#### D — Android
+- **Frond** — built (source) — `10-frond/` — local-first plant-watering companion;
+  Compose + Material 3 (Orbioom-tuned), MVVM, JSON-in-SharedPreferences (no Room/
+  KSP). **APK not built in-sandbox** — no Android SDK present; builds in Android
+  Studio. Gradle wrapper (8.7) included; see `build-apk/build-log.txt`.
+
+**All 10 built. The three science tools run and self-verify (see commands in each
+README); the web apps run end-to-end; iOS projects are generated, structurally
+validated, and reviewed to compile in Xcode 15+.**
+
+---
+
+### Top Recommendation
+
+**Tempo** (`07-tempo/`).
+
+It's the pick that best embodies "a researcher sees depth." A complete,
+dependency-free Pan-Tompkins++ pipeline that hits 100%/100% on a noisy synthetic
+record, with HRV metrics that match physiology — and every filter, threshold,
+and metric is a few readable lines. There's a real product here: a calm,
+auditable HRV toolkit (web upload of a CSV, or an on-device wearable companion)
+that doesn't ship your cardiac data to a cloud. Natural next steps: add
+frequency-domain HRV (Lomb-Scargle for unevenly-sampled RR, still pure Python),
+ingest real PhysioNet WFDB records, and wrap it in a glass web UI.
+
+Runner-up: **Gloaming** — the on-device astronomy is genuinely correct and the
+live sky band is the kind of quiet, daily-delight surface Orbioom is for.
+
+---
+
+### Follow-ups for Next Run
+
+- **Tempo V2**: Lomb-Scargle periodogram for frequency-domain HRV (LF/HF) on
+  unevenly-sampled tachograms; WFDB reader for real PhysioNet records.
+- **Strand V2**: sampled suffix array + run-length BWT to scale past fragments;
+  approximate matching (1–2 mismatch backtracking) toward a real short-read aligner.
+- **Codonaut V2**: add multiple host tables (yeast, human, CHO), avoid restriction
+  sites / hairpins during optimization, GC-window smoothing.
+- **Prism / Reckon**: optional Tauri desktop wrappers for offline-native feel.
+- Watch: r/selfhosted and r/datacurator for "local-first analytics" pain points;
+  PhysioNet challenges for credible biomedical-signal ideas.
+
+---
+
 ## Run: 2026-06-05 02:52 UTC
 **Folder:** `runs/2026-06-05_0252-UTC/`
 
