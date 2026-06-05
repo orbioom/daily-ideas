@@ -206,3 +206,96 @@ blade motif.
 
 **Definition of done:** solve an exposure and see the trade-off diagram update; log a roll of frames;
 export it; everything intact after relaunch.
+
+---
+
+## Repertoire
+
+**Type:** iOS app (native, SwiftUI) — run 2026-06-05_1808-UTC, slot 02 (Category A)
+**Status:** Spec — not built this run (quality-floor protection; one strong iOS app, Split, shipped instead this run)
+
+**Problem:** Musicians (students, hobbyists, returning adults) practice without structure and have no
+honest record of what they actually worked on. Generic timers and note apps can't model a real
+practice life: a piece you're learning, the specific passages giving you trouble, and the minutes you
+put in over weeks. People want to *see* progress accumulate and know what to play next.
+
+**Approach:** A native practice companion built on a real relational model. A **Piece** (title,
+composer, instrument, difficulty, status — learning/polishing/maintenance/retired, target tempo, key,
+notes) owns ordered **PracticeSpots** (a named passage/skill, e.g. "bars 32–40 LH", current tempo,
+target tempo, mastery 0–5). A **PracticeSession** logs a dated block of time against one or more pieces
+(duration, focus notes, tempo achieved, mood/quality). A built-in **metronome + countdown practice
+timer** drives a session hands-free and writes the result to the log on completion. This clears the
+substance floor on both axes — a multi-entity relational model *and* non-trivial logic (streaks,
+per-piece time accumulation, tempo-progress curves, suggested next piece by least-recently-practiced).
+
+**Architecture & stack:**
+- iOS 17+, SwiftUI 5, MVVM, no external deps.
+- **SwiftData** for Pieces / PracticeSpots / PracticeSessions (cascade relationships). `UserDefaults`
+  only for the onboarding flag + settings (default session length, metronome sound, A4 reference,
+  haptics, appearance).
+- Metronome: a sample-accurate click via `AVAudioEngine`/`AVAudioPlayerNode` scheduling buffers on an
+  absolute timeline (not `Timer` tick drift); tap-tempo; subdivisions; honors the silent switch
+  setting. Practice timer via a `Date`-based `@Observable` engine with `@MainActor` UI updates;
+  `UIApplication.isIdleTimerDisabled` while running.
+
+**Screens (≥4 feature, excl. Onboarding/Settings):** Repertoire library (pieces with status + time
+this week); Piece detail (spots, tempo progress, session history, focal "Practice" action); Practice
+session screen (metronome + timer + spot checklist); Insights (weekly minutes heatmap, streak,
+time-by-piece, suggested next). Plus Onboarding and Settings. Export a piece's log / all data as
+CSV/JSON.
+
+**Key logic:** practice-time aggregation per piece/day/week; current & longest streak; tempo-progress
+series per spot; mastery roll-up per piece; least-recently-practiced suggestion; tap-tempo averaging.
+
+**States:** empty library (designed, "add your first piece"), running session, paused, completed
+(summary written to log), guarded errors (a session with no piece selected; metronome BPM bounded
+20–300). Full accessibility (Dynamic Type, VoiceOver values on the tempo dial, Reduce Motion → pulse
+fades instead of swings), light/dark, on-brand orb app icon with a metronome/beat motif.
+
+**Definition of done:** add a piece and its spots, run a metronome-driven practice session, see the
+minutes and tempo land in history and insights, and find everything intact after relaunch.
+
+---
+
+## Larder
+
+**Type:** iOS app (native, SwiftUI) — run 2026-06-05_1808-UTC, slot 03 (Category A)
+**Status:** Spec — not built this run (quality-floor protection)
+
+**Problem:** Food gets bought, forgotten in the back of a cupboard or fridge, and thrown away once it
+expires. People want to know what they already have, where it is, and what's about to go off — and to
+turn "what's running low" into a shopping list without re-typing everything.
+
+**Approach:** A calm pantry/kitchen-inventory app with a genuine relational model. An **Item** (name,
+category, quantity + unit, **Location** it lives in — Pantry/Fridge/Freezer/custom, purchase date,
+expiry/best-before date, low-stock threshold, notes) is the core record; **Locations** and
+**Categories** are managed entities referenced by items; a **ShoppingList** is generated from items at
+or below their low-stock threshold plus manually added entries, and checking an item off the list can
+restock it back into the larder. This clears the substance floor: multi-entity model *and* non-trivial
+logic (expiry windowing, low-stock detection, unit-aware quantity math, list generation/merge).
+
+**Architecture & stack:**
+- iOS 17+, SwiftUI 5, MVVM, no external deps.
+- **SwiftData** for Items / Locations / Categories / ShoppingListEntry (relationships).
+  `UserDefaults` only for onboarding + settings (expiry-soon window in days, default location,
+  appearance, haptics, notifications toggle).
+- Local notifications via `UNUserNotificationCenter` (with permission flow + graceful denial) to warn
+  about items expiring within the configured window; scheduling recomputed on data change. No network.
+
+**Screens (≥4 feature, excl. Onboarding/Settings):** Inventory (grouped by location, search/filter,
+expiry badges); Item detail/editor; Expiring-soon + Low-stock dashboard; Shopping list (generated +
+manual, check-off to restock). Plus Onboarding and Settings. Export inventory as CSV/JSON.
+
+**Key logic:** days-until-expiry bucketing (expired / soon / fresh) against the user's window;
+low-stock detection from per-item thresholds; quantity adjust with unit awareness; shopping-list
+generation that merges auto + manual entries and de-dupes; restock-on-checkoff writing back to the
+item.
+
+**States:** empty inventory (designed, "stock your first item"), populated, expiring-soon empty
+("nothing's about to go off"), error guards (quantity ≥ 0, expiry not before purchase, notification
+permission denied handled calmly). Full accessibility (Dynamic Type, VoiceOver labels on expiry
+badges with text not just color, Reduce Motion), light/dark, on-brand orb app icon with a jar/shelf
+motif.
+
+**Definition of done:** add items across locations with dates, see what's expiring and what's low,
+generate a shopping list and restock from it, and find everything intact after relaunch.
