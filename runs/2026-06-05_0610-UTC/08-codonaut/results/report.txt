@@ -1,0 +1,12 @@
+Codonaut - codon optimization report
+========================================
+protein length : 238 aa
+host           : E. coli K-12
+
+sequence                    CAI     GC%
+naive (rare codons)       0.346    44.0
+E. coli optimized         1.000    48.6
+
+CAI improvement : 2.89x
+codons rewritten: 231/238
+protein identity: preserved

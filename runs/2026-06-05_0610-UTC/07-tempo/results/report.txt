@@ -1,0 +1,21 @@
+Tempo - HRV analysis report
+========================================
+samples         : 22500 @ 250 Hz (90.0 s)
+R-peaks         : 93
+
+Detector vs. ground truth (75 ms tolerance)
+----------------------------------------
+  Sensitivity   : 100.00%
+  Pos. Predict. : 100.00%
+  TP/FP/FN      : 93/0/0
+
+HRV metrics (time-domain + Poincare)
+----------------------------------------
+  mean_HR_bpm   : 62.196
+  mean_RR_ms    : 964.696
+  SDNN_ms       : 42.504
+  RMSSD_ms      : 56.208
+  pNN50_pct     : 38.462
+  SD1_ms        : 39.965
+  SD2_ms        : 44.901
+  SD2_SD1       : 1.124
