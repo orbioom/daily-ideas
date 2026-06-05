@@ -1,0 +1,335 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		895E8FA729A63889A79A7E6C /* CellarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F0F78963D541593C8FC43C /* CellarApp.swift */; };
+		7EBAE0E211D20B18C5638174 /* Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6034E26F98ED8DE3C5BC0DC5 /* Brand.swift */; };
+		762B0CD26F1FF2AC31434EEF /* TastingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D2B303E71A7EDB0CA5529B /* TastingCategory.swift */; };
+		81C433377E3BA7C8166D3939 /* Bottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91FC5D776066F9A842E4E6BF /* Bottle.swift */; };
+		E3C89B75CAD64652E47BEC0D /* Tasting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CADDDDC548715F6B657194 /* Tasting.swift */; };
+		F4A07FF8ADA54FB8B0F6E0B9 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F11DC3702A4BCA8240C8D12 /* SettingsStore.swift */; };
+		D51945B0386BC82EF459ACA0 /* CellarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F55CA190E631813F28FEBF9 /* CellarModel.swift */; };
+		2A2CE9A5C86F63D6980BF35D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD0CA5F6019E50ABE5885FD /* Haptics.swift */; };
+		6B77ADDB19F11AD0EE8C6B36 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0127B904F6C1A77DFCC8B4 /* SampleData.swift */; };
+		0D6A4ADF222889D6D7B02E81 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8C1227915DC3E8958DAEC /* Components.swift */; };
+		EDCAEB0415D1DFDFE5232EF7 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76975A84DA21971D74C3C7D /* RootView.swift */; };
+		7068BB773CD464E556E7AE2D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED73D435AA161F73D044616 /* OnboardingView.swift */; };
+		4F5B967BE995DAE68F247777 /* CellarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E299C063ED10BAD569C2DAE /* CellarListView.swift */; };
+		23490621BEFBA50CDB055D9A /* BottleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56137FCA81A0C61241897AFD /* BottleDetailView.swift */; };
+		00CFF64CB9FA1E6ED4DF819D /* BottleEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE6AFBD27A20F32AA432A2C /* BottleEditView.swift */; };
+		49EC0C759932B5203BD6B4C2 /* TastingEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0EA85D419014A88D20803 /* TastingEditView.swift */; };
+		98AF45DF12B82FC6CB971B0E /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56A2CBAA85AD74B41EA816F /* InsightsView.swift */; };
+		682EC05A395C1ECF286140A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618BCC8A9E7FFC49AD86CEB2 /* SettingsView.swift */; };
+		7C52592CFB298BEFDC580235 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86DB401A1FF26505D9025321 /* Assets.xcassets */; };
+		7959EF2300B6C032353A7FFF /* Preview Content in Resources */ = {isa = PBXBuildFile; fileRef = 5BB7D15F9BCFD4EA6A94705B /* Preview Content */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4F56BB9B3CDC8D4893B456F2 /* Cellar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cellar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2F0F78963D541593C8FC43C /* CellarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CellarApp.swift"; sourceTree = "<group>"; };
+		6034E26F98ED8DE3C5BC0DC5 /* Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme/Brand.swift"; sourceTree = "<group>"; };
+		13D2B303E71A7EDB0CA5529B /* TastingCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/TastingCategory.swift"; sourceTree = "<group>"; };
+		91FC5D776066F9A842E4E6BF /* Bottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Bottle.swift"; sourceTree = "<group>"; };
+		17CADDDDC548715F6B657194 /* Tasting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Tasting.swift"; sourceTree = "<group>"; };
+		7F11DC3702A4BCA8240C8D12 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewModels/SettingsStore.swift"; sourceTree = "<group>"; };
+		7F55CA190E631813F28FEBF9 /* CellarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewModels/CellarModel.swift"; sourceTree = "<group>"; };
+		ADD0CA5F6019E50ABE5885FD /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utilities/Haptics.swift"; sourceTree = "<group>"; };
+		CA0127B904F6C1A77DFCC8B4 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utilities/SampleData.swift"; sourceTree = "<group>"; };
+		1EF8C1227915DC3E8958DAEC /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Components/Components.swift"; sourceTree = "<group>"; };
+		A76975A84DA21971D74C3C7D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/RootView.swift"; sourceTree = "<group>"; };
+		7ED73D435AA161F73D044616 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/OnboardingView.swift"; sourceTree = "<group>"; };
+		5E299C063ED10BAD569C2DAE /* CellarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CellarListView.swift"; sourceTree = "<group>"; };
+		56137FCA81A0C61241897AFD /* BottleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/BottleDetailView.swift"; sourceTree = "<group>"; };
+		ECE6AFBD27A20F32AA432A2C /* BottleEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/BottleEditView.swift"; sourceTree = "<group>"; };
+		6DF0EA85D419014A88D20803 /* TastingEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/TastingEditView.swift"; sourceTree = "<group>"; };
+		D56A2CBAA85AD74B41EA816F /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/InsightsView.swift"; sourceTree = "<group>"; };
+		618BCC8A9E7FFC49AD86CEB2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/SettingsView.swift"; sourceTree = "<group>"; };
+		86DB401A1FF26505D9025321 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5BB7D15F9BCFD4EA6A94705B /* Preview Content */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		041F4670EE3A87F1FFBACA60 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7CB4F5C86BC1495BE5275A82 = {
+			isa = PBXGroup;
+			children = (
+				4ED007F038B15807CC86A8C4 /* Cellar */,
+				A5DC16AFAAF7D256BDD9FB3C /* Products */,
+				51708EAF012E03615C528BFD /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		4ED007F038B15807CC86A8C4 /* Cellar */ = {
+			isa = PBXGroup;
+			children = (
+				D2F0F78963D541593C8FC43C /* CellarApp.swift */,
+				6034E26F98ED8DE3C5BC0DC5 /* Brand.swift */,
+				13D2B303E71A7EDB0CA5529B /* TastingCategory.swift */,
+				91FC5D776066F9A842E4E6BF /* Bottle.swift */,
+				17CADDDDC548715F6B657194 /* Tasting.swift */,
+				7F11DC3702A4BCA8240C8D12 /* SettingsStore.swift */,
+				7F55CA190E631813F28FEBF9 /* CellarModel.swift */,
+				ADD0CA5F6019E50ABE5885FD /* Haptics.swift */,
+				CA0127B904F6C1A77DFCC8B4 /* SampleData.swift */,
+				1EF8C1227915DC3E8958DAEC /* Components.swift */,
+				A76975A84DA21971D74C3C7D /* RootView.swift */,
+				7ED73D435AA161F73D044616 /* OnboardingView.swift */,
+				5E299C063ED10BAD569C2DAE /* CellarListView.swift */,
+				56137FCA81A0C61241897AFD /* BottleDetailView.swift */,
+				ECE6AFBD27A20F32AA432A2C /* BottleEditView.swift */,
+				6DF0EA85D419014A88D20803 /* TastingEditView.swift */,
+				D56A2CBAA85AD74B41EA816F /* InsightsView.swift */,
+				618BCC8A9E7FFC49AD86CEB2 /* SettingsView.swift */,
+				86DB401A1FF26505D9025321 /* Assets.xcassets */,
+				5BB7D15F9BCFD4EA6A94705B /* Preview Content */,
+			);
+			path = Cellar;
+			sourceTree = "<group>";
+		};
+		A5DC16AFAAF7D256BDD9FB3C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4F56BB9B3CDC8D4893B456F2 /* Cellar.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		51708EAF012E03615C528BFD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* Cellar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8CF598ACC897FE8648893EB5 /* Build configuration list for PBXNativeTarget "Cellar" */;
+			buildPhases = (
+				303CCE6304B962FDAF287552 /* Sources */,
+				041F4670EE3A87F1FFBACA60 /* Frameworks */,
+				F964B4AC93F8CB0399137DF2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Cellar;
+			productName = Cellar;
+			productReference = 4F56BB9B3CDC8D4893B456F2 /* Cellar.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					42AEFBAE01D2DFD981F7DA7D = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AD8DC1A475C1871509FE9877 /* Build configuration list for PBXProject "Cellar" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7CB4F5C86BC1495BE5275A82;
+			productRefGroup = A5DC16AFAAF7D256BDD9FB3C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* Cellar */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F964B4AC93F8CB0399137DF2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7959EF2300B6C032353A7FFF /* Preview Content in Resources */,
+				7C52592CFB298BEFDC580235 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		303CCE6304B962FDAF287552 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				895E8FA729A63889A79A7E6C /* CellarApp.swift in Sources */,
+				7EBAE0E211D20B18C5638174 /* Brand.swift in Sources */,
+				762B0CD26F1FF2AC31434EEF /* TastingCategory.swift in Sources */,
+				81C433377E3BA7C8166D3939 /* Bottle.swift in Sources */,
+				E3C89B75CAD64652E47BEC0D /* Tasting.swift in Sources */,
+				F4A07FF8ADA54FB8B0F6E0B9 /* SettingsStore.swift in Sources */,
+				D51945B0386BC82EF459ACA0 /* CellarModel.swift in Sources */,
+				2A2CE9A5C86F63D6980BF35D /* Haptics.swift in Sources */,
+				6B77ADDB19F11AD0EE8C6B36 /* SampleData.swift in Sources */,
+				0D6A4ADF222889D6D7B02E81 /* Components.swift in Sources */,
+				EDCAEB0415D1DFDFE5232EF7 /* RootView.swift in Sources */,
+				7068BB773CD464E556E7AE2D /* OnboardingView.swift in Sources */,
+				4F5B967BE995DAE68F247777 /* CellarListView.swift in Sources */,
+				23490621BEFBA50CDB055D9A /* BottleDetailView.swift in Sources */,
+				00CFF64CB9FA1E6ED4DF819D /* BottleEditView.swift in Sources */,
+				49EC0C759932B5203BD6B4C2 /* TastingEditView.swift in Sources */,
+				98AF45DF12B82FC6CB971B0E /* InsightsView.swift in Sources */,
+				682EC05A395C1ECF286140A1 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		06DB87319F2818D2126BDA3E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		EAEC4ABA75D5863313556F12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		968426D8A36492C5C326175F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Cellar/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Cellar/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.cellar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		038CE5F9D645F2DABC3BB617 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Cellar/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Cellar/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.cellar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AD8DC1A475C1871509FE9877 /* Build configuration list for PBXProject "Cellar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06DB87319F2818D2126BDA3E /* Debug */,
+				EAEC4ABA75D5863313556F12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8CF598ACC897FE8648893EB5 /* Build configuration list for PBXNativeTarget "Cellar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				968426D8A36492C5C326175F /* Debug */,
+				038CE5F9D645F2DABC3BB617 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}

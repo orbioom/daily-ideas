@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme-auto>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lotka — Predator–Prey Dynamics Simulator</title>
+  <meta name="description"
+    content="Interactive Lotka–Volterra predator–prey simulator: RK4 integration, time series, phase portrait, nullclines, and a conserved-quantity check." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-head">
+      <div>
+        <h1>Lotka</h1>
+        <p class="sub">Predator–prey dynamics — Lotka–Volterra model, integrated with RK4.</p>
+      </div>
+      <span class="spacer"></span>
+      <button id="themeToggle" class="toggle-theme glass" type="button"
+        aria-label="Toggle colour theme">Theme</button>
+    </header>
+
+    <div class="layout">
+      <!-- ───────────────────────── Controls ───────────────────────── -->
+      <section class="controls glass" aria-labelledby="controls-h">
+        <h2 id="controls-h">Controls</h2>
+
+        <div class="playbar">
+          <button id="playBtn" class="play-btn" type="button"
+            aria-pressed="false" aria-label="Play animation of the trajectory">
+            <span class="dot" aria-hidden="true"></span><span class="play-label">Play</span>
+          </button>
+          <label class="speed-field">
+            Speed
+            <input id="speed" type="range" min="0.25" max="4" step="0.25" value="1"
+              aria-label="Animation speed multiplier" />
+          </label>
+        </div>
+        <p id="liveStatus" class="status" role="status" aria-live="polite"></p>
+
+        <fieldset>
+          <h2>Model</h2>
+          <label class="checkbox-field">
+            <input id="logistic" type="checkbox" />
+            Logistic prey (carrying capacity K)
+          </label>
+          <div class="field" id="K-field" hidden>
+            <label for="K">Carrying capacity K
+              <span class="val" id="K-val"></span></label>
+            <div class="row">
+              <input id="K" type="range" min="5" max="200" step="1" value="50"
+                aria-label="Carrying capacity K slider" />
+              <input id="K-num" type="number" min="0.1" step="1" value="50"
+                aria-label="Carrying capacity K value" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <h2>Rates</h2>
+          <!-- alpha -->
+          <div class="field">
+            <label for="alpha">α prey growth <span class="val" id="alpha-val"></span></label>
+            <div class="row">
+              <input id="alpha" type="range" min="0" max="4" step="0.01" value="1"
+                aria-label="Alpha, prey growth rate, slider" />
+              <input id="alpha-num" type="number" min="0" step="0.01" value="1"
+                aria-label="Alpha value" />
+            </div>
+          </div>
+          <!-- beta -->
+          <div class="field">
+            <label for="beta">β predation <span class="val" id="beta-val"></span></label>
+            <div class="row">
+              <input id="beta" type="range" min="0" max="1" step="0.005" value="0.1"
+                aria-label="Beta, predation rate, slider" />
+              <input id="beta-num" type="number" min="0" step="0.005" value="0.1"
+                aria-label="Beta value" />
+            </div>
+          </div>
+          <!-- gamma -->
+          <div class="field">
+            <label for="gamma">γ predator death <span class="val" id="gamma-val"></span></label>
+            <div class="row">
+              <input id="gamma" type="range" min="0" max="4" step="0.01" value="1.5"
+                aria-label="Gamma, predator death rate, slider" />
+              <input id="gamma-num" type="number" min="0" step="0.01" value="1.5"
+                aria-label="Gamma value" />
+            </div>
+          </div>
+          <!-- delta -->
+          <div class="field">
+            <label for="delta">δ predator gain <span class="val" id="delta-val"></span></label>
+            <div class="row">
+              <input id="delta" type="range" min="0" max="1" step="0.005" value="0.075"
+                aria-label="Delta, predator reproduction rate, slider" />
+              <input id="delta-num" type="number" min="0" step="0.005" value="0.075"
+                aria-label="Delta value" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <h2>Initial state &amp; integration</h2>
+          <div class="field">
+            <label for="x0">x₀ initial prey <span class="val" id="x0-val"></span></label>
+            <div class="row">
+              <input id="x0" type="range" min="0" max="100" step="0.5" value="10"
+                aria-label="Initial prey population slider" />
+              <input id="x0-num" type="number" min="0" step="0.5" value="10"
+                aria-label="Initial prey value" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="y0">y₀ initial predator <span class="val" id="y0-val"></span></label>
+            <div class="row">
+              <input id="y0" type="range" min="0" max="100" step="0.5" value="5"
+                aria-label="Initial predator population slider" />
+              <input id="y0-num" type="number" min="0" step="0.5" value="5"
+                aria-label="Initial predator value" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="T">T total time <span class="val" id="T-val"></span></label>
+            <div class="row">
+              <input id="T" type="range" min="5" max="300" step="1" value="50"
+                aria-label="Total simulated time slider" />
+              <input id="T-num" type="number" min="1" step="1" value="50"
+                aria-label="Total time value" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="dt">dt step <span class="val" id="dt-val"></span></label>
+            <div class="row">
+              <input id="dt" type="range" min="0.001" max="0.2" step="0.001" value="0.01"
+                aria-label="Integration step size slider" />
+              <input id="dt-num" type="number" min="0.0001" step="0.001" value="0.01"
+                aria-label="Step size value" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <h2>Presets</h2>
+          <div class="presets" id="presets" role="group" aria-label="Scenario presets"></div>
+        </fieldset>
+
+        <fieldset>
+          <h2>Export</h2>
+          <div class="btn-row">
+            <button id="exportPng" type="button">PNG plots</button>
+            <button id="exportCsv" type="button">CSV series</button>
+            <button id="resetBtn" type="button">Reset defaults</button>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- ───────────────────────── Plots ───────────────────────── -->
+      <main class="plots">
+        <section class="plot-card glass" aria-labelledby="ts-h">
+          <h2 id="ts-h">Time series — populations vs time</h2>
+          <span id="loadingTs" class="loading-tag" aria-hidden="true">integrating…</span>
+          <div class="canvas-holder">
+            <canvas id="tsCanvas" role="img"
+              aria-label="Time series plot. Loading."></canvas>
+          </div>
+          <div class="legend" aria-hidden="false">
+            <span class="swatch prey"><span class="line"></span> Prey x(t)</span>
+            <span class="swatch pred"><span class="line"></span> Predator y(t)</span>
+            <span class="swatch" style="color:var(--live)"><span class="line"></span> Play cursor</span>
+          </div>
+        </section>
+
+        <section class="plot-card glass" aria-labelledby="pp-h">
+          <h2 id="pp-h">Phase portrait — predator vs prey</h2>
+          <div class="canvas-holder">
+            <canvas id="ppCanvas" role="img"
+              aria-label="Phase portrait plot. Loading."></canvas>
+          </div>
+          <div class="legend">
+            <span class="swatch prey"><span class="line"></span> Trajectory</span>
+            <span class="swatch eq">● Equilibrium (γ/δ, α/β)</span>
+            <span class="swatch" style="color:var(--text-3)">⊣ Nullclines · ↗ vector field</span>
+          </div>
+        </section>
+
+        <section class="plot-card glass" aria-labelledby="ro-h">
+          <h2 id="ro-h">Readouts</h2>
+          <div class="readouts" id="readouts"></div>
+        </section>
+
+        <section class="panel glass" aria-labelledby="method-h">
+          <h2 id="method-h">Method &amp; references</h2>
+          <p>
+            <strong>Model.</strong> The Lotka–Volterra predator–prey system, with state
+            <code>x</code> = prey and <code>y</code> = predator:
+          </p>
+          <p>
+            <code>dx/dt = αx − βxy</code> &nbsp;·&nbsp; <code>dy/dt = δxy − γy</code>
+          </p>
+          <p>
+            Optional logistic-prey extension with carrying capacity <code>K</code>:
+            <code>dx/dt = αx(1 − x/K) − βxy</code>.
+          </p>
+          <details class="method">
+            <summary>Integrator, conserved quantity &amp; citations</summary>
+            <p>
+              <strong>Integrator.</strong> Classical 4th-order Runge–Kutta (RK4), implemented
+              directly (no library). Each step of size <code>h</code> evaluates the vector field
+              <code>f</code> four times:
+            </p>
+            <p>
+              <code>k₁ = f(s)</code>,
+              <code>k₂ = f(s + h/2·k₁)</code>,
+              <code>k₃ = f(s + h/2·k₂)</code>,
+              <code>k₄ = f(s + h·k₃)</code>,
+              <code>sₙ₊₁ = s + h/6·(k₁ + 2k₂ + 2k₃ + k₄)</code>.
+            </p>
+            <p>
+              <strong>Conserved quantity (classic model).</strong>
+              <code>V = δx − γ ln x + βy − α ln y</code> is invariant along exact trajectories.
+              We track its drift as an integration-quality check (undefined / skipped when a
+              population reaches 0). It is not conserved under the logistic extension.
+            </p>
+            <ul>
+              <li>Lotka, A. J. (1925). <em>Elements of Physical Biology.</em> Williams &amp; Wilkins.</li>
+              <li>Volterra, V. (1926). “Fluctuations in the abundance of a species considered
+                mathematically.” <em>Nature</em>, 118, 558–560.</li>
+              <li>Runge–Kutta classical 4th-order method (Runge 1895; Kutta 1901).</li>
+            </ul>
+            <p>
+              <strong>Honest simplifications.</strong> This is a continuous, deterministic,
+              well-mixed model: no demographic stochasticity, no spatial structure, no age
+              classes, instantaneous interaction. Populations are dimensionless unless you
+              assign units. The classic model's closed orbits are structurally fragile — small
+              numerical error slowly drifts <code>V</code>; the logistic extension instead spirals
+              to the coexistence equilibrium.
+            </p>
+          </details>
+        </section>
+      </main>
+    </div>
+
+    <footer class="app-foot">
+      Lotka · Orbioom studio · deterministic synthetic model · open
+      <code>index.html</code> — no build, no server.
+    </footer>
+  </div>
+
+  <script src="js/ode.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

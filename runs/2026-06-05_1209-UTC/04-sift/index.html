@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sift — Regex Workbench · Orbioom</title>
+  <meta name="description" content="Sift is an offline regex testing & building workbench by Orbioom Studio: live match highlighting, capture groups, replace preview, a pattern library, and saved test cases." />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2323262F'/><text x='16' y='22' font-size='18' fill='white' text-anchor='middle' font-family='monospace'>/s/</text></svg>" />
+</head>
+<body>
+  <div class="app">
+    <!-- ===== Top bar ===== -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark mono" aria-hidden="true">/s/</div>
+        <div>
+          <h1 class="brand-title">Sift</h1>
+          <div class="brand-sub">Orbioom · Regex Workbench</div>
+        </div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <button id="btn-export" class="btn-sm" type="button" aria-label="Export saved snippets as JSON">Export</button>
+        <button id="btn-import" class="btn-sm" type="button" aria-label="Import snippets from a JSON file">Import</button>
+        <input id="file-import" type="file" accept="application/json,.json" class="sr-only" aria-hidden="true" tabindex="-1" />
+        <button id="btn-settings" class="btn-sm" type="button" aria-label="Open settings">Settings</button>
+      </div>
+    </header>
+
+    <!-- ===== Main layout ===== -->
+    <div class="layout">
+
+      <!-- LEFT: saved snippets -->
+      <aside class="col col-snippets" aria-label="Saved test cases">
+        <section class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Saved cases</span>
+            <button id="btn-save" class="btn-primary btn-sm" type="button">Save current</button>
+          </div>
+          <div id="snip-list" class="snip-list" aria-live="polite"></div>
+        </section>
+      </aside>
+
+      <!-- CENTER: editor + matches + replace -->
+      <main class="col col-main">
+
+        <!-- Pattern editor -->
+        <section class="panel" aria-label="Pattern editor">
+          <div class="panel-head">
+            <span class="panel-title">Pattern</span>
+            <span id="regex-status" class="status status-valid" role="status" aria-live="polite">
+              <span class="dot" aria-hidden="true"></span><span id="regex-status-text">valid</span>
+            </span>
+          </div>
+
+          <div class="field-row">
+            <div class="regex-wrap">
+              <span class="regex-delim" aria-hidden="true">/</span>
+              <input id="pattern" type="text" spellcheck="false" autocomplete="off"
+                     autocapitalize="off" placeholder="enter a regular expression…"
+                     aria-label="Regular expression pattern" />
+              <span class="regex-delim" aria-hidden="true" id="flags-delim">/g</span>
+            </div>
+          </div>
+
+          <div id="regex-error" class="error-msg" hidden></div>
+
+          <fieldset class="flags" id="flags" style="border:none;padding:0;margin:0;">
+            <legend class="sr-only">Regex flags</legend>
+            <!-- flag toggles injected by app.js -->
+          </fieldset>
+        </section>
+
+        <!-- Test text + highlight -->
+        <section class="panel" aria-label="Test text">
+          <div class="panel-head">
+            <span class="panel-title">Test text</span>
+            <div class="seg-toggle" role="group" aria-label="View mode">
+              <button id="view-edit" type="button" aria-pressed="true">Edit</button>
+              <button id="view-hl" type="button" aria-pressed="false">Highlights</button>
+            </div>
+          </div>
+          <textarea id="subject" spellcheck="false" aria-label="Subject text to test against"
+                    placeholder="paste or type the text you want to test…"></textarea>
+          <div id="highlight" class="highlight-box" hidden aria-live="off"></div>
+        </section>
+
+        <!-- Replace -->
+        <section class="panel" aria-label="Replace">
+          <div class="panel-head">
+            <span class="panel-title">Replace</span>
+            <button id="btn-copy-result" class="btn-sm" type="button">Copy result</button>
+          </div>
+          <label for="replacement" class="sr-only">Replacement string</label>
+          <input id="replacement" type="text" spellcheck="false" autocomplete="off"
+                 placeholder="replacement — use $1, $<name>, $&amp; …"
+                 aria-label="Replacement string with backreferences" />
+          <div class="panel-hint" style="margin-top:.4rem">
+            Backreferences: <span class="mono">$1</span> group · <span class="mono">$&lt;name&gt;</span> named · <span class="mono">$&amp;</span> whole match
+          </div>
+          <div id="replace-preview" class="replace-preview" aria-live="polite"></div>
+        </section>
+      </main>
+
+      <!-- RIGHT: matches + library + cheatsheet -->
+      <aside class="col col-side" aria-label="Results and references">
+
+        <!-- Match list -->
+        <section class="panel" aria-label="Matches">
+          <div class="panel-head">
+            <span class="panel-title">Matches</span>
+          </div>
+          <div class="match-meta" aria-live="polite">
+            <span class="pill" id="match-count">0 matches</span>
+            <span class="pill" id="match-time">0.00 ms</span>
+          </div>
+          <div id="match-list" class="match-list"></div>
+        </section>
+
+        <!-- Pattern library -->
+        <section class="panel" aria-label="Pattern library">
+          <div class="panel-head">
+            <span class="panel-title">Library</span>
+            <span class="panel-hint">click to load</span>
+          </div>
+          <div id="lib-grid" class="lib-grid"></div>
+        </section>
+
+        <!-- Cheatsheet -->
+        <section class="panel" aria-label="Token reference">
+          <div class="panel-head">
+            <span class="panel-title">Cheatsheet</span>
+          </div>
+          <div id="cheat" class="cheat"></div>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="app-foot">
+      Sift runs entirely in your browser. Your data stays on this device ·
+      <span class="mono">orbioom.sift.v1</span>
+    </footer>
+  </div>
+
+  <!-- ===== Settings dialog ===== -->
+  <dialog id="settings-dialog" aria-label="Settings">
+    <div class="dialog-body">
+      <div class="dialog-head">
+        <h2 style="font-size:1.05rem">Settings</h2>
+        <button id="settings-close" class="icon-btn btn-ghost" type="button" aria-label="Close settings">✕</button>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Theme</div>
+          <div class="setting-desc">Light, dark, or follow your system.</div>
+        </div>
+        <select id="set-theme" class="select" aria-label="Theme">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Distinct group colors</div>
+          <div class="setting-desc">Tint each capture group differently in highlights.</div>
+        </div>
+        <label class="switch">
+          <input id="set-groups" type="checkbox" aria-label="Distinct group colors" />
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Reset to sample data</div>
+          <div class="setting-desc">Replace all saved cases with Sift's starter set.</div>
+        </div>
+        <button id="set-reset" class="btn-sm" type="button">Reset…</button>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="settings-done" class="btn-primary btn-sm" type="button">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ===== Save / rename dialog ===== -->
+  <dialog id="name-dialog" aria-label="Name this test case">
+    <form method="dialog" class="dialog-body" id="name-form">
+      <div class="dialog-head">
+        <h2 style="font-size:1.05rem" id="name-dialog-title">Save test case</h2>
+      </div>
+      <label for="name-input">Name</label>
+      <input id="name-input" type="text" class="input text-ui" maxlength="80"
+             placeholder="e.g. Redact emails in logs" autocomplete="off" />
+      <div id="name-warn" class="panel-hint" style="margin-top:.4rem"></div>
+      <div class="dialog-actions">
+        <button type="button" id="name-cancel" class="btn-sm">Cancel</button>
+        <button type="submit" id="name-save" class="btn-primary btn-sm">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== Confirm dialog ===== -->
+  <dialog id="confirm-dialog" aria-label="Confirm">
+    <div class="dialog-body">
+      <div class="dialog-head"><h2 style="font-size:1.05rem" id="confirm-title">Are you sure?</h2></div>
+      <p id="confirm-msg" style="color:var(--text-2);font-size:.9rem;margin:.2rem 0 0"></p>
+      <div class="dialog-actions">
+        <button type="button" id="confirm-cancel" class="btn-sm">Cancel</button>
+        <button type="button" id="confirm-ok" class="btn-primary btn-sm">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toasts" class="toast-wrap" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="seed.js"></script>
+  <script src="storage.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

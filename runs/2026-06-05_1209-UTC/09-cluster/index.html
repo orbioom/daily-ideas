@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cluster — k-means clustering visualizer</title>
+  <meta name="description" content="An interactive k-means clustering visualizer: Lloyd's algorithm with k-means++ seeding, inertia and silhouette metrics, on synthetic 2-D datasets." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to controls</a>
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1>Cluster</h1>
+        <p class="tagline">k-means clustering, step by step</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle colour theme">
+        <span id="theme-label">Theme: Auto</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="layout">
+    <!-- Visualization column -->
+    <section class="viz-col" aria-label="Cluster visualization">
+      <div class="viz-card glass">
+        <div class="canvas-wrap">
+          <canvas id="scatter" role="img"
+            aria-label="Cluster scatter plot. Initialising."></canvas>
+          <div id="empty-overlay" class="empty-overlay" hidden>
+            <p class="empty-title">No points yet</p>
+            <p class="empty-sub">Click on the canvas to add points, or load a preset dataset from the controls.</p>
+          </div>
+          <div id="busy-overlay" class="busy-overlay" hidden role="status" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="busy-text">Computing…</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card glass">
+          <h2 class="chart-title">Inertia vs iteration</h2>
+          <canvas id="inertia-chart" role="img"
+            aria-label="Line chart of inertia (within-cluster sum of squares) against iteration number."></canvas>
+        </div>
+        <div class="chart-card glass">
+          <h2 class="chart-title">Elbow: inertia vs k</h2>
+          <canvas id="elbow-chart" role="img"
+            aria-label="Elbow chart of best inertia against number of clusters k."></canvas>
+          <p id="elbow-hint" class="chart-hint">Run the elbow sweep to populate.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Controls column -->
+    <aside class="controls-col" aria-label="Controls and metrics">
+
+      <!-- Metrics -->
+      <div class="panel glass">
+        <h2 class="panel-title">Metrics</h2>
+        <div class="metrics-grid">
+          <div class="metric">
+            <span class="metric-label">Iteration</span>
+            <span class="metric-value mono" id="m-iter">0</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Converged</span>
+            <span class="metric-value mono" id="m-converged">no</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Inertia (WCSS)</span>
+            <span class="metric-value mono" id="m-inertia">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Silhouette</span>
+            <span class="metric-value mono" id="m-silhouette">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Points (N)</span>
+            <span class="metric-value mono" id="m-n">0</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Compute</span>
+            <span class="metric-value mono" id="m-time">—</span>
+          </div>
+        </div>
+        <div class="cluster-sizes" id="cluster-sizes" aria-label="Per-cluster sizes"></div>
+        <p id="inline-msg" class="inline-msg" role="alert" hidden></p>
+      </div>
+
+      <!-- Run controls -->
+      <div class="panel glass">
+        <h2 class="panel-title">Run</h2>
+        <div class="btn-row">
+          <button id="btn-step" class="btn" type="button">Step</button>
+          <button id="btn-run" class="btn btn-primary" type="button">Run to convergence</button>
+          <button id="btn-reset" class="btn" type="button">Reset</button>
+        </div>
+        <div class="btn-row">
+          <button id="btn-silhouette" class="btn btn-ghost" type="button">Compute silhouette</button>
+          <button id="btn-elbow" class="btn btn-ghost" type="button">Elbow sweep (k=1..10)</button>
+        </div>
+      </div>
+
+      <!-- Clustering controls -->
+      <div class="panel glass">
+        <h2 class="panel-title">Clustering</h2>
+        <div class="field">
+          <label for="k-slider">Clusters k: <span class="mono" id="k-val">3</span></label>
+          <input id="k-slider" type="range" min="1" max="10" step="1" value="3" />
+        </div>
+        <div class="field">
+          <label for="seed-method">Seeding method</label>
+          <select id="seed-method">
+            <option value="kmeans++" selected>k-means++ (careful)</option>
+            <option value="random">Random</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button id="btn-reinit" class="btn" type="button">Re-initialize centroids</button>
+        </div>
+      </div>
+
+      <!-- Dataset controls -->
+      <div class="panel glass">
+        <h2 class="panel-title">Dataset</h2>
+        <div class="field">
+          <label for="preset">Preset</label>
+          <select id="preset">
+            <option value="blobs" selected>Gaussian blobs</option>
+            <option value="anisotropic">Anisotropic</option>
+            <option value="moons">Two moons</option>
+            <option value="uniform">Uniform random</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="n-slider">Points N: <span class="mono" id="n-val">300</span></label>
+          <input id="n-slider" type="range" min="20" max="800" step="20" value="300" />
+        </div>
+        <div class="field" id="spread-field">
+          <label for="spread-slider">Spread: <span class="mono" id="spread-val">0.06</span></label>
+          <input id="spread-slider" type="range" min="0.02" max="0.14" step="0.01" value="0.06" />
+        </div>
+        <div class="field" id="gen-k-field">
+          <label for="genk-slider">Generated clusters: <span class="mono" id="genk-val">3</span></label>
+          <input id="genk-slider" type="range" min="2" max="8" step="1" value="3" />
+        </div>
+        <div class="field">
+          <label for="seed-input">Seed (reproducible)</label>
+          <div class="seed-row">
+            <input id="seed-input" class="mono" type="number" min="0" step="1" value="1" />
+            <button id="btn-regen" class="btn" type="button">Regenerate</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button id="btn-clear" class="btn btn-ghost" type="button">Clear points</button>
+        </div>
+        <p class="help-text">Tip: click the canvas to add points. Adding points switches to a custom dataset.</p>
+      </div>
+
+      <!-- Export -->
+      <div class="panel glass">
+        <h2 class="panel-title">Export</h2>
+        <div class="btn-row">
+          <button id="btn-png" class="btn" type="button">Download PNG</button>
+          <button id="btn-csv" class="btn" type="button">Download CSV</button>
+        </div>
+      </div>
+
+      <!-- Method / references -->
+      <div class="panel glass">
+        <h2 class="panel-title">Method &amp; references</h2>
+        <details>
+          <summary>What is happening here?</summary>
+          <div class="method-body">
+            <p><strong>k-means</strong> partitions points into <em>k</em> groups,
+            each represented by a <em>centroid</em> (its mean). It alternates two
+            steps until centroids stop moving:</p>
+            <ol>
+              <li><strong>Assignment:</strong> attach each point to its nearest
+              centroid (Euclidean distance).</li>
+              <li><strong>Update:</strong> move each centroid to the mean of its
+              assigned points.</li>
+            </ol>
+            <p>This is <strong>Lloyd's algorithm</strong>. <strong>Inertia</strong>
+            (within-cluster sum of squares, WCSS) is the total squared distance
+            from points to their centroid — it only decreases.
+            <strong>k-means++</strong> seeds the initial centroids far apart so
+            the result is better and more stable. The <strong>silhouette</strong>
+            score (−1…1) rates how well each point fits its cluster versus the
+            nearest other cluster. The <strong>elbow</strong> plots inertia vs k;
+            the "bend" suggests a good k.</p>
+            <p class="refs">References:</p>
+            <ul class="refs">
+              <li>Lloyd, S. P. (1982). "Least squares quantization in PCM."
+              <em>IEEE Trans. Inf. Theory</em> 28(2):129–137. (Work from 1957.)</li>
+              <li>Arthur, D. &amp; Vassilvitskii, S. (2007). "k-means++: The
+              Advantages of Careful Seeding." <em>SODA</em> 1027–1035.</li>
+              <li>Rousseeuw, P. J. (1987). "Silhouettes: a graphical aid to the
+              interpretation and validation of cluster analysis."
+              <em>J. Comput. Appl. Math.</em> 20:53–65.</li>
+            </ul>
+            <p class="refs">Simplifications: 2-D points, Euclidean distance,
+            synthetic data only.</p>
+          </div>
+        </details>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    <span>Orbioom studio · Cluster</span>
+    <span class="mono">Synthetic data · reproducible by seed</span>
+  </footer>
+
+  <script src="js/kmeans.js"></script>
+  <script src="js/datasets.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

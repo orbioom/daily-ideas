@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A foraged sprig: three leaves on a stem, centered in the adaptive safe zone. -->
+    <path
+        android:fillColor="#86C79A"
+        android:pathData="M54,72 C49,60 50,49 58,40 C66,49 67,60 62,72 C60,76 57,78 54,79 C54,77 54,75 54,72 Z" />
+    <path
+        android:fillColor="#5EF0B0"
+        android:fillAlpha="0.85"
+        android:pathData="M48,66 C41,60 38,52 39,43 C48,46 53,52 53,61 C53,65 51,68 49,70 C49,69 48,67 48,66 Z" />
+    <path
+        android:fillColor="#5EF0B0"
+        android:fillAlpha="0.85"
+        android:pathData="M60,66 C67,60 70,52 69,43 C60,46 55,52 55,61 C55,65 57,68 59,70 C59,69 60,67 60,66 Z" />
+    <path
+        android:strokeColor="#23262F"
+        android:strokeWidth="2.2"
+        android:strokeAlpha="0.7"
+        android:strokeLineCap="round"
+        android:pathData="M54,82 L54,40" />
+</vector>

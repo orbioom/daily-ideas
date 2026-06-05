@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Stacks — a personal library catalog by Orbioom. Track your books, shelves, reading sessions, and stats. Offline, private, no accounts." />
+  <title>Stacks — Personal Library Catalog</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23262a36'/><rect x='8' y='7' width='4' height='18' rx='1' fill='%235B6CA8'/><rect x='14' y='7' width='4' height='18' rx='1' fill='%2386C79A'/><rect x='20' y='7' width='4' height='18' rx='1' fill='%23C7A36B'/></svg>" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">St</span>
+        <span>
+          <span class="brand-name">Stacks</span>
+          <span class="brand-sub" aria-hidden="true">by Orbioom</span>
+        </span>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-btn" data-view="library" aria-current="page" type="button">Library</button>
+        <button class="nav-btn" data-view="shelves" type="button">Shelves</button>
+        <button class="nav-btn" data-view="stats" type="button">Stats</button>
+        <button class="nav-btn" data-view="settings" type="button">Settings</button>
+      </nav>
+
+      <button class="btn btn-primary" id="add-book-top" type="button">+ Add book</button>
+    </header>
+
+    <main id="main">
+      <!-- ===================== LIBRARY ===================== -->
+      <section class="view active" id="view-library" aria-labelledby="library-h" tabindex="-1">
+        <div class="view-head">
+          <h2 id="library-h">Library</h2>
+          <span class="count mono" id="library-count" aria-live="polite"></span>
+          <div class="spacer"></div>
+          <div class="seg" role="group" aria-label="View mode">
+            <button id="view-grid" type="button" aria-pressed="true" aria-label="Grid view">▦</button>
+            <button id="view-list" type="button" aria-pressed="false" aria-label="List view">≡</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="grow">
+              <label class="sr-only" for="search">Search by title or author</label>
+              <input class="field" id="search" type="search" placeholder="Search title or author…" autocomplete="off" />
+            </div>
+            <label class="sr-only" for="filter-status">Filter by status</label>
+            <select class="field" id="filter-status" style="flex:0 0 auto;width:auto">
+              <option value="">All statuses</option>
+              <option value="want-to-read">Want to read</option>
+              <option value="reading">Reading</option>
+              <option value="finished">Finished</option>
+              <option value="abandoned">Abandoned</option>
+            </select>
+            <label class="sr-only" for="filter-shelf">Filter by shelf</label>
+            <select class="field" id="filter-shelf" style="flex:0 0 auto;width:auto"></select>
+            <label class="sr-only" for="filter-genre">Filter by genre</label>
+            <select class="field" id="filter-genre" style="flex:0 0 auto;width:auto"></select>
+            <label class="sr-only" for="sort-by">Sort by</label>
+            <select class="field" id="sort-by" style="flex:0 0 auto;width:auto">
+              <option value="dateAdded">Recently added</option>
+              <option value="title">Title (A–Z)</option>
+              <option value="author">Author (A–Z)</option>
+              <option value="year">Year</option>
+              <option value="rating">Rating</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="clear-filters" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div id="library-body"></div>
+      </section>
+
+      <!-- ===================== SHELVES ===================== -->
+      <section class="view" id="view-shelves" aria-labelledby="shelves-h" tabindex="-1">
+        <div class="view-head">
+          <h2 id="shelves-h">Shelves</h2>
+          <span class="count mono" id="shelves-count" aria-live="polite"></span>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" id="add-shelf" type="button">+ New shelf</button>
+        </div>
+        <div id="shelves-body"></div>
+      </section>
+
+      <!-- ===================== STATS ===================== -->
+      <section class="view" id="view-stats" aria-labelledby="stats-h" tabindex="-1">
+        <div class="view-head">
+          <h2 id="stats-h">Reading stats</h2>
+          <div class="spacer"></div>
+        </div>
+        <div id="stats-body" aria-live="polite"></div>
+      </section>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <section class="view" id="view-settings" aria-labelledby="settings-h" tabindex="-1">
+        <div class="view-head"><h2 id="settings-h">Settings</h2></div>
+
+        <div class="panel">
+          <div class="settings-grid">
+            <div class="setting-row">
+              <div class="meta">
+                <h4>Theme</h4>
+                <p>Match your system or pick a fixed look.</p>
+              </div>
+              <div class="ctrl">
+                <label class="sr-only" for="set-theme">Theme</label>
+                <select class="field" id="set-theme">
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="meta">
+                <h4>Default library sort</h4>
+                <p>How the library is ordered when you open the app.</p>
+              </div>
+              <div class="ctrl">
+                <label class="sr-only" for="set-sort">Default sort</label>
+                <select class="field" id="set-sort">
+                  <option value="dateAdded">Recently added</option>
+                  <option value="title">Title (A–Z)</option>
+                  <option value="author">Author (A–Z)</option>
+                  <option value="year">Year</option>
+                  <option value="rating">Rating</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="meta">
+                <h4>View density</h4>
+                <p>Comfortable spacing, or compact to fit more books.</p>
+              </div>
+              <div class="ctrl">
+                <div class="seg" role="group" aria-label="View density">
+                  <button id="density-comfortable" type="button" aria-pressed="true">Comfortable</button>
+                  <button id="density-compact" type="button" aria-pressed="false">Compact</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="meta">
+                <h4>Export &amp; backup</h4>
+                <p>Download your whole library, or import a backup. CSV is for spreadsheets.</p>
+              </div>
+              <div class="ctrl" style="display:flex;gap:0.5rem;flex-wrap:wrap">
+                <button class="btn btn-sm" id="export-json" type="button">Export JSON</button>
+                <button class="btn btn-sm" id="export-csv" type="button">Export CSV</button>
+                <button class="btn btn-sm" id="import-json" type="button">Import JSON</button>
+                <input type="file" id="import-file" accept="application/json,.json" hidden />
+              </div>
+            </div>
+          </div>
+
+          <div class="loading-bar" id="import-loading" aria-hidden="true"><span></span></div>
+
+          <div class="danger-zone">
+            <div class="settings-grid">
+              <div class="setting-row">
+                <div class="meta">
+                  <h4>Reset to sample library</h4>
+                  <p>Replace everything with the original Orbioom starter collection.</p>
+                </div>
+                <div class="ctrl">
+                  <button class="btn btn-danger" id="reset-sample" type="button">Reset to sample</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="meta">
+                  <h4>Clear all data</h4>
+                  <p>Permanently delete every book, shelf, and session on this device.</p>
+                </div>
+                <div class="ctrl">
+                  <button class="btn btn-danger" id="clear-all" type="button">Clear all</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-foot">
+      Stacks · A private, offline library catalog · Data lives only in this browser
+    </footer>
+  </div>
+
+  <!-- ===================== OVERLAY / MODAL ===================== -->
+  <div class="overlay" id="overlay" role="presentation">
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></div>
+  </div>
+
+  <div class="toast-wrap" id="toast-wrap" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="storage.js"></script>
+  <script src="seed.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spectra — FFT Spectral Analyzer</title>
+  <meta name="description" content="Spectra: an interactive FFT spectral analyzer (radix-2 Cooley–Tukey) for synthetic signals. Waveform, power spectrum, and spectrogram in the browser." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-head">
+      <div class="brand">
+        <h1>Spectra</h1>
+        <p class="tag">Interactive FFT spectral analyzer — waveform, power spectrum &amp; spectrogram.</p>
+        <span class="synthetic-badge">Synthetic data</span>
+      </div>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark and light theme">Theme: auto</button>
+    </header>
+
+    <div class="grid">
+      <!-- ============ CONTROLS COLUMN ============ -->
+      <div class="col-controls">
+        <section class="panel" aria-labelledby="h-signal">
+          <h2 id="h-signal">Signal source</h2>
+
+          <div class="field">
+            <label class="lbl" for="preset">Preset (synthetic)</label>
+            <select id="preset" aria-label="Synthetic signal preset">
+              <option value="twoTones">Two tones — 50 Hz + 120 Hz</option>
+              <option value="chirp">Linear chirp — 20 → 200 Hz</option>
+              <option value="square">Square wave — 60 Hz</option>
+              <option value="toneNoise">Tone + white noise — 80 Hz</option>
+              <option value="custom">Custom sum of sines…</option>
+            </select>
+          </div>
+
+          <div id="customEditor" class="field hidden">
+            <label class="lbl">Components — sin(2π·f·t)</label>
+            <div class="comp-head">
+              <span>freq (Hz)</span><span>amp</span><span></span>
+            </div>
+            <div id="components" class="components"></div>
+            <button id="addComp" class="ghost" type="button">+ Add component</button>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label class="lbl" for="fs">Sample rate Fs (Hz)</label>
+              <input id="fs" class="mono" type="number" min="1" step="1" value="1000" inputmode="numeric" />
+            </div>
+            <div class="field">
+              <label class="lbl" for="nsamp">Samples N (2ⁿ)</label>
+              <select id="nsamp" class="mono" aria-label="Number of samples, power of two">
+                <option>256</option>
+                <option>512</option>
+                <option selected>1024</option>
+                <option>2048</option>
+                <option>4096</option>
+                <option>8192</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="run" class="primary" type="button">Regenerate &amp; analyze</button>
+          <div id="signalErr" class="errbox hidden" role="alert"></div>
+          <div id="aliasWarn" class="warnbox hidden" role="status"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="h-analysis">
+          <h2 id="h-analysis">Analysis</h2>
+          <div class="field">
+            <label class="lbl" for="window">Window function (Harris 1978)</label>
+            <select id="window" aria-label="Window function">
+              <option value="rect">Rectangular (none)</option>
+              <option value="hann" selected>Hann</option>
+              <option value="hamming">Hamming</option>
+              <option value="blackman">Blackman</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl">Spectrum scale</label>
+            <div class="seg" role="group" aria-label="Spectrum amplitude scale">
+              <button id="scaleLin" type="button" aria-pressed="false">Linear</button>
+              <button id="scaleDb" type="button" aria-pressed="true">dB</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="h-stft">
+          <h2 id="h-stft">Spectrogram (STFT)</h2>
+          <div class="row2">
+            <div class="field">
+              <label class="lbl" for="stftWin">Window size (2ⁿ)</label>
+              <select id="stftWin" class="mono" aria-label="STFT window size">
+                <option>64</option>
+                <option>128</option>
+                <option selected>256</option>
+                <option>512</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="lbl" for="stftOverlap">Overlap</label>
+              <select id="stftOverlap" class="mono" aria-label="STFT overlap fraction">
+                <option value="0">0%</option>
+                <option value="0.5" selected>50%</option>
+                <option value="0.75">75%</option>
+                <option value="0.875">87.5%</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="h-readouts">
+          <h2 id="h-readouts">Readouts</h2>
+          <div class="readouts">
+            <div class="ro"><span class="k">Δf resolution</span><span class="v mono" id="roDf">—</span></div>
+            <div class="ro"><span class="k">Nyquist</span><span class="v mono" id="roNyq">—</span></div>
+            <div class="ro"><span class="k">Dominant freq</span><span class="v mono peak" id="roPeak">—</span></div>
+            <div class="ro"><span class="k">Peak bin</span><span class="v mono" id="roBin">—</span></div>
+            <div class="ro"><span class="k">N (transform)</span><span class="v mono" id="roN">—</span></div>
+            <div class="ro"><span class="k">Compute time</span><span class="v mono" id="roTime">—</span></div>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="h-export">
+          <h2 id="h-export">Export</h2>
+          <div class="btn-row">
+            <button id="exportPng" class="ghost" type="button">Spectrum PNG</button>
+            <button id="exportCsv" class="ghost" type="button">Spectrum CSV</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ PLOTS COLUMN ============ -->
+      <div class="col-plots">
+        <section class="panel plot-wrap" aria-labelledby="h-wave">
+          <div class="plot-head"><h2 id="h-wave">Waveform — time domain</h2></div>
+          <canvas id="waveCanvas" role="img" tabindex="0" aria-label="Waveform plot, loading"></canvas>
+          <p id="waveDesc" class="aria-desc"></p>
+        </section>
+
+        <section class="panel plot-wrap" aria-labelledby="h-spec">
+          <div class="plot-head">
+            <h2 id="h-spec">Power spectrum — frequency domain</h2>
+          </div>
+          <canvas id="specCanvas" role="img" tabindex="0" aria-label="Power spectrum plot, loading"></canvas>
+          <p id="specDesc" class="aria-desc"></p>
+        </section>
+
+        <section class="panel plot-wrap" aria-labelledby="h-spectro">
+          <div class="plot-head"><h2 id="h-spectro">Spectrogram — STFT heatmap</h2></div>
+          <canvas id="spectroCanvas" role="img" tabindex="0" aria-label="Spectrogram heatmap, loading"></canvas>
+          <p id="spectroDesc" class="aria-desc"></p>
+          <div id="spectroLoading" class="loading hidden"><span class="spinner" aria-hidden="true"></span><span>computing STFT…</span></div>
+          <div class="colorbar-wrap">
+            <span id="cbMin" class="mono">—</span>
+            <span id="colorbar" class="colorbar" aria-hidden="true"></span>
+            <span id="cbMax" class="mono">—</span>
+            <span>dB</span>
+          </div>
+        </section>
+
+        <section class="panel refs" aria-labelledby="h-refs">
+          <h2 id="h-refs">Method &amp; references</h2>
+          <p>
+            The power spectrum is computed with the <span class="cite">radix-2 iterative
+            Cooley–Tukey FFT</span>: bit-reversal permutation followed by log₂N
+            butterfly stages, in pure JavaScript (no library). The one-sided power
+            spectral density is <code>PSD[k] = |X[k]|² / (Fs · Σw²)</code>, doubled
+            for interior bins so total power is preserved.
+          </p>
+          <p>
+            Windows (rectangular, Hann, Hamming, Blackman) are applied before the
+            transform to reduce <em>spectral leakage</em>. The spectrogram is a
+            Short-Time Fourier Transform: a sliding window of the chosen size and
+            overlap, FFT per frame, magnitude in dB stacked as a viridis-like heatmap.
+          </p>
+          <p>
+            <span class="cite">Cooley, J. W. &amp; Tukey, J. W. (1965).</span>
+            "An algorithm for the machine calculation of complex Fourier series."
+            <em>Mathematics of Computation</em> 19, 297–301.
+          </p>
+          <p>
+            <span class="cite">Harris, F. J. (1978).</span>
+            "On the use of windows for harmonic analysis with the discrete Fourier
+            transform." <em>Proceedings of the IEEE</em> 66(1), 51–83.
+          </p>
+          <p>
+            <span class="cite">Welch, P. D. (1967).</span> Averaged periodogram
+            method — the STFT frames here are the same windowed sub-records Welch
+            averages.
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <footer class="app-foot">
+      Spectra · Orbioom studio · all signals synthetic &amp; reproducible (seeded PRNG) · open <code>index.html</code> in any modern browser, no build.
+    </footer>
+  </div>
+
+  <script src="js/fft.js"></script>
+  <script src="js/signal.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

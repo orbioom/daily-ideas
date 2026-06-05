@@ -23,3 +23,11 @@ Canonical list of every idea this routine has ever built. The agent reads this b
 | 17 | Codonaut | sci | 2026-06-05_0610-UTC | Codon Adaptation Index + host-optimized reverse translation (E. coli), pure Python |
 | 18 | Strand | sci | 2026-06-05_0610-UTC | FM-index (BWT) exact DNA pattern matcher, suffix array + backward search |
 | 19 | Frond | android | 2026-06-05_0610-UTC | Local-first plant-watering companion, Compose + Material 3, JSON persistence |
+| 20 | Cellar | ios | 2026-06-05_1209-UTC | Structured tasting journal (coffee/wine/whisky/tea/beer): bottles own tastings, flavor lexicon, insights, SwiftData |
+| 21 | Sift | webapp | 2026-06-05_1209-UTC | Regex workbench: live highlighting, capture groups, replace, 12-pattern library, saved snippets, localStorage |
+| 22 | Stacks | webapp | 2026-06-05_1209-UTC | Personal library catalog: books, shelves, reading sessions, stats/streak, JSON+CSV export, localStorage |
+| 23 | Chroma | webapp | 2026-06-05_1209-UTC | Accessible palette & contrast lab: WCAG 2.1 contrast, Machado CVD simulation, scales/harmonies, token export |
+| 24 | Spectra | sci | 2026-06-05_1209-UTC | FFT spectral analyzer: radix-2 Cooley–Tukey, windowing, PSD, STFT spectrogram, canvas plots, PNG/CSV |
+| 25 | Lotka | sci | 2026-06-05_1209-UTC | Predator–prey simulator: Lotka–Volterra via RK4, time series + phase portrait + nullclines, animated, presets |
+| 26 | Cluster | sci | 2026-06-05_1209-UTC | k-means visualizer: Lloyd + k-means++, step/converge, inertia & silhouette, elbow sweep, canvas, seeded |
+| 27 | Forage | android | 2026-06-05_1209-UTC | Local-first recipe box: recipes own ingredients+steps, live serving scaler, Compose/M3, JSON+DataStore |

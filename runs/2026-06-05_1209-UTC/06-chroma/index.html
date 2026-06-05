@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Chroma — Accessible Color Palette & Contrast Lab</title>
+  <meta name="description" content="Build color palettes, verify WCAG contrast, simulate color-vision deficiency, and export design tokens. An Orbioom studio tool." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="app-header glass">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1 class="brand-title">Chroma</h1>
+        <p class="brand-sub">Accessible palette &amp; contrast lab</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <label class="field inline" for="palette-select">
+        <span class="field-label">Palette</span>
+        <select id="palette-select" class="select" aria-label="Active palette"></select>
+      </label>
+      <button type="button" class="btn" id="new-palette-btn">New</button>
+      <button type="button" class="btn" id="rename-palette-btn">Rename</button>
+      <button type="button" class="btn btn-danger-ghost" id="delete-palette-btn">Delete</button>
+      <button type="button" class="btn" id="settings-btn" aria-haspopup="dialog">Settings</button>
+    </div>
+  </header>
+
+  <main id="main" class="layout">
+
+    <!-- ============ Palette builder ============ -->
+    <section class="card glass" aria-labelledby="builder-h">
+      <div class="card-head">
+        <h2 id="builder-h">Palette</h2>
+        <div class="cvd-toggle" role="group" aria-label="Color vision simulation">
+          <span class="field-label">Simulate</span>
+          <select id="cvd-select" class="select" aria-label="Color vision deficiency simulation">
+            <option value="none">None</option>
+            <option value="protanopia">Protanopia</option>
+            <option value="deuteranopia">Deuteranopia</option>
+            <option value="tritanopia">Tritanopia</option>
+          </select>
+        </div>
+      </div>
+      <p class="cvd-desc" id="cvd-desc" aria-live="polite"></p>
+
+      <ul class="swatch-grid" id="swatch-grid" aria-label="Swatches in this palette"></ul>
+
+      <div class="empty-state" id="empty-state" hidden>
+        <p class="empty-title">No swatches yet</p>
+        <p class="empty-body">Add a color below, or load the sample palettes to get started.</p>
+        <button type="button" class="btn" id="load-sample-btn">Load sample palettes</button>
+      </div>
+
+      <form class="add-swatch" id="add-swatch-form" novalidate>
+        <h3 class="sub-h">Add / edit swatch</h3>
+        <div class="add-row">
+          <label class="field" for="swatch-name">
+            <span class="field-label">Name</span>
+            <input class="input" type="text" id="swatch-name" maxlength="40" placeholder="e.g. Accent" autocomplete="off" />
+          </label>
+          <label class="field" for="swatch-role">
+            <span class="field-label">Role</span>
+            <select class="select" id="swatch-role" aria-label="Swatch role for preview">
+              <option value="">—</option>
+              <option value="bg">Background</option>
+              <option value="surface">Surface</option>
+              <option value="text">Text</option>
+              <option value="accent">Accent</option>
+            </select>
+          </label>
+          <label class="field" for="swatch-hex">
+            <span class="field-label">Hex</span>
+            <input class="input mono" type="text" id="swatch-hex" maxlength="7" placeholder="#5B8CFF" autocomplete="off" spellcheck="false" aria-describedby="hex-error" />
+          </label>
+          <span class="swatch-preview" id="swatch-preview" aria-hidden="true"></span>
+        </div>
+        <p class="inline-error" id="hex-error" role="alert" hidden></p>
+
+        <div class="sliders">
+          <fieldset class="slider-group">
+            <legend>RGB</legend>
+            <label class="slider-row"><span>R</span>
+              <input type="range" id="r-range" min="0" max="255" value="91" aria-label="Red 0 to 255" />
+              <input type="number" id="r-num" min="0" max="255" value="91" class="num mono" aria-label="Red value" />
+            </label>
+            <label class="slider-row"><span>G</span>
+              <input type="range" id="g-range" min="0" max="255" value="140" aria-label="Green 0 to 255" />
+              <input type="number" id="g-num" min="0" max="255" value="140" class="num mono" aria-label="Green value" />
+            </label>
+            <label class="slider-row"><span>B</span>
+              <input type="range" id="b-range" min="0" max="255" value="255" aria-label="Blue 0 to 255" />
+              <input type="number" id="b-num" min="0" max="255" value="255" class="num mono" aria-label="Blue value" />
+            </label>
+          </fieldset>
+          <fieldset class="slider-group">
+            <legend>HSL</legend>
+            <label class="slider-row"><span>H</span>
+              <input type="range" id="h-range" min="0" max="360" value="222" aria-label="Hue 0 to 360" />
+              <input type="number" id="h-num" min="0" max="360" value="222" class="num mono" aria-label="Hue value" />
+            </label>
+            <label class="slider-row"><span>S</span>
+              <input type="range" id="s-range" min="0" max="100" value="100" aria-label="Saturation 0 to 100" />
+              <input type="number" id="s-num" min="0" max="100" value="100" class="num mono" aria-label="Saturation value" />
+            </label>
+            <label class="slider-row"><span>L</span>
+              <input type="range" id="l-range" min="0" max="100" value="68" aria-label="Lightness 0 to 100" />
+              <input type="number" id="l-num" min="0" max="100" value="68" class="num mono" aria-label="Lightness value" />
+            </label>
+          </fieldset>
+        </div>
+
+        <div class="add-actions">
+          <button type="submit" class="btn btn-primary" id="add-swatch-btn">Add swatch</button>
+          <button type="button" class="btn" id="cancel-edit-btn" hidden>Cancel edit</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ Contrast checker ============ -->
+    <section class="card glass" aria-labelledby="contrast-h">
+      <div class="card-head"><h2 id="contrast-h">Contrast checker</h2></div>
+
+      <div class="contrast-pickers">
+        <label class="field" for="fg-pick">
+          <span class="field-label">Foreground</span>
+          <div class="pair-input">
+            <input class="input mono" type="text" id="fg-pick" maxlength="7" value="#1B1D2A" spellcheck="false" aria-describedby="fg-error" />
+            <span class="dot" id="fg-dot" aria-hidden="true"></span>
+          </div>
+          <p class="inline-error" id="fg-error" role="alert" hidden></p>
+        </label>
+        <label class="field" for="bg-pick">
+          <span class="field-label">Background</span>
+          <div class="pair-input">
+            <input class="input mono" type="text" id="bg-pick" maxlength="7" value="#EDEEF3" spellcheck="false" aria-describedby="bg-error" />
+            <span class="dot" id="bg-dot" aria-hidden="true"></span>
+          </div>
+          <p class="inline-error" id="bg-error" role="alert" hidden></p>
+        </label>
+        <button type="button" class="btn" id="swap-btn" aria-label="Swap foreground and background">Swap</button>
+      </div>
+
+      <p class="hint">Tip: click any swatch's <em>FG</em> / <em>BG</em> button to load it here.</p>
+
+      <div class="ratio-block">
+        <output class="ratio-number mono" id="ratio-number" aria-live="polite">21.00:1</output>
+        <div class="badges" id="wcag-badges" aria-label="WCAG results"></div>
+      </div>
+
+      <div class="text-preview" id="text-preview">
+        <p class="tp-normal">The quick brown fox jumps over the lazy dog.</p>
+        <p class="tp-large">The quick brown fox.</p>
+      </div>
+    </section>
+
+    <!-- ============ Live preview surface ============ -->
+    <section class="card glass" aria-labelledby="preview-h">
+      <div class="card-head"><h2 id="preview-h">Live UI preview</h2></div>
+      <p class="hint">Painted from swatch roles (background / surface / text / accent). Assign roles when adding swatches.</p>
+      <div class="mock-stage" id="mock-stage">
+        <div class="mock-card" id="mock-card">
+          <h3 class="mock-title" id="mock-title">Aurora release</h3>
+          <p class="mock-body" id="mock-body">A calm surface, legible text, and a single confident action.</p>
+          <button type="button" class="mock-btn" id="mock-btn">Get started</button>
+        </div>
+      </div>
+      <p class="preview-flag" id="preview-flag" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- ============ Scale & harmony ============ -->
+    <section class="card glass" aria-labelledby="scale-h">
+      <div class="card-head"><h2 id="scale-h">Scale &amp; harmony</h2></div>
+      <label class="field" for="base-select">
+        <span class="field-label">Base swatch</span>
+        <select id="base-select" class="select" aria-label="Base color for generation"></select>
+      </label>
+
+      <h3 class="sub-h">Tint &amp; shade scale</h3>
+      <ul class="scale-row" id="scale-row" aria-label="Generated scale. Activate a chip to add it to the palette."></ul>
+
+      <h3 class="sub-h">Harmonies</h3>
+      <div id="harmony-sets"></div>
+    </section>
+
+    <!-- ============ Export / import ============ -->
+    <section class="card glass" aria-labelledby="export-h">
+      <div class="card-head"><h2 id="export-h">Export &amp; import</h2></div>
+      <div class="export-tabs" role="tablist" aria-label="Export format">
+        <button type="button" class="tab" id="tab-css" role="tab" aria-selected="true" aria-controls="export-out">CSS variables</button>
+        <button type="button" class="tab" id="tab-json" role="tab" aria-selected="false" aria-controls="export-out">JSON tokens</button>
+      </div>
+      <textarea id="export-out" class="export-out mono" readonly rows="8" aria-label="Export output"></textarea>
+      <div class="export-actions">
+        <button type="button" class="btn btn-primary" id="copy-btn">Copy</button>
+        <button type="button" class="btn" id="download-text-btn">Download file</button>
+        <button type="button" class="btn" id="download-png-btn">
+          <span id="png-label">Download PNG sheet</span>
+        </button>
+      </div>
+
+      <h3 class="sub-h">Import JSON palette</h3>
+      <textarea id="import-in" class="export-out mono" rows="5" placeholder='{"name":"My palette","swatches":[{"name":"Accent","hex":"#5B8CFF"}]}' aria-label="JSON palette to import" spellcheck="false"></textarea>
+      <div class="export-actions">
+        <button type="button" class="btn" id="import-btn">Import palette</button>
+        <p class="inline-msg" id="import-msg" role="status" aria-live="polite"></p>
+      </div>
+      <canvas id="sheet-canvas" width="10" height="10" class="visually-hidden" aria-hidden="true"></canvas>
+    </section>
+  </main>
+
+  <!-- ============ Settings dialog ============ -->
+  <div class="dialog-backdrop" id="settings-backdrop" hidden></div>
+  <div class="dialog glass" id="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+    <div class="card-head">
+      <h2 id="settings-title">Settings</h2>
+      <button type="button" class="btn btn-icon" id="settings-close" aria-label="Close settings">×</button>
+    </div>
+    <div class="settings-body">
+      <label class="field" for="theme-select">
+        <span class="field-label">Theme</span>
+        <select id="theme-select" class="select">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <label class="field" for="export-default-select">
+        <span class="field-label">Default export format</span>
+        <select id="export-default-select" class="select">
+          <option value="css">CSS variables</option>
+          <option value="json">JSON tokens</option>
+        </select>
+      </label>
+      <label class="field" for="notation-select">
+        <span class="field-label">Show colors as</span>
+        <select id="notation-select" class="select">
+          <option value="hex">Hex</option>
+          <option value="hsl">HSL</option>
+        </select>
+      </label>
+      <div class="settings-actions">
+        <button type="button" class="btn" id="reset-samples-btn">Reset to sample palettes</button>
+        <button type="button" class="btn btn-danger-ghost" id="clear-all-btn">Clear all data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <footer class="app-footer">
+    <p>Chroma · an Orbioom studio tool · <span id="storage-note"></span></p>
+  </footer>
+
+  <script src="color.js"></script>
+  <script src="storage.js"></script>
+  <script src="seed.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

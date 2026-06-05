@@ -118,3 +118,91 @@ but not distracting. Needs extensive real-world tuning.
 
 **Orbioom translation:** Uses only the mist colors and Manrope. No glass (too visible). The product
 is defined by what it *doesn't* show.
+
+---
+
+## Interval
+
+**Type:** iOS app (native, SwiftUI) — run 2026-06-05_1209-UTC, slot 02 (Category A)
+**Status:** Spec — not built this run (quality floor protection; one strong iOS app, Cellar, shipped instead)
+
+**Problem:** HIIT, mobility, and circuit workouts live in scraps of paper and generic countdown
+timers that can't represent a real routine (warm-up → rounds of work/rest → cooldown) and can't be
+reused. People want to *build* a routine once and run it hands-free.
+
+**Approach:** A native interval-timer builder with a real multi-entity model. A **Routine** owns an
+ordered list of **Segments** (each with a kind — prepare / work / rest / cooldown — a duration, an
+optional label, and an optional repeat-group). A routine can express "warm-up 60s, then 8× (work 40s
+/ rest 20s), then cooldown 90s." Running a routine drives a full-screen timer engine with large
+mono countdown, segment name, next-up preview, progress ring, audio + haptic cues at transitions and
+the final 3-second lead-in, and a screen that stays awake.
+
+**The bar it meets:** multi-entity domain model (Routine, Segment, repeat-groups, plus a Session log
+of completed runs) — comfortably clears the substance floor. ≥4 feature screens: Routine library,
+Routine builder (reorderable segments + repeat groups), Run/timer screen, History/Insights; plus
+Onboarding and Settings.
+
+**Architecture & stack:**
+- iOS 17+, SwiftUI 5, MVVM, no external deps.
+- **SwiftData** for Routines/Segments/Sessions (cascade relationships). `UserDefaults` only for the
+  onboarding flag and settings (default rest sound, count-in length, keep-awake, haptics).
+- Timer engine: a single `@Observable` `WorkoutEngine` driven by an absolute-time scheduler
+  (`Date`-based, not tick-accumulation, so it stays accurate across backgrounding) with `@MainActor`
+  UI updates; precomputes the flattened segment timeline from the routine + repeat-groups.
+- Audio cues via `AVAudioPlayer` (short bundled blips) honoring the silent switch setting;
+  `UINotificationFeedbackGenerator`/`.sensoryFeedback` for transitions; `UIApplication.isIdleTimerDisabled`
+  during a run.
+
+**Key logic:** timeline flattening of nested repeat-groups; pause/resume with correct elapsed math;
+remaining-total vs remaining-segment; "skip segment" and "add 15s"; session summary (total work time,
+rounds completed) written to the History log.
+
+**States:** empty library (designed, "build your first routine"), running, paused, completed
+(summary), and error (a routine with zero segments can't be run — guarded). All Dynamic Type sizes,
+light/dark, VoiceOver labels on every control, Reduce Motion (progress ring fades instead of spins).
+
+**Definition of done:** a person builds a routine, runs it end-to-end hands-free, sees a session in
+History, and finds it intact after relaunch. App icon = an on-brand Orbioom orb with an interval arc.
+
+---
+
+## Apertura
+
+**Type:** iOS app (native, SwiftUI) — run 2026-06-05_1209-UTC, slot 03 (Category A)
+**Status:** Spec — not built this run (quality floor protection)
+
+**Problem:** People learning manual photography (or shooting film) want to (a) reason about the
+exposure triangle before a shot and (b) keep a real logbook of what settings produced what result —
+especially on film, where there's no EXIF and feedback is delayed by weeks.
+
+**Approach:** Two halves that reinforce each other. An **exposure calculator/visualizer**: pick any
+two of aperture / shutter / ISO and a target EV, and see the third solved, plus a live diagram of the
+trade-offs (depth-of-field band as aperture changes, motion-blur risk as shutter changes, noise hint
+as ISO changes) using real photometric relationships (EV = log2(N²/t), reciprocity in full/half/third
+stops). And a **shot log**: a multi-entity journal of **Rolls** (film stock, ISO, format, camera) each
+owning ordered **Frames** (aperture, shutter, focal length, subject, location, notes, and the computed
+EV). This clears the substance floor on both axes — non-trivial photometric computation *and* a real
+relational model.
+
+**Architecture & stack:**
+- iOS 17+, SwiftUI 5, MVVM, no external deps.
+- **SwiftData** for Rolls/Frames (cascade); `UserDefaults` only for preferences (default stop
+  increment ⅓/½/full, default film stock, units, haptics) and onboarding.
+- Pure, testable `Exposure` value type implementing stop math, EV solving, and equivalent-exposure
+  enumeration (all aperture/shutter pairs for a given EV in the chosen increment).
+
+**Screens (≥4 feature):** Calculator/visualizer; Roll library; Roll detail with its frames + add-frame;
+Frame detail/editor; plus Onboarding and Settings. Export a roll's log as CSV/JSON.
+
+**Key logic:** EV computation and the inverse (solve the missing leg), snapping to the nearest valid
+third/half/full stop, equivalent-exposure generation, and a "you're 1⅓ stops under" readout against a
+metered target. DoF/blur indicators are qualitative-but-honest (driven by aperture/focal/shutter,
+clearly labelled as guidance, not a light meter).
+
+**States:** empty roll library, populated calculator (always usable — preloaded with a sensible scene),
+invalid input guarded (shutter 0, ISO ≤ 0), error messaging calm. Full accessibility (Dynamic Type,
+VoiceOver values on the sliders, Reduce Motion), light/dark, on-brand orb app icon with an aperture
+blade motif.
+
+**Definition of done:** solve an exposure and see the trade-off diagram update; log a roll of frames;
+export it; everything intact after relaunch.
