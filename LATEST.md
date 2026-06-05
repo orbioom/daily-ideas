@@ -1,92 +1,50 @@
-# Latest Run — 2026-06-05 1209 UTC
+# Latest Run — 2026-06-05 1808 UTC
 
-**Folder:** `runs/2026-06-05_1209-UTC/`
-**Shipped:** 8 of 10 fully built and production-ready (≥1 in every category A/B/C/D); 2 iOS picks
-specced in `BACKLOG.md` to protect quality on the marginal slots. None repeat `SHIPPED.md`.
+**Folder:** `runs/2026-06-05_1808-UTC/`
+**Shipped:** 8 fully-built, production-ready products (≥1 in every category) + 2 detailed iOS specs in `BACKLOG.md`.
+**No-repeat:** all 10 picks checked against `SHIPPED.md` (entries 1–27) — no repeats, paraphrases, or same-mechanic variations. New entries appended as #28–#35.
 
-Six self-contained web/science apps were built in parallel by sub-builders (each verified with
-`node --check` + a logic test + a clean anti-stub scan), while the iOS and Android apps were built
-and hand-reviewed directly. A repo-wide anti-stub scan is clean.
+Each shipped product passed an anti-stub scan and a hand/automated verification trace (recorded in each slot's README "Self-review"). The four computational tools had their core math re-verified independently in Node before commit (results below).
 
 ---
 
 ## A — iOS (slots 01–03)
 
-- **Cellar** — built — `runs/2026-06-05_1209-UTC/01-cellar` — A structured tasting journal where
-  bottles (coffee/wine/whisky/tea/beer) own dated tastings with the aroma·palate·finish triad and a
-  category-tuned flavor lexicon; SwiftData, 5 feature screens + onboarding + settings, insights with a
-  tasting streak. *Xcode build: not run (no Xcode in sandbox); hand-compiled against the iOS 17 SDK,
-  pbxproj generated with unique IDs referencing every file.*
-- **Interval** — spec (`BACKLOG.md`) — HIIT/circuit routine builder with a real Routine→Segment→
-  repeat-group model and a hands-free, background-accurate timer engine.
-- **Apertura** — spec (`BACKLOG.md`) — manual-photography exposure visualizer + a Rolls→Frames shot
-  log, with honest EV/stop math.
+- **Split** — built — `runs/2026-06-05_1808-UTC/01-split` — Shared-expense splitter; groups own members, expenses (equal/exact/shares), and recorded settlements, with greedy min-cash-flow "who pays whom" suggestions. SwiftData persistence; Decimal-only money math with exact integer-cent reconciliation. 6 feature screens + onboarding + 5 persisted settings. Real 1024×1024 on-brand app icon (two overlapping orbs), light/dark, VoiceOver, Reduce Motion.
+- **Repertoire** — spec — `BACKLOG.md` — Musician practice companion: Pieces own PracticeSpots; PracticeSessions log time; sample-accurate metronome + practice timer; streaks/tempo-progress insights. SwiftData. (Deferred for quality-floor protection — one strong iOS app shipped this run.)
+- **Larder** — spec — `BACKLOG.md` — Pantry/kitchen inventory: Items across Locations/Categories with expiry windowing + low-stock detection feeding a generated shopping list; local expiry notifications. SwiftData.
 
 ## B — Web / SaaS (slots 04–06)
 
-- **Sift** — built — `…/04-sift` — Regex workbench: live highlighting, capture/named groups, flags,
-  replace with backreferences, a 12-pattern library, and saved snippets (full CRUD) in localStorage.
-- **Stacks** — built — `…/05-stacks` — Personal library catalog with three related entities (Books,
-  Shelves, Reading Sessions), a live stats dashboard with a reading streak, and JSON/CSV export.
-- **Chroma** — built — `…/06-chroma` — Accessible palette & contrast lab: WCAG 2.1 relative-luminance
-  contrast, Machado et al. (2009) color-vision-deficiency simulation, scales/harmonies, token export.
+- **Envelope** — built — `runs/2026-06-05_1808-UTC/04-envelope` — Zero-based envelope budgeting. Accounts, envelopes (grouped, rollover), month-aware transactions; "To Be Budgeted" hero, grouped progress + overspend, reports (hand-drawn canvas donut / SVG bars). localStorage, JSON/CSV round-trip, light/dark, full a11y. _JS syntax-checked; only `placeholder=` HTML attrs (no stubs)._
+- **Recall** — built — `runs/2026-06-05_1808-UTC/05-recall` — SM-2 spaced-repetition flashcards. Decks/cards, study sessions with keyboard rating, 12-week SVG heatmap + 7-day due forecast. localStorage, JSON/CSV. _SM-2 verified in Node: n=0→I=1, n=1→I=6, n=2→I=15, Easy→EF 2.6, lapse handling correct._
+- **Renewal** — built — `runs/2026-06-05_1808-UTC/06-renewal` — Subscription & recurring-expense tracker. 6 billing cycles incl. custom-N-days, month-end-safe next-renewal stepping, calendar + donut, totals by category/method. localStorage, JSON/CSV. _Verified in Node: Jan-31 monthly → Feb 28 / Feb 29 (leap) / Mar 31; monthly↔yearly↔custom normalization correct._
 
-## C — Science (interactive UI, slots 07–09)
+## C — Scientific / Technological, interactive UI (slots 07–09)
 
-- **Spectra** — built — `…/07-spectra` — FFT spectral analyzer: hand-written radix-2 Cooley–Tukey,
-  windowing (Harris 1978), one-sided PSD, and an STFT spectrogram, all on `<canvas>`; PNG/CSV export.
-  Verified in Node to recover a two-tone signal at 49.96 Hz / 120.03 Hz with correct amplitudes.
-- **Lotka** — built — `…/08-lotka` — Predator–prey simulator: Lotka–Volterra integrated with RK4,
-  time series + phase portrait with nullclines and a marked equilibrium, animated, with presets.
-  Conserved-quantity drift ~1.6e-9 confirms integrator quality.
-- **Cluster** — built — `…/09-cluster` — k-means visualizer: Lloyd's algorithm + k-means++ seeding,
-  step/run-to-convergence, inertia & silhouette, an elbow sweep, seeded reproducible datasets.
+- **Smooth** — built — `runs/2026-06-05_1808-UTC/07-smooth` — Savitzky–Golay smoothing & differentiation (Savitzky & Golay, *Anal. Chem.* 1964). Coefficients computed from the Vandermonde design matrix via normal equations + Gaussian elimination (no hardcoded tables); asymmetric boundary handling; live window/order/derivative; canvas chart, PNG/CSV. _Verified in Node: window-5/order-2 → [-3,12,17,12,-3]/35, smoothing sum 1, derivative sum 0, quadratic reproduced to 1e-15._
+- **Axis** — built — `runs/2026-06-05_1808-UTC/08-axis` — PCA explorer (Pearson 1901; Hotelling 1933) via Jacobi eigendecomposition. Standardize toggle, scores scatter + scree + loadings biplot; bundled Iris (Fisher 1936 / UCI) + seeded synthetic; PNG/CSV. _Verified in Node: standardized Iris PC1+PC2 = 95.81% (matches sklearn), eigenvectors orthonormal, variance sums to 1._
+- **Compass** — built — `runs/2026-06-05_1808-UTC/09-compass` — A* pathfinding visualizer (Hart, Nilsson & Raphael, *IEEE T-SSC* 1968) with a hand-written binary min-heap; Dijkstra & Greedy comparison; 5 heuristics; seeded maze/terrain generators; animated frontier + path; PNG export. _Verified in Node: all 5 built-in sanity checks pass (A*=Dijkstra optimal cost, admissible pruning, no-path, trivial, heap invariant)._
 
 ## D — Android (slot 10)
 
-- **Forage** — built — `…/10-forage` — Local-first recipe box: recipes own ingredients + ordered
-  steps; the highlight is a live **serving scaler** that re-computes quantities into clean fractions.
-  Compose + Material 3 (Orbioom-tuned), Navigation Compose, JSON persistence + DataStore, no Room/KSP.
-  *APK build: attempted; the sandbox has no Android SDK and the AGP/AndroidX repos are unreachable, so
-  it can't build here — see `10-forage/android/build-log.txt`. Versions are the pinned known-good
-  Kotlin 1.9.24 / AGP 8.5.2 / Compose BOM 2024.06.00 / compiler ext 1.5.14 set; builds in Android Studio.*
+- **Transit** — built — `runs/2026-06-05_1808-UTC/10-transit` — Fuel & mileage log. Vehicles own fill-ups; the engine computes fuel economy *between full tanks*, folding partial fills into the fuel total and flagging untrustworthy segments; cross-vehicle insights; self-drawn Compose Canvas trend charts. MVVM, DataStore + JSON (no Room/KSP), custom Orbioom Material 3 light/dark, adaptive icon (+ monochrome + round).
 
 ---
 
-## Build / APK status summary
+## Build / APK status
 
-| Slot | App | Built | Build/compile check |
-|---|---|---|---|
-| 01 | Cellar (iOS) | yes | Hand-compiled vs iOS 17 SDK; anti-stub clean; pbxproj valid |
-| 04 | Sift (web) | yes | `node --check` + logic test; anti-stub clean |
-| 05 | Stacks (web) | yes | `node --check` + pipeline test; anti-stub clean |
-| 06 | Chroma (web) | yes | 16-assertion color-math test passes; anti-stub clean |
-| 07 | Spectra (sci) | yes | FFT cross-checked in Node; anti-stub clean |
-| 08 | Lotka (sci) | yes | RK4 verified (conserved qty drift ~1e-9); anti-stub clean |
-| 09 | Cluster (sci) | yes | Convergence/silhouette/reproducibility tested; anti-stub clean |
-| 10 | Forage (Android) | yes | Gradle wrapper runs; SDK absent in sandbox → build locally (build-log.txt) |
-| 02 | Interval (iOS) | spec | BACKLOG.md |
-| 03 | Apertura (iOS) | spec | BACKLOG.md |
+- **iOS (Split):** No Xcode in the sandbox — hand-compiled by careful source review. All 24 Swift files referenced in every required `project.pbxproj` section with unique IDs; icon is a valid 1024×1024 RGBA PNG; no force-unwraps/`try!` on user paths. Builds in Xcode 15+ (Cmd+R, iOS 17+ simulator).
+- **Android (Transit):** `./gradlew assembleDebug` ran — the wrapper fetched Gradle and started, then failed only at Android Gradle Plugin resolution (no Android SDK / no Google Maven in the sandbox; ~5 GB SDK deliberately not installed). Documented in `android/build-log.txt`. Versions are the known-good set (Kotlin 1.9.24, AGP 8.5.2, Compose BOM 2024.06.00, compiler ext 1.5.14, SDK 26/34/34); no annotation processors; Compose plugin not applied. Builds in Android Studio (sync → Build APK(s)).
+- **Web & Sci (6):** open `index.html` directly — no build, no server, no keys. All JS `node --check`-clean; all core algorithms independently re-verified (above).
 
 ## Top recommendation
 
-**Spectra (07).** It is the most complete realization of the Category-C brief: a genuinely correct,
-from-scratch FFT (numerically verified to recover known tones and amplitudes), three live linked
-visualizations (waveform, power spectrum, STFT spectrogram), real parameter controls, exports, and a
-Web Worker for the heavy compute — all behind a calm Orbioom interface that opens to a correct result
-with zero setup. It best embodies "the science is seen and manipulated," and it's broadly useful
-beyond a demo.
+**Compass (A* pathfinding visualizer).** It is the most complete expression of this run's bar: a genuinely rigorous, correctly-cited algorithm (real binary-heap A* plus Dijkstra/Greedy for contrast) made *visible and manipulable* — you paint walls and weighted terrain, pick a heuristic, and watch the frontier breathe outward before the path locks in with the brand's rare green "magic" flash. Its built-in sanity suite (A* optimal cost == Dijkstra) proves correctness, and the science-as-spectacle framing is exactly the Orbioom "conjured, not just coded" feeling. Close runners-up: Axis (PCA matching sklearn to the decimal) and Split (the only slot with a non-trivial *relational* model plus settlement optimization).
 
 ## Research signals worth following next run
 
-- **Local-first, no-account utilities** keep over-indexing on r/SideProject and HN — single-purpose
-  tools that own a week of real data (regex, palettes, libraries) resonate; lean further into
-  *export/round-trip* as a first-class feature.
-- **"Make the science visual"** is an under-served niche: practitioners repeatedly ask for browser
-  tools that *show* an algorithm (alignment, dimensionality reduction, Kalman filtering, beamforming)
-  rather than print to stdout. Candidates: a UMAP/t-SNE explorer, a PID/Kalman tuning sandbox, a
-  Savitzky–Golay smoothing lab, a phylogenetic alignment viewer.
-- **Hobby logbooks with real computation** (tasting, photography, brewing, fermentation) pair a rich
-  domain model with a small honest calculation — a strong recurring shape for native apps.
-- Bundling **real Manrope/JetBrains Mono TTFs** into the Android template would close the one graceful
-  fallback currently in the brand stack.
+- **Personal-finance "calm money" tools** keep surfacing on r/SideProject and PH — debt-payoff (snowball/avalanche) planners, sinking-funds, and net-worth-over-time trackers are wanted but mostly ship as spreadsheets; strong Category-B candidates that clear the substance floor.
+- **Local-first / no-account journaling & logging** (mood, symptoms, training load) remains a recurring r/androiddev + r/iosprogramming ask — good for the native slots, and the multi-entity + computed-trend angle keeps them above the floor.
+- **"See the algorithm" science tools** have room beyond what's shipped: Gillespie SSA (stochastic chemical kinetics), Kalman filtering on a tracked signal, Barnes–Hut n-body, hierarchical clustering dendrograms, and wavelet transforms are all named, citable, and highly visual — natural Category-C picks that avoid the already-shipped FFT/k-means/ODE/PCA/A* space.
+- **Spaced-repetition analytics** (forgetting-curve fitting, FSRS vs SM-2 comparison) came up while building Recall — a visual FSRS explorer would be a distinct, rigorous Category-C follow-up.

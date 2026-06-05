@@ -31,3 +31,11 @@ Canonical list of every idea this routine has ever built. The agent reads this b
 | 25 | Lotka | sci | 2026-06-05_1209-UTC | Predator–prey simulator: Lotka–Volterra via RK4, time series + phase portrait + nullclines, animated, presets |
 | 26 | Cluster | sci | 2026-06-05_1209-UTC | k-means visualizer: Lloyd + k-means++, step/converge, inertia & silhouette, elbow sweep, canvas, seeded |
 | 27 | Forage | android | 2026-06-05_1209-UTC | Local-first recipe box: recipes own ingredients+steps, live serving scaler, Compose/M3, JSON+DataStore |
+| 28 | Split | ios | 2026-06-05_1808-UTC | Shared-expense splitter: groups own members/expenses/settlements, Decimal split (equal/exact/shares) + greedy min-cash-flow debt simplification, SwiftData |
+| 29 | Envelope | webapp | 2026-06-05_1808-UTC | Zero-based envelope budgeting: accounts/envelopes/transactions, month-aware budgets with rollover, dashboard + reports, localStorage, JSON/CSV |
+| 30 | Recall | webapp | 2026-06-05_1808-UTC | Spaced-repetition flashcards: correct SM-2 scheduler, decks/cards, study sessions, 12-week heatmap + due forecast, localStorage |
+| 31 | Renewal | webapp | 2026-06-05_1808-UTC | Subscription & recurring-expense tracker: cost normalization across 6 cycles, month-end-safe next-renewal, calendar + donut, localStorage |
+| 32 | Smooth | sci | 2026-06-05_1808-UTC | Savitzky–Golay smoothing/differentiation: Vandermonde + normal equations (Gaussian elim), live window/order/derivative, canvas, PNG/CSV |
+| 33 | Axis | sci | 2026-06-05_1808-UTC | PCA explorer: Jacobi eigendecomposition, standardize toggle, scores scatter + scree + loadings biplot, Iris + synthetic, PNG/CSV |
+| 34 | Compass | sci | 2026-06-05_1808-UTC | A* pathfinding visualizer: binary-heap A*/Dijkstra/Greedy, 5 heuristics, seeded maze/terrain, animated frontier + path, PNG export |
+| 35 | Transit | android | 2026-06-05_1808-UTC | Fuel & mileage log: vehicles own fill-ups, economy-between-full-tanks engine (partial-fill aware), Canvas trend charts, Compose/M3, DataStore/JSON |
