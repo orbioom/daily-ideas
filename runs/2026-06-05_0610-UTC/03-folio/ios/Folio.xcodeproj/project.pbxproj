@@ -1,0 +1,301 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AE3E045A3A782859E35BBFAA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B991E1C8544CE936CF1969 /* ContentView.swift */; };
+		EE5AA10ABC294A5C80155A33 /* FolioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFE58E2811EACB72A822DD9 /* FolioApp.swift */; };
+		B79D26C9B556BBFF2A43E431 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C39888073A2F83A22E2E5B9 /* Book.swift */; };
+		5DBBC2F15BCE96B932CD158A /* OrbioomTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5ADE8C6247A94B60421A90C /* OrbioomTheme.swift */; };
+		BD2884D4277EAFD087BE2619 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B0DCD0F04DCEC128F3BF52 /* LibraryViewModel.swift */; };
+		D04E359944543C5527C7B1DE /* AddBookSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C5832295E368663B09191A /* AddBookSheet.swift */; };
+		4C56344B6572037637E9C002 /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC44C627AFD72DCE818C5A6 /* BookCard.swift */; };
+		C3BA09471EB95E8BDB8B69CC /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F0A37B40BE81EC71655722F /* BookDetailView.swift */; };
+		250B5932B71EDFE4540D4C41 /* ProgressArc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120D254E18E93AFD479D76B4 /* ProgressArc.swift */; };
+		44DF4B94465D60C01D31563C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5A1F959A4CE774ADFE25CEF /* Assets.xcassets */; };
+		1F3384EF508E47E0D806DB84 /* Preview Content in Resources */ = {isa = PBXBuildFile; fileRef = CB767592A7234BF2EAB5C48B /* Preview Content */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E8A2B099214BE2C00E358092 /* Folio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Folio.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		21B991E1C8544CE936CF1969 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
+		6BFE58E2811EACB72A822DD9 /* FolioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FolioApp.swift"; sourceTree = "<group>"; };
+		7C39888073A2F83A22E2E5B9 /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Book.swift"; sourceTree = "<group>"; };
+		A5ADE8C6247A94B60421A90C /* OrbioomTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme/OrbioomTheme.swift"; sourceTree = "<group>"; };
+		61B0DCD0F04DCEC128F3BF52 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewModels/LibraryViewModel.swift"; sourceTree = "<group>"; };
+		B0C5832295E368663B09191A /* AddBookSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/AddBookSheet.swift"; sourceTree = "<group>"; };
+		2EC44C627AFD72DCE818C5A6 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/BookCard.swift"; sourceTree = "<group>"; };
+		0F0A37B40BE81EC71655722F /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/BookDetailView.swift"; sourceTree = "<group>"; };
+		120D254E18E93AFD479D76B4 /* ProgressArc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ProgressArc.swift"; sourceTree = "<group>"; };
+		D5A1F959A4CE774ADFE25CEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CB767592A7234BF2EAB5C48B /* Preview Content */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		283B1BF32E4858B4B82F0AA7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A6952CCBFB68691D6A647962 = {
+			isa = PBXGroup;
+			children = (
+				EF4AFFF4D426F8BADD9ED4C7 /* Folio */,
+				B8E7A78700B45FBA4A70FA01 /* Products */,
+				34B1F3E8EC6F06A49BFE03EB /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		EF4AFFF4D426F8BADD9ED4C7 /* Folio */ = {
+			isa = PBXGroup;
+			children = (
+				21B991E1C8544CE936CF1969 /* ContentView.swift */,
+				6BFE58E2811EACB72A822DD9 /* FolioApp.swift */,
+				7C39888073A2F83A22E2E5B9 /* Book.swift */,
+				A5ADE8C6247A94B60421A90C /* OrbioomTheme.swift */,
+				61B0DCD0F04DCEC128F3BF52 /* LibraryViewModel.swift */,
+				B0C5832295E368663B09191A /* AddBookSheet.swift */,
+				2EC44C627AFD72DCE818C5A6 /* BookCard.swift */,
+				0F0A37B40BE81EC71655722F /* BookDetailView.swift */,
+				120D254E18E93AFD479D76B4 /* ProgressArc.swift */,
+				D5A1F959A4CE774ADFE25CEF /* Assets.xcassets */,
+				CB767592A7234BF2EAB5C48B /* Preview Content */,
+			);
+			path = Folio;
+			sourceTree = "<group>";
+		};
+		B8E7A78700B45FBA4A70FA01 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E8A2B099214BE2C00E358092 /* Folio.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		34B1F3E8EC6F06A49BFE03EB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C966B73012C4973B9148ED47 /* Folio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A31F20A226F6FAA20E9DCEC /* Build configuration list for PBXNativeTarget "Folio" */;
+			buildPhases = (
+				765C568C0EFC94F10AACEC61 /* Sources */,
+				283B1BF32E4858B4B82F0AA7 /* Frameworks */,
+				2490B2BB938D2ADC5010DAAE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Folio;
+			productName = Folio;
+			productReference = E8A2B099214BE2C00E358092 /* Folio.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		03D5151DCDFE1673C103F7CA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					C966B73012C4973B9148ED47 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 4BE9A85145111D92B74E420D /* Build configuration list for PBXProject "Folio" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A6952CCBFB68691D6A647962;
+			productRefGroup = B8E7A78700B45FBA4A70FA01 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C966B73012C4973B9148ED47 /* Folio */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2490B2BB938D2ADC5010DAAE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F3384EF508E47E0D806DB84 /* Preview Content in Resources */,
+				44DF4B94465D60C01D31563C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		765C568C0EFC94F10AACEC61 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AE3E045A3A782859E35BBFAA /* ContentView.swift in Sources */,
+				EE5AA10ABC294A5C80155A33 /* FolioApp.swift in Sources */,
+				B79D26C9B556BBFF2A43E431 /* Book.swift in Sources */,
+				5DBBC2F15BCE96B932CD158A /* OrbioomTheme.swift in Sources */,
+				BD2884D4277EAFD087BE2619 /* LibraryViewModel.swift in Sources */,
+				D04E359944543C5527C7B1DE /* AddBookSheet.swift in Sources */,
+				4C56344B6572037637E9C002 /* BookCard.swift in Sources */,
+				C3BA09471EB95E8BDB8B69CC /* BookDetailView.swift in Sources */,
+				250B5932B71EDFE4540D4C41 /* ProgressArc.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B9F45FD705C6C3DD34382FE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F0E7AF57418A19358BFA209F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		C505DAE288D14F48A3D473E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Folio/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Folio/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=*]" = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.folio;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F9AA970AA829FCBA4D672C3D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Folio/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Folio/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=*]" = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.folio;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4BE9A85145111D92B74E420D /* Build configuration list for PBXProject "Folio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9F45FD705C6C3DD34382FE2 /* Debug */,
+				F0E7AF57418A19358BFA209F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3A31F20A226F6FAA20E9DCEC /* Build configuration list for PBXNativeTarget "Folio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C505DAE288D14F48A3D473E6 /* Debug */,
+				F9AA970AA829FCBA4D672C3D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 03D5151DCDFE1673C103F7CA /* Project object */;
+}

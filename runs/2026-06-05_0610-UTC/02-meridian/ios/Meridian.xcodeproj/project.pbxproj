@@ -1,0 +1,293 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FDF6D6ECB53EDB394812FB46 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2494441F1B30A339F14FD1D8 /* ContentView.swift */; };
+		D0EF6C702F7F5E341DFA304B /* MeridianApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B1C78C4BE77E783C041B4F /* MeridianApp.swift */; };
+		F35B8F095793CEB0DC91F9A3 /* Participant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90152DF8BB3573012B21B104 /* Participant.swift */; };
+		EF814FB53CB73A1867C17B18 /* OrbioomTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91418C803F91300CA60D6413 /* OrbioomTheme.swift */; };
+		526F9328AC9D990651B94C04 /* MeetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EECE65840F55516567A751D /* MeetingViewModel.swift */; };
+		767949595F149404B0E2BBC4 /* AddParticipantSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144533ECE583301107EE0DFB /* AddParticipantSheet.swift */; };
+		6E40715A24E07D1C69DC4F80 /* ParticipantRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C3615C8CC1396066460D60 /* ParticipantRow.swift */; };
+		E11601031BAF7099CE4556AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24566D7A82D146586746C32D /* Assets.xcassets */; };
+		0508F258E4C6963713B1F53D /* Preview Content in Resources */ = {isa = PBXBuildFile; fileRef = B13C9368BBECE644C1E64224 /* Preview Content */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		188EC2630381B002E2979704 /* Meridian.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Meridian.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2494441F1B30A339F14FD1D8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
+		22B1C78C4BE77E783C041B4F /* MeridianApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MeridianApp.swift"; sourceTree = "<group>"; };
+		90152DF8BB3573012B21B104 /* Participant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Participant.swift"; sourceTree = "<group>"; };
+		91418C803F91300CA60D6413 /* OrbioomTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme/OrbioomTheme.swift"; sourceTree = "<group>"; };
+		4EECE65840F55516567A751D /* MeetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewModels/MeetingViewModel.swift"; sourceTree = "<group>"; };
+		144533ECE583301107EE0DFB /* AddParticipantSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/AddParticipantSheet.swift"; sourceTree = "<group>"; };
+		F1C3615C8CC1396066460D60 /* ParticipantRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ParticipantRow.swift"; sourceTree = "<group>"; };
+		24566D7A82D146586746C32D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B13C9368BBECE644C1E64224 /* Preview Content */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B925C23E6D11D490815EB2B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1A2F1962CD32F0285D1B2758 = {
+			isa = PBXGroup;
+			children = (
+				64D4D70988851C3E7D5E4144 /* Meridian */,
+				857887C9ED480DF588BE16EC /* Products */,
+				4806572D71FE1ADD04F3B2C1 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		64D4D70988851C3E7D5E4144 /* Meridian */ = {
+			isa = PBXGroup;
+			children = (
+				2494441F1B30A339F14FD1D8 /* ContentView.swift */,
+				22B1C78C4BE77E783C041B4F /* MeridianApp.swift */,
+				90152DF8BB3573012B21B104 /* Participant.swift */,
+				91418C803F91300CA60D6413 /* OrbioomTheme.swift */,
+				4EECE65840F55516567A751D /* MeetingViewModel.swift */,
+				144533ECE583301107EE0DFB /* AddParticipantSheet.swift */,
+				F1C3615C8CC1396066460D60 /* ParticipantRow.swift */,
+				24566D7A82D146586746C32D /* Assets.xcassets */,
+				B13C9368BBECE644C1E64224 /* Preview Content */,
+			);
+			path = Meridian;
+			sourceTree = "<group>";
+		};
+		857887C9ED480DF588BE16EC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				188EC2630381B002E2979704 /* Meridian.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4806572D71FE1ADD04F3B2C1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		33014985D67FA73BBE8A46CC /* Meridian */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAFDB508AD314B5CB0C64D17 /* Build configuration list for PBXNativeTarget "Meridian" */;
+			buildPhases = (
+				B54112FE05F021BEBD2237AC /* Sources */,
+				B925C23E6D11D490815EB2B2 /* Frameworks */,
+				CFE361A33B25E75EB4F5CB9F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Meridian;
+			productName = Meridian;
+			productReference = 188EC2630381B002E2979704 /* Meridian.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3D929F6FF31660130CE358F2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					33014985D67FA73BBE8A46CC = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 201D0164E17C6595BD5026BC /* Build configuration list for PBXProject "Meridian" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1A2F1962CD32F0285D1B2758;
+			productRefGroup = 857887C9ED480DF588BE16EC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				33014985D67FA73BBE8A46CC /* Meridian */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CFE361A33B25E75EB4F5CB9F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0508F258E4C6963713B1F53D /* Preview Content in Resources */,
+				E11601031BAF7099CE4556AD /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B54112FE05F021BEBD2237AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FDF6D6ECB53EDB394812FB46 /* ContentView.swift in Sources */,
+				D0EF6C702F7F5E341DFA304B /* MeridianApp.swift in Sources */,
+				F35B8F095793CEB0DC91F9A3 /* Participant.swift in Sources */,
+				EF814FB53CB73A1867C17B18 /* OrbioomTheme.swift in Sources */,
+				526F9328AC9D990651B94C04 /* MeetingViewModel.swift in Sources */,
+				767949595F149404B0E2BBC4 /* AddParticipantSheet.swift in Sources */,
+				6E40715A24E07D1C69DC4F80 /* ParticipantRow.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6757ABB485F116043B6137E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		53D733DE695E934A4B244829 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		C8F0C15134B94A4740709954 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Meridian/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Meridian/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=*]" = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.meridian;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		84A7C6E1CF0AB0E43644C015 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Meridian/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Meridian/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=*]" = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.meridian;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		201D0164E17C6595BD5026BC /* Build configuration list for PBXProject "Meridian" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6757ABB485F116043B6137E5 /* Debug */,
+				53D733DE695E934A4B244829 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FAFDB508AD314B5CB0C64D17 /* Build configuration list for PBXNativeTarget "Meridian" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C8F0C15134B94A4740709954 /* Debug */,
+				84A7C6E1CF0AB0E43644C015 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3D929F6FF31660130CE358F2 /* Project object */;
+}
