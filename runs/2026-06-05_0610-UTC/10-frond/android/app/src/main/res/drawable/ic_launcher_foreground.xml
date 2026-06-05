@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A single calm frond / leaf, centered in the adaptive safe zone. -->
+    <path
+        android:fillColor="#86C79A"
+        android:pathData="M54,30 C66,38 70,52 64,70 C62,76 58,80 54,82 C50,80 46,76 44,70 C38,52 42,38 54,30 Z" />
+    <path
+        android:strokeColor="#1B1D2A"
+        android:strokeWidth="1.4"
+        android:strokeAlpha="0.55"
+        android:pathData="M54,34 L54,80" />
+    <path
+        android:strokeColor="#1B1D2A"
+        android:strokeWidth="1.1"
+        android:strokeAlpha="0.4"
+        android:pathData="M54,48 L46,44 M54,56 L62,52 M54,64 L46,60 M54,72 L62,68" />
+</vector>
