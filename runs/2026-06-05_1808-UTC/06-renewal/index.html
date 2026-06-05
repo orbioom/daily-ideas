@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Renewal — see every recurring charge in one place. Track subscriptions, renewal dates, and spending in a calm, organized dashboard." />
+  <title>Renewal · Subscription Tracker</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Scripts loaded in dependency order: billing → storage → seed → charts → app -->
+  <script src="billing.js"></script>
+  <script src="storage.js"></script>
+  <script src="seed.js"></script>
+  <script src="charts.js"></script>
+</head>
+<body>
+
+<!-- Mobile sidebar overlay -->
+<div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+<!-- Mobile hamburger -->
+<button id="hamburger" class="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">☰</button>
+
+<!-- Loading overlay -->
+<div id="loading-overlay" class="loading-overlay" role="status" aria-label="Loading" hidden>
+  <div class="spinner" aria-hidden="true"></div>
+  <span>Importing…</span>
+</div>
+
+<!-- Toast region -->
+<div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ═══ App shell ═════════════════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ─── Sidebar ──────────────────────────────────────────────────────── -->
+  <nav id="sidebar" class="sidebar" aria-label="Main navigation">
+    <div class="sidebar-logo">
+      <h1>Renewal</h1>
+      <div class="brand-sub">by Orbioom</div>
+    </div>
+
+    <ul class="nav-list" role="list">
+      <li role="listitem">
+        <button class="nav-item active" data-view="dashboard" aria-current="page" type="button">
+          <span class="nav-icon" aria-hidden="true">📊</span>
+          Dashboard
+        </button>
+      </li>
+      <li role="listitem">
+        <button class="nav-item" data-view="subscriptions" type="button">
+          <span class="nav-icon" aria-hidden="true">📋</span>
+          Subscriptions
+        </button>
+      </li>
+      <li role="listitem">
+        <button class="nav-item" data-view="calendar" type="button">
+          <span class="nav-icon" aria-hidden="true">📅</span>
+          Calendar
+        </button>
+      </li>
+      <li role="listitem">
+        <button class="nav-item" data-view="settings" type="button">
+          <span class="nav-icon" aria-hidden="true">⚙️</span>
+          Settings
+        </button>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <p>All data stored locally.<br>No account required.</p>
+    </div>
+  </nav>
+
+  <!-- ─── Main content ─────────────────────────────────────────────────── -->
+  <main class="main-content" id="main-content" tabindex="-1">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Dashboard View
+    ════════════════════════════════════════════════════════════════════ -->
+    <section id="view-dashboard" class="view active" aria-labelledby="dash-title">
+
+      <div class="view-header">
+        <h2 class="view-title" id="dash-title">Dashboard</h2>
+        <button class="btn btn-ink" id="dash-add-btn" type="button" aria-label="Add new subscription">
+          + Add Subscription
+        </button>
+      </div>
+
+      <!-- Hero totals -->
+      <div class="dashboard-hero" aria-live="polite" aria-label="Spending totals">
+        <article class="glass-card hero-card" aria-label="Monthly spend">
+          <div class="hero-label">Monthly Spend</div>
+          <div class="hero-amount" id="hero-monthly" aria-live="polite">$0.00</div>
+          <div class="hero-sub">active subscriptions</div>
+        </article>
+        <article class="glass-card hero-card" aria-label="Yearly spend">
+          <div class="hero-label">Yearly Spend</div>
+          <div class="hero-amount" id="hero-yearly" aria-live="polite">$0.00</div>
+          <div class="hero-sub">annualized</div>
+        </article>
+        <article class="glass-card hero-card" aria-label="Active subscriptions">
+          <div class="hero-label">Active</div>
+          <div class="hero-amount" id="hero-count" aria-live="polite">0</div>
+          <div class="hero-sub">subscriptions</div>
+        </article>
+      </div>
+
+      <!-- Empty state -->
+      <div id="dashboard-empty" style="display:none">
+        <div class="glass-card empty-state">
+          <div class="empty-state-icon" aria-hidden="true">📭</div>
+          <h3>No subscriptions yet</h3>
+          <p>Add your first recurring charge to start tracking your spending, renewal dates, and billing calendar.</p>
+          <button class="btn btn-ink" id="dash-add-first" type="button">Add your first subscription</button>
+        </div>
+      </div>
+
+      <!-- Dashboard content -->
+      <div id="dashboard-content">
+
+        <!-- Trials ending soon -->
+        <div id="trials-list" style="display:none;margin-bottom:16px" aria-live="polite"></div>
+
+        <div class="dashboard-grid">
+
+          <!-- Upcoming renewals -->
+          <article class="glass-card">
+            <h3 class="section-title">Renewing Soon <span style="color:var(--text-tertiary);font-weight:500">(30 days)</span></h3>
+            <ul id="upcoming-list" class="upcoming-list" aria-live="polite" aria-label="Upcoming renewals">
+              <li class="empty-note">Loading…</li>
+            </ul>
+          </article>
+
+          <!-- Spend by category chart -->
+          <article class="glass-card">
+            <h3 class="section-title">Spend by Category</h3>
+            <div class="chart-area">
+              <div class="chart-donut-wrap">
+                <svg id="donut-svg" viewBox="0 0 220 220" aria-label="Category spending donut chart" role="img"></svg>
+              </div>
+              <div id="donut-legend" aria-label="Category legend"></div>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Bar breakdown -->
+        <article class="glass-card" style="margin-top:16px">
+          <h3 class="section-title">Monthly Breakdown by Category</h3>
+          <div id="bar-chart" class="bar-chart" aria-label="Monthly cost per category"></div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Subscriptions View
+    ════════════════════════════════════════════════════════════════════ -->
+    <section id="view-subscriptions" class="view" aria-labelledby="subs-title">
+
+      <div class="view-header">
+        <h2 class="view-title" id="subs-title">Subscriptions</h2>
+        <button class="btn btn-ink" id="sub-add-btn" type="button">+ Add Subscription</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="list-controls" role="search" aria-label="Filter subscriptions">
+        <input
+          type="search"
+          id="sub-search"
+          class="form-input"
+          placeholder="Search…"
+          aria-label="Search subscriptions"
+          style="min-width:180px"
+        />
+        <select id="filter-category" class="form-select" aria-label="Filter by category">
+          <option value="">All Categories</option>
+        </select>
+        <select id="filter-status" class="form-select" aria-label="Filter by status">
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="canceled">Canceled</option>
+        </select>
+        <select id="filter-payment" class="form-select" aria-label="Filter by payment method">
+          <option value="">All Payment Methods</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="glass-card" style="padding:0;overflow:hidden">
+        <div class="sub-table-wrap" style="padding:16px">
+          <table class="sub-table" role="table" aria-label="Subscriptions list">
+            <thead>
+              <tr role="row">
+                <th scope="col">
+                  <button class="sort-btn" data-sort="name" type="button" aria-sort="none">
+                    Name <span class="sort-arrow"></span>
+                  </button>
+                </th>
+                <th scope="col">Status</th>
+                <th scope="col">
+                  <button class="sort-btn" data-sort="nextRenewal" type="button" aria-sort="ascending">
+                    Next Renewal <span class="sort-arrow"> ↑</span>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button class="sort-btn" data-sort="amount" type="button" aria-sort="none">
+                    Billed <span class="sort-arrow"></span>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button class="sort-btn" data-sort="amount" type="button" aria-sort="none">
+                    /mo equiv. <span class="sort-arrow"></span>
+                  </button>
+                </th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="sub-tbody" role="rowgroup">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state for list -->
+        <div id="sub-empty-state" class="empty-state" style="display:none">
+          <div class="empty-state-icon" aria-hidden="true">🔍</div>
+          <h3>No subscriptions found</h3>
+          <p>Try adjusting your filters, or add a new subscription.</p>
+          <button class="btn btn-ink" type="button" onclick="document.getElementById('sub-add-btn').click()">+ Add Subscription</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Calendar View
+    ════════════════════════════════════════════════════════════════════ -->
+    <section id="view-calendar" class="view" aria-labelledby="cal-title">
+
+      <div class="view-header">
+        <h2 class="view-title" id="cal-title">Calendar</h2>
+      </div>
+
+      <!-- Month navigation -->
+      <div class="calendar-view-header glass-card" style="max-width:700px">
+        <button class="btn btn-ghost btn-sm" id="cal-prev" type="button" aria-label="Previous month">‹ Prev</button>
+        <h3 class="calendar-month-label" id="cal-month-label" aria-live="polite" aria-atomic="true">June 2026</h3>
+        <button class="btn btn-ghost btn-sm" id="cal-today" type="button">Today</button>
+        <button class="btn btn-ghost btn-sm" id="cal-next" type="button" aria-label="Next month">Next ›</button>
+      </div>
+
+      <!-- Calendar grid -->
+      <div class="glass-card calendar-wrap" style="margin-top:16px">
+        <div id="cal-grid-container" aria-label="Renewal calendar" role="grid"></div>
+      </div>
+
+      <!-- Day detail -->
+      <div id="day-detail" class="glass-card day-detail" style="margin-top:16px;max-width:700px;display:none" aria-live="polite"></div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Settings View
+    ════════════════════════════════════════════════════════════════════ -->
+    <section id="view-settings" class="view" aria-labelledby="settings-title">
+
+      <div class="view-header">
+        <h2 class="view-title" id="settings-title">Settings</h2>
+      </div>
+
+      <div class="settings-sections">
+
+        <!-- General -->
+        <div class="glass-card settings-section">
+          <h3 class="settings-section-title">General</h3>
+
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Currency Symbol</div>
+              <div class="settings-desc">Used throughout the app</div>
+            </div>
+            <div class="settings-control">
+              <input
+                type="text"
+                id="setting-currency"
+                class="form-input"
+                maxlength="5"
+                aria-label="Currency symbol"
+                style="width:70px;text-align:center"
+              />
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Theme</div>
+              <div class="settings-desc">Light, dark, or follow system</div>
+            </div>
+            <div class="settings-control">
+              <select id="setting-theme" class="form-select" aria-label="Color theme" style="min-width:130px">
+                <option value="system">System default</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Calendar Starts On</div>
+              <div class="settings-desc">First day of the week</div>
+            </div>
+            <div class="settings-control">
+              <select id="setting-month-start" class="form-select" aria-label="Week starts on" style="min-width:130px">
+                <option value="0">Sunday</option>
+                <option value="1">Monday</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Reduce Motion</div>
+              <div class="settings-desc">Disable animations app-wide</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle" aria-label="Reduce motion">
+                <input type="checkbox" id="setting-reduced-motion" role="switch" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories & Payment Methods tabs -->
+        <div class="glass-card settings-section">
+          <h3 class="settings-section-title">Manage</h3>
+
+          <div class="tabs" role="tablist" aria-label="Manage categories and payment methods">
+            <button class="tab-btn active" role="tab" data-tab="categories" aria-selected="true" aria-controls="tab-categories" type="button">
+              Categories
+            </button>
+            <button class="tab-btn" role="tab" data-tab="payment-methods" aria-selected="false" aria-controls="tab-payment-methods" type="button">
+              Payment Methods
+            </button>
+          </div>
+
+          <div id="tab-categories" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-categories">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+              <button class="btn btn-ghost btn-sm" id="btn-add-category" type="button">+ Add Category</button>
+            </div>
+            <div id="category-list" class="manage-list" aria-live="polite"></div>
+          </div>
+
+          <div id="tab-payment-methods" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-payment-methods">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+              <button class="btn btn-ghost btn-sm" id="btn-add-pm" type="button">+ Add Payment Method</button>
+            </div>
+            <div id="pm-list" class="manage-list" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <!-- Export / Import -->
+        <div class="glass-card settings-section">
+          <h3 class="settings-section-title">Export &amp; Import</h3>
+
+          <div class="export-import-grid">
+            <div>
+              <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px">Download your data as JSON (full backup) or CSV (spreadsheet).</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-ghost" id="btn-export-json" type="button">⬇ Export JSON</button>
+                <button class="btn btn-ghost" id="btn-export-csv" type="button">⬇ Export CSV</button>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px">Import a previously exported JSON file to restore your data.</p>
+              <div
+                id="import-drop-area"
+                class="file-drop"
+                role="button"
+                tabindex="0"
+                aria-label="Import JSON file — click or drag and drop"
+                onclick="document.getElementById('import-file').click()"
+                onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('import-file').click()"
+              >
+                <div style="font-size:1.5rem;margin-bottom:8px" aria-hidden="true">📂</div>
+                Click or drag &amp; drop a .json file
+                <input type="file" id="import-file" accept=".json" aria-hidden="true" />
+              </div>
+              <button class="btn btn-ghost" id="btn-import-json" type="button" style="margin-top:8px;width:100%">⬆ Import JSON</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="glass-card settings-section">
+          <h3 class="settings-section-title">Data Management</h3>
+          <div class="danger-zone">
+            <div class="danger-zone-title">⚠ Danger Zone</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm" id="btn-reset-sample" type="button">Reset to sample data</button>
+              <button class="btn btn-danger btn-sm" id="btn-clear-all" type="button">Clear all data</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Subscription Modal -->
+<div id="sub-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sub-modal-title" hidden>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="sub-modal-title">Add Subscription</h2>
+      <button class="btn-icon" type="button" aria-label="Close dialog" onclick="document.getElementById('sub-modal').classList.remove('open');document.getElementById('sub-modal').setAttribute('hidden','')">✕</button>
+    </div>
+
+    <form id="sub-form" novalidate>
+      <div class="form-grid">
+
+        <!-- Name -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-name">Name <span class="form-required" aria-label="required">*</span></label>
+          <input type="text" id="sub-form-name" class="form-input" placeholder="e.g. Netflix" maxlength="100" required autocomplete="off" />
+          <span class="form-error" id="err-name" role="alert" aria-live="polite"></span>
+        </div>
+
+        <!-- Vendor -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-vendor">Vendor / Provider</label>
+          <input type="text" id="sub-form-vendor" class="form-input" placeholder="e.g. Netflix Inc." maxlength="50" autocomplete="off" />
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-amount">Amount <span class="form-required" aria-label="required">*</span></label>
+          <input type="number" id="sub-form-amount" class="form-input" placeholder="0.00" min="0" step="0.01" required style="font-family:var(--font-mono)" />
+          <span class="form-error" id="err-amount" role="alert" aria-live="polite"></span>
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-currency">Currency Symbol</label>
+          <input type="text" id="sub-form-currency" class="form-input" maxlength="5" style="font-family:var(--font-mono);text-align:center" />
+        </div>
+
+        <!-- Billing cycle -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-cycle">Billing Cycle <span class="form-required" aria-label="required">*</span></label>
+          <select id="sub-form-cycle" class="form-select">
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="semiannual">Semiannual</option>
+            <option value="yearly">Yearly</option>
+            <option value="custom">Custom (N days)</option>
+          </select>
+        </div>
+
+        <!-- Custom days (hidden unless custom) -->
+        <div class="form-group" id="custom-days-row" style="display:none">
+          <label class="form-label" for="sub-form-custom-days">Interval (days) <span class="form-required" aria-label="required">*</span></label>
+          <input type="number" id="sub-form-custom-days" class="form-input" min="1" step="1" value="30" style="font-family:var(--font-mono)" />
+          <span class="form-error" id="err-custom" role="alert" aria-live="polite"></span>
+        </div>
+
+        <!-- Anchor date -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-anchor">First / Anchor Billing Date <span class="form-required" aria-label="required">*</span></label>
+          <input type="date" id="sub-form-anchor" class="form-input" required style="font-family:var(--font-mono)" />
+          <span class="form-hint">Next renewal is computed from this date.</span>
+          <span class="form-error" id="err-anchor" role="alert" aria-live="polite"></span>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-category">Category</label>
+          <select id="sub-form-category" class="form-select">
+            <option value="Uncategorized">Uncategorized</option>
+          </select>
+        </div>
+
+        <!-- Payment method -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-payment">Payment Method</label>
+          <select id="sub-form-payment" class="form-select">
+            <option value="">— None —</option>
+          </select>
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-status">Status</label>
+          <select id="sub-form-status" class="form-select">
+            <option value="active">Active</option>
+            <option value="paused">Paused</option>
+            <option value="canceled">Canceled</option>
+          </select>
+        </div>
+
+        <!-- Trial ends -->
+        <div class="form-group">
+          <label class="form-label" for="sub-form-trial">Free Trial Ends</label>
+          <input type="date" id="sub-form-trial" class="form-input" style="font-family:var(--font-mono)" />
+          <span class="form-hint">Leave blank if no trial.</span>
+          <span class="form-error" id="err-trial" role="alert" aria-live="polite"></span>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group full-width">
+          <label class="form-label" for="sub-form-notes">Notes</label>
+          <textarea id="sub-form-notes" class="form-textarea" maxlength="500" rows="3" placeholder="Any extra details…"></textarea>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="sub-form-cancel">Cancel</button>
+        <button type="submit" class="btn btn-ink">Save Subscription</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div id="cat-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cat-modal-title" hidden>
+  <div class="modal-box modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title" id="cat-modal-title">Add Category</h2>
+      <button class="btn-icon" type="button" aria-label="Close dialog" onclick="document.getElementById('cat-modal').classList.remove('open');document.getElementById('cat-modal').setAttribute('hidden','')">✕</button>
+    </div>
+
+    <form id="cat-form" novalidate>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label" for="cat-form-name">Category Name <span class="form-required" aria-label="required">*</span></label>
+        <input type="text" id="cat-form-name" class="form-input" maxlength="50" required autocomplete="off" />
+        <span class="form-error" id="err-cat-name" role="alert" aria-live="polite"></span>
+      </div>
+      <div class="form-grid" style="gap:12px">
+        <div class="form-group">
+          <label class="form-label" for="cat-form-color">Color</label>
+          <input type="color" id="cat-form-color" class="form-input" style="padding:4px;height:44px;cursor:pointer" value="#7C6FCD" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cat-form-glyph">Glyph / Emoji</label>
+          <input type="text" id="cat-form-glyph" class="form-input" maxlength="4" placeholder="🎬" style="text-align:center;font-size:1.2rem" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="cat-form-cancel">Cancel</button>
+        <button type="submit" class="btn btn-ink">Save Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Payment Method Modal -->
+<div id="pm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pm-modal-title" hidden>
+  <div class="modal-box modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title" id="pm-modal-title">Add Payment Method</h2>
+      <button class="btn-icon" type="button" aria-label="Close dialog" onclick="document.getElementById('pm-modal').classList.remove('open');document.getElementById('pm-modal').setAttribute('hidden','')">✕</button>
+    </div>
+
+    <form id="pm-form" novalidate>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label" for="pm-form-label">Label <span class="form-required" aria-label="required">*</span></label>
+        <input type="text" id="pm-form-label" class="form-input" maxlength="60" required placeholder="e.g. Visa ··4321" autocomplete="off" />
+        <span class="form-hint">Short label you'll recognize</span>
+        <span class="form-error" id="err-pm-label" role="alert" aria-live="polite"></span>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="pm-form-cancel">Cancel</button>
+        <button type="submit" class="btn btn-ink">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm / Reassign Modal -->
+<div id="confirm-modal" class="modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message" hidden>
+  <div class="modal-box modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title" id="confirm-title">Confirm</h2>
+    </div>
+    <p class="confirm-msg" id="confirm-message">Are you sure?</p>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+      <button type="button" class="btn btn-danger" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- sr-only utility -->
+<style>
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+</style>
+
+<!-- App entry (loaded last so all modules are defined) -->
+<script src="app.js"></script>
+
+</body>
+</html>
