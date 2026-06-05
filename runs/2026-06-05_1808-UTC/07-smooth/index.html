@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smooth — Savitzky–Golay Signal Workbench | Orbioom</title>
+  <meta name="description" content="Interactive Savitzky–Golay signal smoothing and differentiation. Correct algorithm from Savitzky & Golay (1964), live controls, canvas visualization." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Google Fonts: Manrope + JetBrains Mono. Loaded from network for aesthetics;
+       the app works fully without them (system font stacks are the fallback). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="app-shell" role="main">
+
+  <!-- ===== HEADER ===== -->
+  <header class="panel app-header" role="banner">
+    <div class="app-logo">
+      <h1>Smooth<span class="logo-dot" aria-hidden="true"></span></h1>
+      <span class="app-tagline">Savitzky–Golay Signal Smoothing &amp; Differentiation</span>
+    </div>
+    <span class="header-badge" aria-label="Algorithm: Savitzky–Golay 1964">SG · Anal. Chem. 1964</span>
+  </header>
+
+  <!-- ===== MAIN GRID ===== -->
+  <div class="main-grid">
+
+    <!-- ===== LEFT COLUMN: Chart + Metrics + Method ===== -->
+    <div style="display:flex; flex-direction:column; gap:20px; min-width:0;">
+
+      <!-- CHART PANEL -->
+      <section class="panel chart-panel" aria-label="Signal visualization">
+        <div class="chart-title-row">
+          <h2>Signal Plot</h2>
+          <div class="export-group" role="group" aria-label="Export options">
+            <button class="btn-export" id="export-png" aria-label="Export chart as PNG image">
+              ↓ PNG
+            </button>
+            <button class="btn-export" id="export-csv" aria-label="Export data as CSV spreadsheet">
+              ↓ CSV
+            </button>
+          </div>
+        </div>
+
+        <div id="chart-container" role="img" aria-label="Savitzky-Golay smoothed signal chart">
+          <span class="chart-aria-desc" id="chart-desc" aria-live="polite">
+            Chart showing raw noisy signal overlaid with Savitzky–Golay smoothed signal.
+          </span>
+          <canvas id="chart-canvas" aria-describedby="chart-desc"></canvas>
+        </div>
+
+        <div id="error-banner" role="alert" aria-live="assertive"></div>
+
+        <p class="edge-note">
+          <strong>Edge policy:</strong> asymmetric SG coefficients — the full window is anchored at
+          the signal boundary and the polynomial is evaluated at the point's offset from window centre.
+          No zero-padding; no truncation.
+        </p>
+      </section>
+
+      <!-- METRICS -->
+      <section class="panel metrics-panel" aria-label="Computed metrics">
+        <h2>Key Metrics</h2>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-card-label">Window</div>
+            <div class="metric-card-value" id="metric-window" aria-live="polite">11</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">Poly. Order</div>
+            <div class="metric-card-value" id="metric-order" aria-live="polite">3</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">Deriv. Order</div>
+            <div class="metric-card-value" id="metric-deriv" aria-live="polite">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">Data Points</div>
+            <div class="metric-card-value" id="metric-points" aria-live="polite">—</div>
+          </div>
+          <div class="metric-card accent">
+            <div class="metric-card-label">Residual RMS</div>
+            <div class="metric-card-value" id="metric-rms" aria-live="polite">—</div>
+          </div>
+          <div class="metric-card accent">
+            <div class="metric-card-label">Noise Reduction</div>
+            <div class="metric-card-value" id="metric-nr" aria-live="polite">—</div>
+          </div>
+          <div class="metric-card" style="grid-column: 1 / -1;">
+            <div class="metric-card-label">Compute Time</div>
+            <div class="metric-card-value" id="metric-time" aria-live="polite">— ms</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SANITY CHECKS -->
+      <section class="panel checks-panel" aria-label="Algorithm sanity checks">
+        <h2>Coefficient Sanity Checks</h2>
+        <p class="checks-desc">
+          Mathematical invariants verified in the browser: smoothing coefficients must sum to 1;
+          derivative coefficients must sum to 0; SG with p≥2 must reproduce a quadratic exactly.
+        </p>
+        <button class="btn-checks" id="run-checks" aria-label="Re-run all sanity checks">
+          ↻ Re-run checks
+        </button>
+        <div class="checks-status" id="checks-status" aria-live="polite"></div>
+        <div id="sanity-checks" aria-live="polite" role="list" aria-label="Sanity check results"></div>
+      </section>
+
+      <!-- METHOD & REFERENCES -->
+      <section class="panel method-panel" aria-label="Method description and references">
+        <h2>Method &amp; References</h2>
+        <div class="method-content">
+
+          <p>
+            <strong>Algorithm:</strong> Savitzky–Golay least-squares polynomial convolution.
+            For each sample point, a polynomial of degree <em>p</em> is fit (by ordinary least squares)
+            to the surrounding window of 2m+1 points. The smoothed value is the polynomial
+            evaluated at the window centre. For the <em>d</em>-th derivative, the
+            <em>d</em>-th derivative of the polynomial is evaluated instead, scaled by <em>d!</em>.
+          </p>
+
+          <code class="equation">
+            w = A (AᵀA)⁻¹ eₓ₀ <br/>
+            where A[j,k] = (j−m)ᵏ,  eₓ₀[k] = x₀ᵏ (d=0)  or  k!/(k−d)! · x₀^(k−d) (d>0)
+          </code>
+
+          <p>
+            <strong>Implementation:</strong> The (p+1)×(p+1) normal-equations system
+            (AᵀA)·v = eₓ₀ is solved by Gaussian elimination with partial pivoting
+            (coded from scratch in <code>js/savgol.js</code> — no linear-algebra library).
+            Coefficients are computed once per unique evaluation offset; interior points
+            share a single cached centred coefficient vector.
+          </p>
+
+          <p>
+            <strong>Constraints enforced:</strong> window must be odd and ≥ p+2;
+            derivative order ≤ polynomial order; window ≤ signal length.
+          </p>
+
+          <p>
+            <strong>Edge policy:</strong> Asymmetric coefficients (Savitzky &amp; Golay 1964,
+            Appendix). The window is anchored at the signal boundary; the polynomial is evaluated
+            at the offset of the target point within the window. This is exact — not an
+            approximation — because the polynomial model does not change.
+          </p>
+
+          <p><strong>Primary reference:</strong></p>
+          <code class="ref">
+            Savitzky, A.; Golay, M.J.E.<br/>
+            "Smoothing and Differentiation of Data by Simplified Least Squares Procedures."<br/>
+            Analytical Chemistry, 1964, 36(8), pp. 1627–1639.<br/>
+            DOI: 10.1021/ac60214a047
+          </code>
+
+          <p>
+            <strong>Honest simplifications:</strong> Spacing between samples is assumed uniform
+            (unit spacing, Δx = 1). Derivative values are in units of
+            [signal unit / sample index]. For physical derivative values, divide by the
+            physical sample spacing Δx.
+          </p>
+
+        </div>
+      </section>
+
+    </div><!-- end left column -->
+
+    <!-- ===== RIGHT COLUMN: Controls ===== -->
+    <aside class="panel controls-panel" aria-label="Filter controls">
+      <h2>Controls</h2>
+
+      <!-- Data source -->
+      <div class="control-group">
+        <label class="control-label" for="ctrl-source">
+          Data Source
+        </label>
+        <select id="ctrl-source" aria-label="Select signal data source">
+          <option value="gaussian_peak">Gaussian Peak + Baseline</option>
+          <option value="multi_peak">Multi-Peak Spectrum</option>
+          <option value="noisy_sine">Noisy Sine Wave</option>
+          <option value="step_noise">Step Function + Noise</option>
+          <option value="user" disabled>─── Paste custom data below ───</option>
+        </select>
+      </div>
+
+      <!-- Window length -->
+      <div class="control-group">
+        <label class="control-label" for="ctrl-window-slider">
+          Window Length (odd)
+          <span class="control-label-val" id="ctrl-window-display" aria-hidden="true">11</span>
+        </label>
+        <div class="slider-row">
+          <input
+            type="range"
+            id="ctrl-window-slider"
+            min="3" max="101" step="2"
+            value="11"
+            aria-label="Window length slider — must be odd"
+            aria-valuemin="3" aria-valuemax="101" aria-valuenow="11"
+          />
+          <input
+            type="number"
+            id="ctrl-window-number"
+            min="3" max="999" step="2"
+            value="11"
+            aria-label="Window length numeric input"
+          />
+        </div>
+        <p style="font-size:0.72rem; color:var(--text-tertiary); margin-top:4px;">
+          Odd integer ≥ poly.&nbsp;order + 2. Larger → smoother, less detail.
+        </p>
+      </div>
+
+      <!-- Polynomial order -->
+      <div class="control-group">
+        <label class="control-label" for="ctrl-order">
+          Polynomial Order
+        </label>
+        <select id="ctrl-order" aria-label="Polynomial order for Savitzky-Golay filter">
+          <option value="1">1 — Linear</option>
+          <option value="2">2 — Quadratic</option>
+          <option value="3" selected>3 — Cubic</option>
+          <option value="4">4 — Quartic</option>
+          <option value="5">5 — Quintic</option>
+        </select>
+        <p style="font-size:0.72rem; color:var(--text-tertiary); margin-top:4px;">
+          Higher → preserves peaks better; requires wider window.
+        </p>
+      </div>
+
+      <!-- Derivative order -->
+      <div class="control-group">
+        <label class="control-label" for="ctrl-deriv">
+          Derivative Order
+        </label>
+        <select id="ctrl-deriv" aria-label="Derivative order to overlay on chart">
+          <option value="0" selected>0 — Smoothed signal only</option>
+          <option value="1">1 — 1st derivative</option>
+          <option value="2">2 — 2nd derivative</option>
+        </select>
+        <p style="font-size:0.72rem; color:var(--text-tertiary); margin-top:4px;">
+          Derivative shown as dashed overlay with right-axis scale (arb. units / sample).
+          Requires deriv. ≤ poly. order.
+        </p>
+      </div>
+
+      <!-- User data -->
+      <div class="user-data-section">
+        <h3>Paste Custom Data</h3>
+        <p class="user-data-hint">
+          Newline- or comma-separated numbers (≥ 4 values).<br/>
+          Ctrl+Enter to load.
+        </p>
+        <textarea
+          id="user-data-input"
+          placeholder="1.2, 2.5, 3.1, 2.8, 4.0, ..."
+          aria-label="Paste your numeric signal data here, separated by commas or newlines"
+          spellcheck="false"
+        ></textarea>
+        <button class="btn-load" id="load-user-data" aria-label="Load pasted data as signal">
+          Load pasted data
+        </button>
+      </div>
+
+    </aside><!-- end controls -->
+
+  </div><!-- end main-grid -->
+
+  <!-- FOOTER -->
+  <footer class="app-footer" role="contentinfo">
+    Orbioom · Smooth · Savitzky &amp; Golay (Anal. Chem. 1964) ·
+    <span style="font-family: var(--font-mono); font-size:0.72rem;">
+      All computation in browser — no server, no data upload.
+    </span>
+  </footer>
+
+</div><!-- end app-shell -->
+
+<!-- Scripts — plain <script> tags so file:// works without CORS -->
+<script src="js/savgol.js"></script>
+<script src="js/signals.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

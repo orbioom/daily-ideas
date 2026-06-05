@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Recall — spaced-repetition flashcards powered by the SM-2 algorithm. Study smarter, not harder." />
+  <title>Recall · Spaced Repetition Flashcards</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Screen-reader live region -->
+<div id="live-region" class="live-region" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Toast container -->
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+<!-- ── Application ──────────────────────────────────────── -->
+<div id="app">
+
+  <!-- Navigation -->
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="Recall home" onclick="return false;">
+        <div class="nav-logo-icon" aria-hidden="true">⟲</div>
+        <span>Recall</span>
+      </a>
+
+      <nav class="nav-tabs" role="navigation" aria-label="Main navigation">
+        <button class="nav-tab active" data-page="decks" aria-current="page">Decks</button>
+        <button class="nav-tab" data-page="study" aria-current="false">Study</button>
+        <button class="nav-tab" data-page="stats" aria-current="false">Stats</button>
+        <button class="nav-tab" data-page="settings" aria-current="false">Settings</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main" id="main-content" role="main">
+
+    <!-- ── DECKS PAGE ─────────────────────────────────────── -->
+    <section id="page-decks" class="page active" aria-labelledby="decks-heading">
+      <div class="section-heading">
+        <h1 id="decks-heading" style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">Your Decks</h1>
+        <div class="toolbar" style="margin-bottom:0;margin-left:auto;">
+          <button class="btn btn-glass btn-sm" id="btn-study-all">Study All Due</button>
+          <button class="btn btn-primary" id="btn-new-deck">+ New Deck</button>
+        </div>
+      </div>
+      <div id="decks-container" class="deck-grid" role="list" aria-label="Deck list">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ── STUDY PAGE ─────────────────────────────────────── -->
+    <section id="page-study" class="page" aria-label="Study session">
+      <!-- Rendered dynamically by JS -->
+    </section>
+
+    <!-- ── DECK DETAIL PAGE ───────────────────────────────── -->
+    <section id="page-deck-detail" class="page" aria-label="Deck detail and card list">
+      <!-- Rendered dynamically by JS -->
+    </section>
+
+    <!-- ── STATS PAGE ─────────────────────────────────────── -->
+    <section id="page-stats" class="page" aria-labelledby="stats-heading">
+      <div class="section-heading">
+        <h1 id="stats-heading" style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">Statistics</h1>
+      </div>
+
+      <!-- Key metrics -->
+      <div class="stats-grid" role="list" aria-label="Key statistics">
+        <div class="stat-card" role="listitem">
+          <div class="stat-card-value mono" id="stat-total-cards">0</div>
+          <div class="stat-card-label">Total Cards</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-card-value mono" id="stat-total-decks">0</div>
+          <div class="stat-card-label">Decks</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-card-value mono" id="stat-due-today">0</div>
+          <div class="stat-card-label">Due Today</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-card-value mono" id="stat-streak">0d</div>
+          <div class="stat-card-label">Current Streak</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-card-value mono" id="stat-retention">—</div>
+          <div class="stat-card-label">Retention Rate</div>
+          <div class="stat-card-sub">% rated Good or better</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-card-value mono" id="stat-reviews-7">0</div>
+          <div class="stat-card-label">Reviews (7 days)</div>
+        </div>
+      </div>
+
+      <!-- Heatmap -->
+      <div class="heatmap-container" aria-label="Review activity heatmap">
+        <h2 style="font-size:0.9375rem;font-weight:700;margin-bottom:16px;">Review Activity · Last 12 Weeks</h2>
+        <div style="overflow-x:auto;">
+          <svg id="heatmap-svg" aria-label="Review heatmap"></svg>
+        </div>
+      </div>
+
+      <!-- Forecast -->
+      <div class="heatmap-container" aria-label="Upcoming reviews forecast">
+        <h2 style="font-size:0.9375rem;font-weight:700;margin-bottom:16px;">Cards Due · Next 7 Days</h2>
+        <div style="overflow-x:auto;">
+          <svg id="forecast-svg" aria-label="Cards due forecast"></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SETTINGS PAGE ──────────────────────────────────── -->
+    <section id="page-settings" class="page" aria-labelledby="settings-heading">
+      <div class="section-heading">
+        <h1 id="settings-heading" style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">Settings</h1>
+      </div>
+
+      <div class="card" style="max-width:600px;">
+
+        <!-- Study -->
+        <div class="settings-section">
+          <h2>Study</h2>
+          <div class="settings-row">
+            <div class="settings-label">
+              <div class="settings-label-title">Daily new card limit</div>
+              <div class="settings-label-desc">Maximum new cards introduced per day.</div>
+            </div>
+            <div class="settings-control">
+              <input type="number" id="setting-new-limit" class="form-input settings-number-input mono"
+                min="1" max="200" value="20" aria-label="Daily new card limit" />
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-label">
+              <div class="settings-label-title">Max reviews per session</div>
+              <div class="settings-label-desc">Cap the number of cards in a single study session.</div>
+            </div>
+            <div class="settings-control">
+              <input type="number" id="setting-max-reviews" class="form-input settings-number-input mono"
+                min="1" max="500" value="100" aria-label="Max reviews per session" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="settings-section">
+          <h2>Appearance</h2>
+          <div class="settings-row">
+            <div class="settings-label">
+              <div class="settings-label-title">Theme</div>
+              <div class="settings-label-desc">Light, dark, or follow your system preference.</div>
+            </div>
+            <div class="settings-control">
+              <div class="theme-options" role="group" aria-label="Theme selection">
+                <button class="theme-option" data-theme="light" aria-pressed="false">Light</button>
+                <button class="theme-option active" data-theme="system" aria-pressed="true">System</button>
+                <button class="theme-option" data-theme="dark" aria-pressed="false">Dark</button>
+              </div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-label">
+              <div class="settings-label-title">Reduce motion</div>
+              <div class="settings-label-desc">Disable card flip animations and transitions.</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle" aria-label="Reduce motion">
+                <input type="checkbox" id="setting-reduced-motion" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save -->
+        <div style="display:flex;justify-content:flex-end;">
+          <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Data -->
+        <div class="settings-section">
+          <h2>Data & Export</h2>
+          <div class="settings-row" style="border:none;">
+            <div class="settings-label">
+              <div class="settings-label-title">Export all data</div>
+              <div class="settings-label-desc">Download all decks, cards, and scheduling state as JSON (full round-trip restore) or cards as CSV.</div>
+            </div>
+            <div class="settings-control" style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-glass btn-sm" id="btn-export-json">Export JSON</button>
+              <button class="btn btn-glass btn-sm" id="btn-export-csv">Export CSV</button>
+            </div>
+          </div>
+          <div class="settings-row" style="border:none;">
+            <div class="settings-label">
+              <div class="settings-label-title">Import JSON</div>
+              <div class="settings-label-desc">Restore from a previously exported JSON file. Replaces all current data.</div>
+            </div>
+            <div class="settings-control">
+              <button class="btn btn-glass btn-sm" id="btn-import-json">Import JSON</button>
+              <input type="file" id="import-json-file" accept=".json,application/json" class="hidden" aria-label="Import JSON file" />
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Danger zone -->
+        <div class="settings-section">
+          <h2 style="color:var(--danger);">Danger Zone</h2>
+          <div class="settings-row">
+            <div class="settings-label">
+              <div class="settings-label-title">Reset to sample data</div>
+              <div class="settings-label-desc">Replace all data with the built-in sample decks.</div>
+            </div>
+            <div class="settings-control">
+              <button class="btn btn-ghost btn-sm" id="btn-reset-sample">Reset to Sample</button>
+            </div>
+          </div>
+          <div class="settings-row" style="border:none;">
+            <div class="settings-label">
+              <div class="settings-label-title">Clear all data</div>
+              <div class="settings-label-desc">Permanently delete all decks, cards, and review history.</div>
+            </div>
+            <div class="settings-control">
+              <button class="btn btn-danger btn-sm" id="btn-clear-all">Clear All</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- /main -->
+</div><!-- /app -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     MODALS
+     ══════════════════════════════════════════════════════════ -->
+
+<!-- Deck Modal (Create / Edit) -->
+<div id="modal-deck" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-deck-title">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-deck-title">New Deck</h3>
+      <button class="btn btn-icon btn-ghost btn-close-modal" aria-label="Close dialog">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="deck-name">Deck name <span aria-hidden="true">*</span></label>
+        <input type="text" id="deck-name" class="form-input" placeholder="e.g. Spanish Vocabulary"
+          maxlength="100" autocomplete="off" aria-required="true" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="deck-desc">Description</label>
+        <textarea id="deck-desc" class="form-textarea" placeholder="Optional description…"
+          maxlength="300" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Color</div>
+        <div class="color-options" role="group" aria-label="Deck color"></div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Icon</div>
+        <div class="glyph-options" role="group" aria-label="Deck icon"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-cancel-modal">Cancel</button>
+      <button class="btn btn-primary btn-save-deck">Save Deck</button>
+    </div>
+  </div>
+</div>
+
+<!-- Card Modal (Add / Edit) -->
+<div id="modal-card" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-card-title">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <h3 class="modal-card-title" id="modal-card-title">Add Card</h3>
+      <button class="btn btn-icon btn-ghost btn-close-card" aria-label="Close dialog">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="card-front">Front (prompt) <span aria-hidden="true">*</span></label>
+        <textarea id="card-front" class="form-textarea" placeholder="Question or term…"
+          maxlength="500" rows="3" aria-required="true"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="card-back">Back (answer) <span aria-hidden="true">*</span></label>
+        <textarea id="card-back" class="form-textarea" placeholder="Answer or definition…"
+          maxlength="1000" rows="4" aria-required="true"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="card-tags">Tags <span class="form-hint" style="font-weight:400;">(comma-separated)</span></label>
+        <input type="text" id="card-tags" class="form-input" placeholder="e.g. verb, irregular, chapter-3"
+          maxlength="200" autocomplete="off" />
+        <span class="form-hint">Optional. Used for filtering and display.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-cancel-card">Cancel</button>
+      <button class="btn btn-primary btn-save-card">Save Card</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Import Modal -->
+<div id="modal-bulk" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-bulk-title">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <h3 id="modal-bulk-title">Bulk Import Cards</h3>
+      <button class="btn btn-icon btn-ghost btn-close-bulk" aria-label="Close dialog">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-muted text-small mb-4">
+        Paste one card per line in the format: <strong class="mono">front | back</strong><br />
+        Lines without a <span class="mono">|</span> separator or with empty sides are skipped.
+      </p>
+      <div class="form-group">
+        <label class="form-label" for="bulk-text">Cards</label>
+        <textarea id="bulk-text" class="form-textarea" rows="8"
+          placeholder="hola | hello&#10;gracias | thank you&#10;por favor | please"
+          aria-describedby="bulk-result-desc"></textarea>
+      </div>
+      <div class="bulk-result text-small text-muted mono" id="bulk-result-desc" aria-live="polite"></div>
+      <div class="bulk-preview" style="margin-top:12px;max-height:180px;overflow-y:auto;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-cancel-bulk">Cancel</button>
+      <button class="btn btn-primary btn-commit-bulk">Import Cards</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div id="modal-confirm" class="modal-backdrop hidden confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-dialog-title">
+  <div class="modal" style="max-width:400px;" role="document">
+    <div class="modal-header">
+      <h3 class="confirm-title" id="confirm-dialog-title">Confirm</h3>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-message text-muted"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost confirm-cancel">Cancel</button>
+      <button class="btn btn-danger confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Scripts — in dependency order -->
+<script src="sm2.js"></script>
+<script src="storage.js"></script>
+<script src="seed.js"></script>
+<script src="stats.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
