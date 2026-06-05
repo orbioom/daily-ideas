@@ -1,10 +1,10 @@
 Strand - FM-index query report
 ========================================
 reference : 8000 bp
-build     : 28 ms
+build     : 24 ms
 round-trip: ok
 
 GATTACA        hits=3    verified=ok
 ACGTACGT       hits=2    verified=ok
 
-benchmark (2000x 12-mer): FM=6ms naive=50ms speedup=8.8x
+benchmark (2000x 12-mer): FM=5ms naive=47ms speedup=9.3x
