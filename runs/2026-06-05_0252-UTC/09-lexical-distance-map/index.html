@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lexical Distance Map — Orbioom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --glass: rgba(255,255,255,0.42);
+  --glass-raised: rgba(255,255,255,0.78);
+  --border: rgba(255,255,255,0.7);
+  --text: #1b1d2a;
+  --text-2: #565a70;
+  --text-3: #8b8fa3;
+  --accent-grad: linear-gradient(180deg, #3a3e4c 0%, #23262f 100%);
+  --dot-live: #86c79a;
+  --blur: 22px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(155deg, #EDEEF3 0%, #E7E9F0 50%, #ECEEF2 100%);
+  color: var(--text); height: 100vh;
+  display: flex; flex-direction: column;
+}
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 28px; flex-shrink: 0;
+  background: var(--glass-raised);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.logo { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.logo-sub {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text-3); margin-left: 10px; font-weight: 400; letter-spacing: 0.06em;
+}
+.filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.filter-chip {
+  background: rgba(255,255,255,0.45); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.05em; color: var(--text-3);
+  cursor: pointer; transition: all 0.15s var(--ease); user-select: none;
+}
+.filter-chip.active {
+  background: rgba(255,255,255,0.75); border-color: rgba(27,29,42,0.2); color: var(--text-2);
+}
+.filter-chip:hover:not(.active) { background: rgba(255,255,255,0.65); }
+
+.canvas-area {
+  flex: 1; position: relative; overflow: hidden;
+}
+svg {
+  width: 100%; height: 100%;
+}
+
+/* Node */
+.lang-node circle {
+  transition: r 0.2s var(--ease), fill-opacity 0.2s;
+  cursor: pointer;
+}
+.lang-node text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.lang-node.highlighted circle { stroke-width: 2 !important; }
+.lang-node.dimmed { opacity: 0.2; }
+
+.edge {
+  stroke: rgba(27,29,42,0.06);
+  stroke-width: 1; pointer-events: none;
+  transition: stroke-opacity 0.2s;
+}
+.edge.highlighted { stroke: rgba(134,199,154,0.5); stroke-width: 1.5; }
+
+/* Info panel */
+.info-panel {
+  position: absolute; bottom: 28px; left: 28px;
+  width: 260px;
+  background: var(--glass-raised);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 4px 24px rgba(40,44,80,0.1);
+  border-radius: 16px; padding: 18px 20px;
+  transition: opacity 0.2s var(--ease);
+  pointer-events: none;
+}
+.info-panel.hidden { opacity: 0; }
+.info-name { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.info-family {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border-radius: 20px; padding: 3px 10px; display: inline-block;
+  margin-bottom: 12px;
+}
+.info-speakers { font-size: 13px; color: var(--text-2); margin-bottom: 6px; }
+.info-note { font-size: 12px; color: var(--text-3); line-height: 1.55; }
+
+/* Legend */
+.legend-panel {
+  position: absolute; top: 80px; right: 28px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  border-radius: 14px; padding: 14px 18px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.04em; color: var(--text-3);
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.hint {
+  position: absolute; bottom: 28px; right: 28px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; color: var(--text-3);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">Orbioom <span class="logo-sub">LEXICAL DISTANCE MAP</span></div>
+  <div class="filter-row" id="filterRow">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.1em">show:</span>
+    <div class="filter-chip active" data-family="all" onclick="filterFamily(this)">all families</div>
+  </div>
+</div>
+
+<div class="canvas-area">
+  <svg id="svg">
+    <defs>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(40,44,80,0.12)"/>
+      </filter>
+    </defs>
+    <g id="edges"></g>
+    <g id="nodes"></g>
+  </svg>
+</div>
+
+<div class="info-panel hidden" id="infoPanel">
+  <div class="info-name" id="infoName"></div>
+  <div class="info-family" id="infoFamily"></div>
+  <div class="info-speakers" id="infoSpeakers"></div>
+  <div class="info-note" id="infoNote"></div>
+</div>
+
+<div class="legend-panel" id="legendPanel"></div>
+<div class="hint">hover a language · drag to explore</div>
+
+<script>
+// Language data: approximate positions based on linguistic distance research
+// Positions in [−100, 100] normalized space; will be scaled to canvas
+// Based on Ethnologue genetic distance and ASJP lexicostatistical distances
+const FAMILIES = {
+  germanic:  { color: '#3a4a7a', label: 'Germanic' },
+  romance:   { color: '#7a3a4a', label: 'Romance' },
+  slavic:    { color: '#3a6a4a', label: 'Slavic' },
+  celtic:    { color: '#4a6a7a', label: 'Celtic' },
+  hellenic:  { color: '#6a5a3a', label: 'Hellenic' },
+  semitic:   { color: '#7a5a3a', label: 'Semitic' },
+  iranic:    { color: '#5a3a6a', label: 'Iranic/Indo-Iranian' },
+  balticslavic: { color: '#3a5a3a', label: 'Baltic' },
+  uralic:    { color: '#5a6a3a', label: 'Uralic' },
+  turkic:    { color: '#6a3a5a', label: 'Turkic' },
+  sinitic:   { color: '#3a5a6a', label: 'Sino-Tibetan' },
+  japonic:   { color: '#5a4a6a', label: 'Japonic' },
+};
+
+const LANGUAGES = [
+  // Germanic
+  { id: 'en',  name: 'English',    family: 'germanic', x: -20, y: -55, speakers: '1.5B native+L2', note: 'West Germanic, heavily influenced by French and Latin.' },
+  { id: 'de',  name: 'German',     family: 'germanic', x:  -2, y: -58, speakers: '100M native', note: 'West Germanic. English and German share ~60% core vocabulary.' },
+  { id: 'nl',  name: 'Dutch',      family: 'germanic', x:  -12, y: -56, speakers: '24M native', note: 'West Germanic. Often described as between English and German.' },
+  { id: 'sv',  name: 'Swedish',    family: 'germanic', x:   8, y: -66, speakers: '10M native', note: 'North Germanic. Mutually intelligible with Norwegian and Danish.' },
+  { id: 'no',  name: 'Norwegian',  family: 'germanic', x:   2, y: -64, speakers: '5M native', note: 'North Germanic. Two official written forms: Bokmål and Nynorsk.' },
+  { id: 'da',  name: 'Danish',     family: 'germanic', x:   5, y: -60, speakers: '6M native', note: 'North Germanic. More conservative spelling than Swedish.' },
+  { id: 'af',  name: 'Afrikaans',  family: 'germanic', x: -30, y: -48, speakers: '7M native', note: 'Derived from 17th-century Dutch settlers in South Africa. Simplified grammar.' },
+  // Romance
+  { id: 'fr',  name: 'French',     family: 'romance', x: -40, y: -40, speakers: '300M L1+L2', note: 'Major influence on English. ~30% of English words have French roots.' },
+  { id: 'es',  name: 'Spanish',    family: 'romance', x: -52, y: -32, speakers: '500M native', note: 'Second-most spoken native language globally.' },
+  { id: 'pt',  name: 'Portuguese', family: 'romance', x: -60, y: -26, speakers: '250M native', note: 'Very close to Spanish; Brazilian and European variants differ notably.' },
+  { id: 'it',  name: 'Italian',    family: 'romance', x: -38, y: -28, speakers: '65M native', note: 'Considered closest to Latin among major Romance languages.' },
+  { id: 'ro',  name: 'Romanian',   family: 'romance', x: -22, y: -18, speakers: '26M native', note: 'Eastern Romance, with significant Slavic influence.' },
+  { id: 'ca',  name: 'Catalan',    family: 'romance', x: -46, y: -36, speakers: '10M native', note: 'Bridge between French and Spanish; spoken in Catalonia, Valencia, Balearics.' },
+  // Slavic
+  { id: 'ru',  name: 'Russian',    family: 'slavic',  x:  28, y: -20, speakers: '170M native', note: 'East Slavic. Uses Cyrillic script; largest Slavic language.' },
+  { id: 'uk',  name: 'Ukrainian',  family: 'slavic',  x:  20, y: -28, speakers: '40M native', note: 'East Slavic. Very close to Russian but distinct language.' },
+  { id: 'pl',  name: 'Polish',     family: 'slavic',  x:  12, y: -32, speakers: '45M native', note: 'West Slavic. Uses Latin script with many diacritics.' },
+  { id: 'cs',  name: 'Czech',      family: 'slavic',  x:   6, y: -28, speakers: '11M native', note: 'West Slavic. Mutually intelligible with Slovak.' },
+  { id: 'hr',  name: 'Croatian',   family: 'slavic',  x:   0, y: -18, speakers: '7M native', note: 'South Slavic. Mutually intelligible with Serbian and Bosnian.' },
+  // Celtic
+  { id: 'ga',  name: 'Irish',      family: 'celtic',  x: -56, y: -54, speakers: '170K native', note: 'Goidelic Celtic. Very different structure from Indo-European neighbors.' },
+  { id: 'cy',  name: 'Welsh',      family: 'celtic',  x: -48, y: -56, speakers: '870K native', note: 'Brythonic Celtic. Active language revival since 1960s.' },
+  // Hellenic
+  { id: 'el',  name: 'Greek',      family: 'hellenic', x:  -8, y:   4, speakers: '13M native', note: 'Hellenic branch. 3,000+ year written tradition. Source of much scientific vocabulary.' },
+  // Semitic
+  { id: 'ar',  name: 'Arabic',     family: 'semitic', x:  10, y:  28, speakers: '300M native', note: 'Semitic. Many varieties; Modern Standard Arabic unifies writing.' },
+  { id: 'he',  name: 'Hebrew',     family: 'semitic', x:  22, y:  24, speakers: '9M native', note: 'Revived as a spoken language in the 20th century from liturgical use.' },
+  // Iranic/Indo-Iranian
+  { id: 'fa',  name: 'Persian',    family: 'iranic',  x:  40, y:  10, speakers: '70M native', note: 'Iranian branch. Uses Arabic script; significant literary tradition.' },
+  { id: 'hi',  name: 'Hindi',      family: 'iranic',  x:  52, y:  -4, speakers: '600M native', note: 'Indo-Aryan. Shares Devanagari script with many South Asian languages.' },
+  { id: 'ur',  name: 'Urdu',       family: 'iranic',  x:  58, y:   2, speakers: '70M native', note: 'Nearly identical to Hindi in spoken form; uses Nastaliq (Arabic-derived) script.' },
+  // Baltic
+  { id: 'lt',  name: 'Lithuanian', family: 'balticslavic', x: 16, y: -44, speakers: '3M native', note: 'Most archaic living Indo-European language; preserves ancient features.' },
+  { id: 'lv',  name: 'Latvian',    family: 'balticslavic', x: 20, y: -40, speakers: '1.8M native', note: 'Baltic, closely related to Lithuanian.' },
+  // Uralic
+  { id: 'fi',  name: 'Finnish',    family: 'uralic',  x:  24, y: -58, speakers: '5M native', note: 'Uralic family — unrelated to Indo-European. Agglutinative morphology.' },
+  { id: 'hu',  name: 'Hungarian',  family: 'uralic',  x:  14, y: -50, speakers: '13M native', note: 'Uralic. Geographic outlier — surrounded by Indo-European languages.' },
+  { id: 'et',  name: 'Estonian',   family: 'uralic',  x:  28, y: -52, speakers: '1.1M native', note: 'Uralic, closely related to Finnish.' },
+  // Turkic
+  { id: 'tr',  name: 'Turkish',    family: 'turkic',  x:  12, y:  14, speakers: '80M native', note: 'Turkic family. Agglutinative; vowel harmony system.' },
+  // Sinitic
+  { id: 'zh',  name: 'Mandarin',   family: 'sinitic', x:  70, y:  -20, speakers: '920M native', note: 'Sino-Tibetan. Tonal; logographic writing system (Hanzi).' },
+  // Japonic
+  { id: 'ja',  name: 'Japanese',   family: 'japonic', x:  75, y:   6, speakers: '125M native', note: 'Language isolate within Japonic family. Three writing systems.' },
+  { id: 'ko',  name: 'Korean',     family: 'japonic', x:  68, y:  14, speakers: '80M native', note: 'Koreanic — likely a language isolate. Hangul script invented 1443.' },
+];
+
+// Compute edges (show connections within families + close cross-family)
+const EDGES = [];
+LANGUAGES.forEach((a, i) => {
+  LANGUAGES.forEach((b, j) => {
+    if (j <= i) return;
+    if (a.family === b.family) {
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 22) EDGES.push({ a: a.id, b: b.id });
+    }
+  });
+});
+
+// Build family filter chips
+const families = [...new Set(LANGUAGES.map(l => l.family))];
+const filterRow = document.getElementById('filterRow');
+families.forEach(f => {
+  const chip = document.createElement('div');
+  chip.className = 'filter-chip';
+  chip.dataset.family = f;
+  chip.textContent = FAMILIES[f]?.label || f;
+  chip.style.setProperty('--fcolor', FAMILIES[f]?.color || '#888');
+  chip.onclick = () => filterFamily(chip);
+  filterRow.appendChild(chip);
+});
+
+// Build legend
+const legend = document.getElementById('legendPanel');
+families.forEach(f => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  const dot = document.createElement('div');
+  dot.className = 'legend-dot';
+  dot.style.background = FAMILIES[f]?.color || '#888';
+  dot.style.opacity = '0.75';
+  item.appendChild(dot);
+  item.appendChild(document.createTextNode(FAMILIES[f]?.label || f));
+  legend.appendChild(item);
+});
+
+let activeFamily = 'all';
+let isDragging = false;
+let dragNode = null;
+let dragOffset = { x: 0, y: 0 };
+const nodePositions = {};
+LANGUAGES.forEach(l => { nodePositions[l.id] = { x: l.x, y: l.y }; });
+
+function filterFamily(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFamily = el.dataset.family;
+  renderMap();
+}
+
+function toSVGCoords(nx, ny) {
+  const svg = document.getElementById('svg');
+  const W = svg.clientWidth, H = svg.clientHeight;
+  const scale = Math.min(W, H) / 220;
+  return {
+    x: W / 2 + nx * scale,
+    y: H / 2 + ny * scale
+  };
+}
+
+function renderMap() {
+  const svg = document.getElementById('svg');
+  const edgesG = document.getElementById('edges');
+  const nodesG = document.getElementById('nodes');
+  edgesG.innerHTML = '';
+  nodesG.innerHTML = '';
+
+  const visibleLangs = activeFamily === 'all' ? LANGUAGES : LANGUAGES.filter(l => l.family === activeFamily);
+  const visibleIds = new Set(visibleLangs.map(l => l.id));
+
+  // Draw edges
+  EDGES.forEach(e => {
+    if (!visibleIds.has(e.a) || !visibleIds.has(e.b)) return;
+    const pa = toSVGCoords(nodePositions[e.a].x, nodePositions[e.a].y);
+    const pb = toSVGCoords(nodePositions[e.b].x, nodePositions[e.b].y);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', pa.x); line.setAttribute('y1', pa.y);
+    line.setAttribute('x2', pb.x); line.setAttribute('y2', pb.y);
+    line.className = 'edge';
+    line.dataset.a = e.a; line.dataset.b = e.b;
+    edgesG.appendChild(line);
+  });
+
+  // Draw nodes
+  visibleLangs.forEach(lang => {
+    const pos = toSVGCoords(nodePositions[lang.id].x, nodePositions[lang.id].y);
+    const color = FAMILIES[lang.family]?.color || '#888';
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.className = 'lang-node';
+    g.dataset.id = lang.id;
+
+    // Glow ring
+    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    glow.setAttribute('cx', pos.x); glow.setAttribute('cy', pos.y);
+    glow.setAttribute('r', 14);
+    glow.setAttribute('fill', color);
+    glow.setAttribute('fill-opacity', '0.08');
+    g.appendChild(glow);
+
+    // Main dot
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', pos.x); circle.setAttribute('cy', pos.y);
+    circle.setAttribute('r', 7);
+    circle.setAttribute('fill', color);
+    circle.setAttribute('fill-opacity', '0.8');
+    circle.setAttribute('stroke', 'rgba(255,255,255,0.7)');
+    circle.setAttribute('stroke-width', '1.5');
+    g.appendChild(circle);
+
+    // Label
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', pos.x);
+    text.setAttribute('y', pos.y + 18);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', '#565a70');
+    text.textContent = lang.name;
+    g.appendChild(text);
+
+    // Interactions
+    g.addEventListener('mouseenter', () => showInfo(lang, color, g));
+    g.addEventListener('mouseleave', hideInfo);
+    g.addEventListener('mousedown', e => startDrag(e, lang.id, g));
+
+    nodesG.appendChild(g);
+  });
+}
+
+function showInfo(lang, color, nodeEl) {
+  const panel = document.getElementById('infoPanel');
+  document.getElementById('infoName').textContent = lang.name;
+  const fam = document.getElementById('infoFamily');
+  fam.textContent = FAMILIES[lang.family]?.label || lang.family;
+  fam.style.background = `${color}22`;
+  fam.style.color = color;
+  fam.style.border = `1px solid ${color}44`;
+  document.getElementById('infoSpeakers').textContent = lang.speakers;
+  document.getElementById('infoNote').textContent = lang.note || '';
+  panel.classList.remove('hidden');
+
+  // Highlight edges
+  document.querySelectorAll('.edge').forEach(e => {
+    if (e.dataset.a === lang.id || e.dataset.b === lang.id) e.classList.add('highlighted');
+    else e.style.opacity = '0.3';
+  });
+}
+
+function hideInfo() {
+  if (isDragging) return;
+  document.getElementById('infoPanel').classList.add('hidden');
+  document.querySelectorAll('.edge').forEach(e => {
+    e.classList.remove('highlighted');
+    e.style.opacity = '';
+  });
+}
+
+function startDrag(e, id, g) {
+  isDragging = true;
+  dragNode = { id, g };
+  const svg = document.getElementById('svg');
+  const rect = svg.getBoundingClientRect();
+  const W = svg.clientWidth, H = svg.clientHeight;
+  const scale = Math.min(W, H) / 220;
+  dragOffset.x = e.clientX - rect.left;
+  dragOffset.y = e.clientY - rect.top;
+  e.preventDefault();
+}
+
+document.addEventListener('mousemove', e => {
+  if (!isDragging || !dragNode) return;
+  const svg = document.getElementById('svg');
+  const rect = svg.getBoundingClientRect();
+  const W = svg.clientWidth, H = svg.clientHeight;
+  const scale = Math.min(W, H) / 220;
+  const nx = (e.clientX - rect.left - W / 2) / scale;
+  const ny = (e.clientY - rect.top - H / 2) / scale;
+  nodePositions[dragNode.id] = { x: nx, y: ny };
+  renderMap();
+});
+
+document.addEventListener('mouseup', () => { isDragging = false; dragNode = null; });
+
+window.addEventListener('resize', () => renderMap());
+renderMap();
+</script>
+</body>
+</html>

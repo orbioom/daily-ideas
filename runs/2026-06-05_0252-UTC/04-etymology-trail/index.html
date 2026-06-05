@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etymology Trail — Orbioom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --glass: rgba(255,255,255,0.42);
+  --glass-raised: rgba(255,255,255,0.78);
+  --border: rgba(255,255,255,0.7);
+  --text: #1b1d2a;
+  --text-2: #565a70;
+  --text-3: #8b8fa3;
+  --accent-grad: linear-gradient(180deg, #3a3e4c 0%, #23262f 100%);
+  --dot-live: #86c79a;
+  --blur: 22px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(155deg, #EDEEF3 0%, #E7E9F0 50%, #ECEEF2 100%);
+  color: var(--text); min-height: 100vh;
+  padding: 40px 24px 80px;
+}
+
+.page-header {
+  max-width: 720px; margin: 0 auto 48px;
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+.page-title {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
+}
+h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+h1 span { color: var(--text-3); font-weight: 400; }
+
+.search-panel {
+  max-width: 720px; margin: 0 auto 40px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 4px 24px rgba(40,44,80,0.07);
+  border-radius: 16px; padding: 20px 24px;
+  display: flex; gap: 12px; align-items: center;
+}
+.search-input {
+  flex: 1; border: none; background: transparent;
+  font-family: 'Manrope', sans-serif; font-size: 18px;
+  color: var(--text); outline: none; font-weight: 500;
+}
+.search-input::placeholder { color: var(--text-3); font-weight: 400; font-size: 16px; }
+.btn-primary {
+  background: var(--accent-grad); color: white; border: none;
+  border-radius: 12px; padding: 10px 24px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; letter-spacing: -0.01em; white-space: nowrap;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(35,38,47,0.28); }
+
+.suggestion-row {
+  max-width: 720px; margin: 0 auto 40px;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.suggest-chip {
+  background: rgba(255,255,255,0.38); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.05em; color: var(--text-3);
+  cursor: pointer; transition: all 0.15s var(--ease);
+}
+.suggest-chip:hover { background: rgba(255,255,255,0.65); color: var(--text-2); }
+
+/* Trail */
+.trail-container { max-width: 720px; margin: 0 auto; }
+.trail-word-title {
+  font-size: 32px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px;
+}
+.trail-word-meaning {
+  font-size: 14px; color: var(--text-2); margin-bottom: 36px; line-height: 1.55;
+}
+
+.trail { position: relative; padding-left: 28px; }
+.trail-line {
+  position: absolute; left: 9px; top: 12px; bottom: 12px;
+  width: 1px; background: linear-gradient(180deg, rgba(134,199,154,0.6), rgba(134,199,154,0.08));
+}
+
+.trail-node {
+  position: relative; margin-bottom: 0; padding-bottom: 32px;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.trail-node.visible { opacity: 1; transform: translateY(0); }
+.trail-node:last-child { padding-bottom: 0; }
+
+.node-dot {
+  position: absolute; left: -24px; top: 6px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--glass-raised); border: 2px solid rgba(134,199,154,0.55);
+  box-shadow: 0 0 0 3px rgba(134,199,154,0.12);
+}
+.node-dot.origin { background: var(--dot-live); border-color: var(--dot-live); }
+
+.node-card {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 12px rgba(40,44,80,0.06);
+  border-radius: 14px; padding: 18px 22px;
+}
+.node-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 12px; flex-wrap: wrap; }
+.node-word { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.node-lang {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: rgba(134,199,154,0.12); border: 1px solid rgba(134,199,154,0.28);
+  border-radius: 20px; padding: 3px 10px; color: var(--text-2); white-space: nowrap;
+}
+.node-era {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; color: var(--text-3); white-space: nowrap;
+}
+.node-meaning { font-size: 14px; color: var(--text-2); line-height: 1.55; margin-bottom: 6px; }
+.node-note { font-size: 12px; color: var(--text-3); line-height: 1.5; font-style: italic; }
+
+.not-found {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  border-radius: 16px; padding: 36px 28px; text-align: center;
+}
+.not-found p { color: var(--text-3); font-size: 14px; line-height: 1.65; }
+.not-found p:first-child { font-size: 18px; color: var(--text-2); margin-bottom: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .trail-node { transition: none !important; opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">
+    <span class="eyebrow">Orbioom &nbsp;·&nbsp; Etymology Trail</span>
+    <h1>Words through <span>time</span></h1>
+  </div>
+</div>
+
+<div class="search-panel">
+  <input class="search-input" id="searchInput" placeholder="Enter a word…" autocomplete="off" spellcheck="false">
+  <button class="btn-primary" onclick="lookup()">Trace</button>
+</div>
+
+<div class="suggestion-row">
+  <span class="eyebrow" style="align-self:center;margin-right:4px">try:</span>
+</div>
+
+<div class="trail-container" id="trailContainer"></div>
+
+<script>
+// Etymology dataset: each entry has a word, its current meaning, and a trail of ancestor nodes
+const ETYMOLOGIES = {
+  salary: {
+    meaning: "fixed regular payment for employment",
+    trail: [
+      { word: "salary", lang: "Modern English", era: "c. 1300–present", meaning: "regular payment for work", note: "Now used universally for employment compensation." },
+      { word: "salarie", lang: "Old French", era: "c. 1100–1300", meaning: "pay, wages", note: "Passed into English via Norman French." },
+      { word: "salarium", lang: "Medieval Latin", era: "c. 500–1100", meaning: "wage, stipend for soldiers", note: "Possibly the allowance given to Roman soldiers to buy salt." },
+      { word: "sal", lang: "Latin", era: "c. 200 BCE–500 CE", meaning: "salt", note: "Salt was a crucial and valuable commodity in the ancient world — 'worth their salt'." }
+    ]
+  },
+  window: {
+    meaning: "an opening in a wall for light and air",
+    trail: [
+      { word: "window", lang: "Middle English", era: "c. 1200–present", meaning: "opening for light", note: "Replaced the Old English 'ēagþȳrel' (eye-hole)." },
+      { word: "vindauga", lang: "Old Norse", era: "c. 800–1200", meaning: "wind-eye", note: "Brought to England by Norse settlers. Literally 'eye of the wind'." },
+      { word: "vindr + auga", lang: "Proto-Norse", era: "c. 200–800 CE", meaning: "wind + eye", note: "'auga' shares roots with the Latin 'oculus' (eye) and Greek 'ops' (sight)." }
+    ]
+  },
+  muscle: {
+    meaning: "tissue that contracts to produce movement",
+    trail: [
+      { word: "muscle", lang: "Modern English", era: "c. 1400–present", meaning: "contractile tissue", note: "We kept the spelling close to the Latin." },
+      { word: "musculus", lang: "Latin", era: "c. 200 BCE–500 CE", meaning: "little mouse / muscle", note: "Romans saw flexed arm muscles moving under skin — resembling a mouse running beneath a blanket." },
+      { word: "mūs", lang: "Proto-Italic / Latin root", era: "c. 500 BCE", meaning: "mouse", note: "Cognate with Greek 'mys' (mouse / muscle) and Old English 'mūs'." }
+    ]
+  },
+  disaster: {
+    meaning: "a sudden great misfortune",
+    trail: [
+      { word: "disaster", lang: "Modern English", era: "c. 1590–present", meaning: "catastrophe, calamity", note: "Entered English from Italian, via the astrological belief that bad stars caused misfortune." },
+      { word: "disastro", lang: "Italian", era: "c. 1500–1590", meaning: "bad star omen, calamity", note: "A blend of 'dis-' (bad, ill) and 'astro' (star)." },
+      { word: "dis- + astrum", lang: "Latin", era: "c. 200 BCE–500 CE", meaning: "bad + star", note: "'Astrum' shares roots with Greek 'astron' — the word literally means 'bad star'." },
+      { word: "ἀστήρ (astēr)", lang: "Ancient Greek", era: "c. 800 BCE–300 CE", meaning: "star", note: "Root of astronomy, asterisk, asteroid, and disaster." }
+    ]
+  },
+  calculate: {
+    meaning: "to determine by mathematical computation",
+    trail: [
+      { word: "calculate", lang: "Modern English", era: "c. 1560–present", meaning: "to compute mathematically", note: "The act of counting once involved the physical movement of small stones." },
+      { word: "calculare", lang: "Latin", era: "c. 200 BCE–500 CE", meaning: "to reckon, to count", note: "Derived from 'calculus', the diminutive of 'calx'." },
+      { word: "calculus", lang: "Latin", era: "c. 100 BCE–500 CE", meaning: "small stone used for counting", note: "Roman counting boards used pebbles moved in grooves — the original calculator." },
+      { word: "calx", lang: "Latin", era: "c. 300 BCE", meaning: "limestone, heel", note: "Calcium and chalk share this root — limestone was crushed into small counting stones." }
+    ]
+  },
+  panic: {
+    meaning: "sudden overwhelming fear",
+    trail: [
+      { word: "panic", lang: "Modern English", era: "c. 1600–present", meaning: "sudden uncontrollable fear", note: "Both the emotion and the adjective 'panic-stricken' derive from a Greek god." },
+      { word: "panique", lang: "French", era: "c. 1500–1600", meaning: "sudden terror", note: "The French brought it to English during the Renaissance." },
+      { word: "panikon (δέος)", lang: "Ancient Greek", era: "c. 500–100 BCE", meaning: "fear of Pan", note: "Pan, god of wild places, was said to cause sudden irrational terror in lonely travelers — especially at noon." },
+      { word: "Πάν (Pan)", lang: "Ancient Greek mythology", era: "c. 800 BCE", meaning: "god of shepherds, wild nature", note: "The name Pan may derive from 'pa-on' meaning 'shepherd', or from a root meaning 'all'." }
+    ]
+  },
+  hazard: {
+    meaning: "a danger or risk",
+    trail: [
+      { word: "hazard", lang: "Modern English", era: "c. 1530–present", meaning: "risk, danger, chance", note: "Entered English as a gambling term before broadening to mean any danger." },
+      { word: "hasard", lang: "Old French", era: "c. 1100–1530", meaning: "game of dice, chance", note: "A popular dice game in medieval France — losing at dice was hazardous to your fortune." },
+      { word: "az-zahr", lang: "Arabic", era: "c. 700–1100 CE", meaning: "the die (dice), luck", note: "Brought to Europe through medieval Spain and the Crusades — Arabic dice games." },
+      { word: "zahr", lang: "Arabic root", era: "c. 500–700 CE", meaning: "flower on a die face / luck", note: "The Arabic die was marked with flowers; rolling the flower was a special result." }
+    ]
+  },
+  trivial: {
+    meaning: "of little importance",
+    trail: [
+      { word: "trivial", lang: "Modern English", era: "c. 1580–present", meaning: "commonplace, unimportant", note: "The meaning shifted from 'commonly known' to 'unimportant' over centuries." },
+      { word: "trivialis", lang: "Latin", era: "c. 100 BCE–500 CE", meaning: "found at crossroads, commonplace", note: "Something available to anyone at the street corner was 'trivial'." },
+      { word: "trivium", lang: "Latin", era: "c. 100 BCE", meaning: "place where three roads meet", note: "From 'tri-' (three) + 'via' (road). Also the name for the three foundational subjects: grammar, rhetoric, logic." }
+    ]
+  },
+  serendipity: {
+    meaning: "the happy accident of finding something good",
+    trail: [
+      { word: "serendipity", lang: "Modern English", era: "c. 1754–present", meaning: "fortunate discovery by accident", note: "One of the few words with a known inventor: coined by Horace Walpole in a letter." },
+      { word: "(coined word)", lang: "Horace Walpole", era: "1754", meaning: "invented from a Persian fairy tale", note: "Walpole read 'The Three Princes of Serendip' — a story about princes who find things through accident and sagacity." },
+      { word: "Serendip", lang: "Persian / Arabic", era: "c. 800–1300 CE", meaning: "the island of Sri Lanka", note: "From Arabic 'Sarandīb', itself from Sanskrit 'Siṃhaladvīpa' — lion-island." },
+      { word: "Siṃhaladvīpa", lang: "Sanskrit", era: "c. 200–800 CE", meaning: "island of the Sinhala people / lion-island", note: "Root of 'Ceylon', the older English name for Sri Lanka." }
+    ]
+  },
+  clue: {
+    meaning: "a piece of evidence that helps solve a problem",
+    trail: [
+      { word: "clue", lang: "Modern English", era: "c. 1500–present", meaning: "hint, guiding evidence", note: "Spelling shifted from 'clew' to 'clue' around the 17th century." },
+      { word: "clew", lang: "Old / Middle English", era: "c. 900–1500", meaning: "a ball of yarn or thread", note: "From the legend of Theseus: he used a ball of thread (clew) to find his way out of the labyrinth." },
+      { word: "cliewen", lang: "Old English", era: "c. 500–900 CE", meaning: "ball of thread, sphere", note: "Cognate with Dutch 'kluwen' and German 'Knäuel' (ball of thread)." }
+    ]
+  },
+  paradise: {
+    meaning: "a place of perfect happiness",
+    trail: [
+      { word: "paradise", lang: "Modern English", era: "c. 1175–present", meaning: "heaven, perfect happiness", note: "Passed through Old French and Latin before reaching English." },
+      { word: "paradis", lang: "Old French", era: "c. 900–1175", meaning: "garden of Eden, heaven" },
+      { word: "paradisus", lang: "Latin", era: "c. 200 BCE–900 CE", meaning: "park, enclosed garden, paradise" },
+      { word: "paradeisos (παράδεισος)", lang: "Ancient Greek", era: "c. 400–200 BCE", meaning: "enclosed park, orchard", note: "Used by Xenophon to describe Persian royal gardens." },
+      { word: "pairi-daēza", lang: "Avestan (Old Persian)", era: "c. 1000–500 BCE", meaning: "walled enclosure / garden", note: "'Pairi' (around) + 'daēza' (wall). The original paradise was just a nice walled garden." }
+    ]
+  },
+  robot: {
+    meaning: "a machine that performs tasks autonomously",
+    trail: [
+      { word: "robot", lang: "Modern English", era: "c. 1921–present", meaning: "artificial mechanical being", note: "One of the few words with an exact birth date and author." },
+      { word: "robot", lang: "Czech", era: "1921", meaning: "forced laborer, drudge", note: "Coined by Karel Čapek in his play 'R.U.R.' (Rossum's Universal Robots), depicting artificial workers who revolt." },
+      { word: "robota", lang: "Czech / Slovak / Old Slavonic", era: "c. 900–1921", meaning: "drudgery, servitude, forced labor", note: "From the feudal system — peasants owed 'robota' (labor) to their lords." }
+    ]
+  },
+  nice: {
+    meaning: "pleasant, agreeable",
+    trail: [
+      { word: "nice", lang: "Modern English", era: "c. 1800–present", meaning: "pleasant, kind, agreeable", note: "The word's meaning has almost completely reversed over 700 years." },
+      { word: "nice", lang: "Early Modern English", era: "c. 1400–1800", meaning: "precise, particular, careful", note: "By the 1400s it had shifted to mean 'fastidious' or 'precise'." },
+      { word: "nice", lang: "Middle English", era: "c. 1290–1400", meaning: "foolish, stupid, wanton", note: "The original English sense was negative — foolish or lascivious." },
+      { word: "nice", lang: "Old French", era: "c. 1100–1290", meaning: "foolish, silly", note: "Derived from Latin." },
+      { word: "nescius", lang: "Latin", era: "c. 200 BCE–500 CE", meaning: "ignorant, unaware", note: "From 'ne-' (not) + 'scire' (to know). To be 'nice' was to not know things." }
+    ]
+  },
+  assassin: {
+    meaning: "someone who murders for political motives",
+    trail: [
+      { word: "assassin", lang: "Modern English", era: "c. 1530–present", meaning: "political or hired killer", note: "Reached English via French or Italian during the Crusades era." },
+      { word: "assassino", lang: "Italian", era: "c. 1300–1530", meaning: "murderer, hired killer" },
+      { word: "hashshashin / حَشَّاشِين", lang: "Arabic", era: "c. 1100–1300", meaning: "hashish users", note: "A pejorative name for members of the Nizari Ismaili sect, known for political killings. The legend of hashish use is likely a slander by their enemies." },
+      { word: "hashish / حشيش", lang: "Arabic", era: "c. 800–1100 CE", meaning: "dried herb, grass — specifically cannabis", note: "The etymology is disputed; the connection to hashish use may be medieval propaganda." }
+    ]
+  },
+  algorithm: {
+    meaning: "a step-by-step procedure for solving a problem",
+    trail: [
+      { word: "algorithm", lang: "Modern English", era: "c. 1950–present", meaning: "computational procedure or rule set", note: "The computer science meaning emerged in the mid-20th century." },
+      { word: "algorism", lang: "Medieval Latin / Old French", era: "c. 1200–1900", meaning: "the Arabic numeral system, arithmetic", note: "Referred specifically to the Hindu-Arabic positional number system." },
+      { word: "al-Khwārizmī", lang: "Arabic name", era: "c. 780–850 CE", meaning: "the man from Khwarazm", note: "Muhammad ibn Musa al-Khwārizmī wrote 'On the Calculation with Hindu Numerals' — the source of algorism." },
+      { word: "Khwarazm", lang: "Persian / Sogdian", era: "c. 300 BCE–800 CE", meaning: "a region in modern Uzbekistan", note: "Al-Khwārizmī's name means 'native of Khwarazm'. The word 'algebra' also comes from his work." }
+    ]
+  }
+};
+
+const SUGGESTIONS = Object.keys(ETYMOLOGIES);
+
+// Populate suggestion chips
+const row = document.querySelector('.suggestion-row');
+SUGGESTIONS.slice(0, 10).forEach(word => {
+  const chip = document.createElement('span');
+  chip.className = 'suggest-chip';
+  chip.textContent = word;
+  chip.onclick = () => { document.getElementById('searchInput').value = word; lookup(); };
+  row.appendChild(chip);
+});
+
+function lookup() {
+  const raw = document.getElementById('searchInput').value.trim().toLowerCase();
+  const container = document.getElementById('trailContainer');
+
+  const entry = ETYMOLOGIES[raw];
+  if (!entry) {
+    container.innerHTML = `<div class="not-found">
+      <p>"${escHtml(raw)}" not in the trail yet.</p>
+      <p>Try one of the suggestions above — or contribute an etymology.<br>
+      Dataset includes: ${SUGGESTIONS.join(', ')}.</p>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="trail-word-title">${escHtml(raw)}</div>
+    <div class="trail-word-meaning">${escHtml(entry.meaning)}</div>
+    <div class="trail" id="trail">
+      <div class="trail-line"></div>
+      ${entry.trail.map((node, i) => `
+        <div class="trail-node" style="transition-delay:${i * 80}ms">
+          <div class="node-dot ${i === 0 ? 'origin' : ''}"></div>
+          <div class="node-card">
+            <div class="node-top">
+              <span class="node-word">${escHtml(node.word)}</span>
+              <span class="node-lang">${escHtml(node.lang)}</span>
+              <span class="node-era">${escHtml(node.era)}</span>
+            </div>
+            <div class="node-meaning">${escHtml(node.meaning)}</div>
+            ${node.note ? `<div class="node-note">${escHtml(node.note)}</div>` : ''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  // Stagger-animate nodes in
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.trail-node').forEach((node, i) => {
+      setTimeout(() => node.classList.add('visible'), i * 80);
+    });
+  });
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Enter key to search
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookup();
+});
+
+// Show a default word on load
+document.getElementById('searchInput').value = 'serendipity';
+lookup();
+</script>
+</body>
+</html>

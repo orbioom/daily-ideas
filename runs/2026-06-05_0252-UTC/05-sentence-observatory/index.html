@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentence Observatory — Orbioom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --glass: rgba(255,255,255,0.42);
+  --glass-raised: rgba(255,255,255,0.78);
+  --border: rgba(255,255,255,0.7);
+  --text: #1b1d2a;
+  --text-2: #565a70;
+  --text-3: #8b8fa3;
+  --accent-grad: linear-gradient(180deg, #3a3e4c 0%, #23262f 100%);
+  --dot-live: #86c79a;
+  --blur: 22px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(155deg, #1a1b22 0%, #1e1f28 55%, #191b24 100%);
+  color: white; min-height: 100vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* Dark mode for this one — observatory */
+.top-bar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px;
+  background: rgba(20,21,28,0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo-mark {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.top-stats {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; color: rgba(255,255,255,0.3);
+  display: flex; gap: 20px;
+}
+.top-stats span { display: flex; align-items: center; gap: 6px; }
+.live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--dot-live); box-shadow: 0 0 5px var(--dot-live);
+}
+
+canvas {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  cursor: crosshair;
+}
+
+/* Input panel — slides up from bottom */
+.input-panel {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: rgba(20,21,28,0.75);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 20px 28px 24px;
+  transition: transform 0.5s var(--ease);
+}
+.input-panel.collapsed { transform: translateY(calc(100% - 48px)); }
+
+.panel-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; cursor: pointer; user-select: none;
+}
+.panel-toggle-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.panel-toggle-arrow {
+  font-size: 14px; color: rgba(255,255,255,0.3);
+  transition: transform 0.3s var(--ease);
+}
+.input-panel.collapsed .panel-toggle-arrow { transform: rotate(180deg); }
+
+.panel-body { display: flex; gap: 12px; align-items: flex-start; }
+.text-input {
+  flex: 1; background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px; padding: 14px 16px;
+  font-family: 'Manrope', sans-serif; font-size: 14px;
+  color: rgba(255,255,255,0.85); resize: none; outline: none;
+  line-height: 1.6; min-height: 88px;
+}
+.text-input::placeholder { color: rgba(255,255,255,0.25); }
+.panel-actions { display: flex; flex-direction: column; gap: 8px; }
+
+.btn-primary {
+  background: var(--accent-grad); color: white; border: none;
+  border-radius: 12px; padding: 11px 22px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; letter-spacing: -0.01em; white-space: nowrap;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
+.btn-ghost {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px; padding: 10px 18px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.04em; color: rgba(255,255,255,0.45);
+  cursor: pointer; transition: all 0.15s var(--ease); white-space: nowrap;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+
+/* Tooltip */
+.tooltip {
+  position: fixed; z-index: 200; pointer-events: none;
+  background: rgba(20,21,28,0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px; padding: 10px 14px;
+  max-width: 280px; opacity: 0;
+  transition: opacity 0.18s ease;
+  font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.55;
+}
+.tooltip.visible { opacity: 1; }
+.tooltip-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--dot-live); margin-bottom: 5px; letter-spacing: 0.06em;
+}
+
+/* Legend */
+.legend {
+  position: absolute; top: 72px; right: 28px; z-index: 50;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.legend-item {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: 0.08em; color: rgba(255,255,255,0.25);
+  display: flex; align-items: center; gap: 7px;
+}
+.legend-dot {
+  border-radius: 50%; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="logo-mark">Orbioom &nbsp;·&nbsp; Sentence Observatory</span>
+  <div class="top-stats">
+    <span><span class="live-dot"></span><span id="sentenceCount">0 sentences</span></span>
+    <span id="wordTotal">0 words</span>
+    <span id="avgLen">avg 0 words/sentence</span>
+  </div>
+</div>
+
+<canvas id="sky"></canvas>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="width:14px;height:14px;background:rgba(255,255,255,0.6)"></div> long sentence</div>
+  <div class="legend-item"><div class="legend-dot" style="width:8px;height:8px;background:rgba(255,255,255,0.3)"></div> short sentence</div>
+  <div class="legend-item"><div class="legend-dot" style="width:8px;height:8px;background:rgba(134,199,154,0.9)"></div> question</div>
+  <div class="legend-item"><div class="legend-dot" style="width:8px;height:8px;background:rgba(255,220,100,0.9)"></div> exclamation</div>
+</div>
+
+<div class="input-panel" id="inputPanel">
+  <div class="panel-toggle" onclick="togglePanel()">
+    <span class="panel-toggle-label">Paste text to observe</span>
+    <span class="panel-toggle-arrow">▲</span>
+  </div>
+  <div class="panel-body" id="panelBody">
+    <textarea class="text-input" id="textInput" placeholder="Paste any text here — a paragraph, an essay, a poem. Each sentence becomes a star." rows="4"></textarea>
+    <div class="panel-actions">
+      <button class="btn-primary" onclick="renderText()">Observe</button>
+      <button class="btn-ghost" onclick="loadSample()">sample</button>
+      <button class="btn-ghost" onclick="clearSky()">clear</button>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-num" id="tooltipNum">#1</div>
+  <div id="tooltipText"></div>
+</div>
+
+<script>
+const canvas = document.getElementById('sky');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+let stars = [];
+let animating = false;
+let bgStars = [];
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  if (stars.length) drawAll();
+  else drawBg();
+}
+window.addEventListener('resize', resize);
+
+// Generate background star field
+function makeStarField() {
+  bgStars = [];
+  const n = Math.floor((canvas.width * canvas.height) / 6000);
+  for (let i = 0; i < n; i++) {
+    bgStars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 0.8 + 0.2,
+      a: Math.random() * 0.25 + 0.05
+    });
+  }
+}
+
+function drawBg() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  bgStars.forEach(s => {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+    ctx.fill();
+  });
+}
+
+function parseSentences(text) {
+  // Split on sentence-ending punctuation, keep the punctuation
+  const raw = text.trim().split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+  return raw.map(s => s.trim());
+}
+
+function wordCount(s) { return s.trim().split(/\s+/).filter(w => w.length > 0).length; }
+function avgWordLen(s) {
+  const words = s.trim().split(/\s+/).filter(w => w.length > 0);
+  if (!words.length) return 0;
+  return words.reduce((a, w) => a + w.replace(/[^a-z]/gi,'').length, 0) / words.length;
+}
+
+function sentenceType(s) {
+  if (/\?$/.test(s.trim())) return 'question';
+  if (/!$/.test(s.trim())) return 'exclamation';
+  return 'statement';
+}
+
+function renderText() {
+  const text = document.getElementById('textInput').value;
+  if (!text.trim()) return;
+
+  const sentences = parseSentences(text);
+  if (!sentences.length) return;
+
+  const maxWords = Math.max(...sentences.map(wordCount));
+  const W = canvas.width, H = canvas.height;
+  const inputPanelH = 160;
+  const usableH = H - 80 - inputPanelH;
+
+  // Layout: spread stars in a constellation arc pattern
+  stars = sentences.map((s, i) => {
+    const wc = wordCount(s);
+    const type = sentenceType(s);
+    const awl = avgWordLen(s);
+
+    // Arrange in a gentle arc from left to right
+    const t = sentences.length === 1 ? 0.5 : i / (sentences.length - 1);
+    const arcY = 0.5 + 0.25 * Math.sin(t * Math.PI); // gentle arc
+    const jitterX = (Math.random() - 0.5) * 60;
+    const jitterY = (Math.random() - 0.5) * 50;
+
+    const x = 80 + t * (W - 160) + jitterX;
+    const y = 80 + arcY * usableH * 0.85 + jitterY;
+
+    const r = 3 + (wc / Math.max(maxWords, 1)) * 12;
+
+    let color;
+    if (type === 'question') color = { r: 134, g: 199, b: 154 };
+    else if (type === 'exclamation') color = { r: 255, g: 220, b: 100 };
+    else {
+      const bright = 0.3 + 0.6 * (wc / Math.max(maxWords, 1));
+      const v = Math.round(bright * 220);
+      color = { r: v, g: v, b: v + Math.round(awl * 3) };
+    }
+
+    return { s, x, y, r, color, wc, type, index: i + 1, targetR: r, currentR: 0, opacity: 0 };
+  });
+
+  // Update stats
+  const total = sentences.reduce((a, s) => a + wordCount(s), 0);
+  document.getElementById('sentenceCount').textContent = `${sentences.length} sentence${sentences.length !== 1 ? 's' : ''}`;
+  document.getElementById('wordTotal').textContent = `${total} words`;
+  document.getElementById('avgLen').textContent = `avg ${Math.round(total / sentences.length)} words/sentence`;
+
+  togglePanel();
+  animateIn();
+}
+
+function animateIn() {
+  if (animating) return;
+  animating = true;
+  const start = performance.now();
+  const dur = 800 + stars.length * 30;
+
+  function frame(now) {
+    const t = Math.min(1, (now - start) / dur);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBg();
+    drawConnections(t);
+    stars.forEach((star, i) => {
+      const delay = i / stars.length;
+      const starT = Math.max(0, Math.min(1, (t - delay * 0.5) / 0.5));
+      star.opacity = easeOut(starT);
+      drawStar(star, star.opacity);
+    });
+    if (t < 1) requestAnimationFrame(frame);
+    else { animating = false; drawAll(); }
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawConnections(t) {
+  if (stars.length < 2) return;
+  ctx.save();
+  for (let i = 0; i < stars.length - 1; i++) {
+    const a = stars[i], b = stars[i + 1];
+    const lineT = Math.max(0, Math.min(1, (t - (i / stars.length) * 0.4) / 0.3));
+    const x2 = a.x + (b.x - a.x) * lineT;
+    const y2 = a.y + (b.y - a.y) * lineT;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = `rgba(255,255,255,0.04)`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawStar(star, opacity) {
+  const { x, y, r, color } = star;
+  const op = opacity || 1;
+
+  // Glow
+  const grd = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
+  grd.addColorStop(0, `rgba(${color.r},${color.g},${color.b},${(0.18 * op).toFixed(3)})`);
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  // Core
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${(0.88 * op).toFixed(3)})`;
+  ctx.fill();
+
+  // Highlight
+  ctx.beginPath();
+  ctx.arc(x - r * 0.28, y - r * 0.28, r * 0.32, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(255,255,255,${(0.55 * op).toFixed(3)})`;
+  ctx.fill();
+}
+
+function drawAll() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBg();
+  drawConnections(1);
+  stars.forEach(s => drawStar(s, 1));
+}
+
+function easeOut(t) { return 1 - (1 - t) * (1 - t); }
+
+// Mouse interaction
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  let hit = null;
+  for (const star of stars) {
+    const dist = Math.hypot(star.x - mx, star.y - my);
+    if (dist < star.r + 12) { hit = star; break; }
+  }
+  if (hit) {
+    tooltip.querySelector('#tooltipNum').textContent = `#${hit.index} · ${hit.wc} words · ${hit.type}`;
+    tooltip.querySelector('#tooltipText').textContent = hit.s.length > 160 ? hit.s.slice(0, 157) + '…' : hit.s;
+    const tx = Math.min(e.clientX + 16, window.innerWidth - 300);
+    const ty = Math.max(e.clientY - 60, 8);
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+    tooltip.classList.add('visible');
+    canvas.style.cursor = 'pointer';
+  } else {
+    tooltip.classList.remove('visible');
+    canvas.style.cursor = 'crosshair';
+  }
+});
+canvas.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+
+function togglePanel() {
+  document.getElementById('inputPanel').classList.toggle('collapsed');
+}
+
+function clearSky() {
+  stars = [];
+  document.getElementById('sentenceCount').textContent = '0 sentences';
+  document.getElementById('wordTotal').textContent = '0 words';
+  document.getElementById('avgLen').textContent = 'avg 0 words/sentence';
+  drawBg();
+}
+
+const SAMPLE = `The sky above the port was the color of television, tuned to a dead channel. It was a bright cold day in April, and the clocks were striking thirteen. In the beginning was the Word. Call me Ishmael. All happy families are alike; each unhappy family is unhappy in its own way. It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness. Many years later, as he faced the firing squad, Colonel Aureliano Buendía was to remember that distant afternoon when his father took him to discover ice. It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. The man in black fled across the desert, and the gunman followed.`;
+
+function loadSample() {
+  document.getElementById('textInput').value = SAMPLE;
+  renderText();
+}
+
+resize();
+makeStarField();
+drawBg();
+</script>
+</body>
+</html>

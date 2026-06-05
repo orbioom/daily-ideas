@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiet Counter — Orbioom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --glass: rgba(255,255,255,0.42);
+  --glass-raised: rgba(255,255,255,0.78);
+  --border: rgba(255,255,255,0.7);
+  --text: #1b1d2a;
+  --text-2: #565a70;
+  --text-3: #8b8fa3;
+  --accent-grad: linear-gradient(180deg, #3a3e4c 0%, #23262f 100%);
+  --dot-live: #86c79a;
+  --blur: 22px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(155deg, #EDEEF3 0%, #E7E9F0 50%, #ECEEF2 100%);
+  color: var(--text); min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 40px 20px 60px;
+}
+
+.studio-mark {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 40px; align-self: flex-start;
+  padding-left: 8px;
+}
+
+.metric-panel {
+  width: 100%; max-width: 480px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 8px 48px rgba(40,44,80,0.1);
+  border-radius: 24px; padding: 40px 40px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  margin-bottom: 20px;
+}
+
+.metric-label-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 28px; width: 100%; justify-content: center;
+  position: relative;
+}
+.metric-name {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3);
+  cursor: pointer;
+}
+.metric-name:hover { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; }
+.metric-name-input {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  background: transparent; border: none; border-bottom: 1px solid var(--text-3);
+  color: var(--text-2); outline: none; width: 160px; text-align: center;
+  padding-bottom: 2px;
+}
+
+.big-number {
+  font-size: clamp(80px, 20vw, 140px);
+  font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1; color: var(--text);
+  margin-bottom: 8px;
+  transition: transform 0.12s var(--ease);
+}
+.big-number.bump { transform: scale(1.06); }
+
+.unit-label {
+  font-size: 14px; font-weight: 400; color: var(--text-3);
+  margin-bottom: 36px; letter-spacing: 0.02em;
+}
+
+.counter-controls {
+  display: flex; gap: 12px; align-items: center;
+}
+.btn-inc {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent-grad); color: white; border: none;
+  font-size: 24px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s var(--ease), box-shadow 0.15s var(--ease);
+  box-shadow: 0 3px 16px rgba(35,38,47,0.22);
+  user-select: none;
+}
+.btn-inc:hover { transform: scale(1.06); box-shadow: 0 6px 24px rgba(35,38,47,0.32); }
+.btn-inc:active { transform: scale(0.95); }
+
+.btn-dec {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.5); border: 1px solid var(--border);
+  font-size: 20px; color: var(--text-3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.1s var(--ease);
+  user-select: none;
+}
+.btn-dec:hover { background: rgba(255,255,255,0.75); color: var(--text-2); }
+
+.btn-set {
+  background: transparent; border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 10px; padding: 8px 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; color: var(--text-3);
+  cursor: pointer; transition: all 0.15s var(--ease);
+}
+.btn-set:hover { background: rgba(255,255,255,0.5); color: var(--text-2); }
+
+.today-date {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text-3); letter-spacing: 0.06em; margin-top: 20px;
+}
+
+/* Heatmap */
+.heatmap-panel {
+  width: 100%; max-width: 480px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 20px rgba(40,44,80,0.06);
+  border-radius: 20px; padding: 24px 28px;
+}
+.heatmap-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 14px;
+}
+.heatmap-grid {
+  display: flex; gap: 5px; flex-wrap: wrap;
+}
+.heat-cell {
+  width: 22px; height: 22px; border-radius: 6px;
+  background: rgba(134,199,154,0.0);
+  border: 1px solid rgba(255,255,255,0.6);
+  position: relative; cursor: default;
+  transition: transform 0.15s var(--ease);
+}
+.heat-cell:hover { transform: scale(1.12); }
+.heat-cell[title]:hover::after {
+  content: attr(title);
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--accent-grad); color: white; border-radius: 6px;
+  padding: 3px 8px; font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; white-space: nowrap; z-index: 10;
+  pointer-events: none;
+}
+
+/* metric preset chips */
+.preset-row {
+  width: 100%; max-width: 480px;
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px;
+}
+.preset-chip {
+  background: rgba(255,255,255,0.38); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.05em; color: var(--text-3);
+  cursor: pointer; transition: all 0.15s var(--ease);
+  user-select: none;
+}
+.preset-chip:hover { background: rgba(255,255,255,0.65); color: var(--text-2); }
+.preset-chip.active { background: rgba(27,29,42,0.07); border-color: rgba(27,29,42,0.2); color: var(--text-2); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="studio-mark">Orbioom &nbsp;·&nbsp; Quiet Counter</div>
+
+<div class="metric-panel">
+  <div class="metric-label-row">
+    <span class="metric-name" id="metricNameDisplay" onclick="startEditName()" title="click to rename">words written</span>
+    <input class="metric-name-input" id="metricNameInput" style="display:none" maxlength="32" />
+  </div>
+  <div class="big-number" id="bigNum">0</div>
+  <div class="unit-label" id="unitLabel">today</div>
+  <div class="counter-controls">
+    <button class="btn-dec" onclick="decrement()" title="−1">−</button>
+    <button class="btn-inc" onclick="increment()" title="+1">+</button>
+    <button class="btn-set" onclick="promptSet()">set</button>
+  </div>
+  <div class="today-date" id="todayDate"></div>
+</div>
+
+<div class="preset-row" id="presetRow">
+  <div class="preset-chip active" data-key="words" data-unit="words written" onclick="switchMetric(this)">words written</div>
+  <div class="preset-chip" data-key="focus" data-unit="focus minutes" onclick="switchMetric(this)">focus minutes</div>
+  <div class="preset-chip" data-key="pages" data-unit="pages read" onclick="switchMetric(this)">pages read</div>
+  <div class="preset-chip" data-key="custom" data-unit="custom" onclick="switchMetric(this)">custom…</div>
+</div>
+
+<div class="heatmap-panel" style="margin-top:20px">
+  <div class="heatmap-label">30-day history</div>
+  <div class="heatmap-grid" id="heatmapGrid"></div>
+</div>
+
+<script>
+const KEYS = {
+  words: 'orbioom:qc:words', focus: 'orbioom:qc:focus',
+  pages: 'orbioom:qc:pages', custom: 'orbioom:qc:custom'
+};
+let currentMetricKey = 'words';
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function loadHistory(key) {
+  try { return JSON.parse(localStorage.getItem(KEYS[key])) || {}; } catch { return {}; }
+}
+function saveHistory(key, history) {
+  localStorage.setItem(KEYS[key], JSON.stringify(history));
+}
+function todayVal(key) { return loadHistory(key)[todayStr()] || 0; }
+
+function setToday(key, val) {
+  const h = loadHistory(key);
+  if (val <= 0) delete h[todayStr()]; else h[todayStr()] = val;
+  saveHistory(key, h);
+}
+
+function increment() {
+  const v = todayVal(currentMetricKey) + 1;
+  setToday(currentMetricKey, v);
+  render(true);
+}
+function decrement() {
+  const v = Math.max(0, todayVal(currentMetricKey) - 1);
+  setToday(currentMetricKey, v);
+  render(false);
+}
+function promptSet() {
+  const cur = todayVal(currentMetricKey);
+  const raw = prompt(`Set today's ${getUnitLabel()} count:`, cur);
+  if (raw === null) return;
+  const v = parseInt(raw);
+  if (!isNaN(v) && v >= 0) { setToday(currentMetricKey, v); render(false); }
+}
+
+function getUnitLabel() {
+  const chip = document.querySelector('.preset-chip.active');
+  return chip ? chip.dataset.unit : 'count';
+}
+
+function switchMetric(el) {
+  document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentMetricKey = el.dataset.key;
+  if (currentMetricKey === 'custom') {
+    const name = prompt('Name your metric:', 'breaths taken') || 'custom';
+    el.textContent = name;
+    el.dataset.unit = name;
+  }
+  document.getElementById('metricNameDisplay').textContent = getUnitLabel();
+  render(false);
+}
+
+function startEditName() {
+  const disp = document.getElementById('metricNameDisplay');
+  const inp = document.getElementById('metricNameInput');
+  inp.value = disp.textContent;
+  disp.style.display = 'none';
+  inp.style.display = 'inline-block';
+  inp.focus();
+}
+
+document.getElementById('metricNameInput').addEventListener('blur', finishEditName);
+document.getElementById('metricNameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') finishEditName();
+  if (e.key === 'Escape') {
+    document.getElementById('metricNameInput').style.display = 'none';
+    document.getElementById('metricNameDisplay').style.display = 'inline';
+  }
+});
+
+function finishEditName() {
+  const inp = document.getElementById('metricNameInput');
+  const disp = document.getElementById('metricNameDisplay');
+  const v = inp.value.trim();
+  if (v) {
+    disp.textContent = v;
+    const chip = document.querySelector('.preset-chip.active');
+    if (chip) { chip.textContent = v; chip.dataset.unit = v; }
+  }
+  inp.style.display = 'none';
+  disp.style.display = 'inline';
+}
+
+function render(bump) {
+  const val = todayVal(currentMetricKey);
+  const el = document.getElementById('bigNum');
+  el.textContent = val.toLocaleString();
+  if (bump) {
+    el.classList.add('bump');
+    setTimeout(() => el.classList.remove('bump'), 180);
+  }
+  document.getElementById('metricNameDisplay').textContent = getUnitLabel();
+  document.getElementById('unitLabel').textContent = 'today';
+
+  const now = new Date();
+  document.getElementById('todayDate').textContent =
+    now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  renderHeatmap();
+}
+
+function renderHeatmap() {
+  const history = loadHistory(currentMetricKey);
+  const grid = document.getElementById('heatmapGrid');
+  const days = 30;
+  const vals = Object.values(history).filter(v => v > 0);
+  const maxVal = vals.length ? Math.max(...vals) : 1;
+  const cells = [];
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const v = history[key] || 0;
+    const intensity = maxVal > 0 ? v / maxVal : 0;
+    const isToday = key === todayStr();
+    const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    cells.push({ key, v, intensity, isToday, label });
+  }
+
+  grid.innerHTML = cells.map(c => {
+    const bg = c.v > 0
+      ? `rgba(134,199,154,${(0.15 + 0.75 * c.intensity).toFixed(2)})`
+      : 'rgba(139,143,163,0.06)';
+    const border = c.isToday
+      ? '1px solid rgba(134,199,154,0.55)'
+      : '1px solid rgba(255,255,255,0.6)';
+    return `<div class="heat-cell" style="background:${bg};border:${border}"
+      title="${c.label}${c.v ? ': ' + c.v : ''}"></div>`;
+  }).join('');
+}
+
+// keyboard shortcut: + / - keys
+document.addEventListener('keydown', e => {
+  if (document.getElementById('metricNameInput').style.display !== 'none') return;
+  if (e.key === '+' || e.key === '=') increment();
+  if (e.key === '-') decrement();
+});
+
+render(false);
+</script>
+</body>
+</html>

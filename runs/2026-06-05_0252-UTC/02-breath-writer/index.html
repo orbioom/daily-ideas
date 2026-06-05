@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breath Writer — Orbioom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --glass: rgba(255,255,255,0.42);
+  --glass-raised: rgba(255,255,255,0.78);
+  --border: rgba(255,255,255,0.7);
+  --text: #1b1d2a;
+  --text-2: #565a70;
+  --text-3: #8b8fa3;
+  --accent-grad: linear-gradient(180deg, #3a3e4c 0%, #23262f 100%);
+  --dot-live: #86c79a;
+  --blur: 22px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(155deg, #EDEEF3 0%, #E7E9F0 50%, #ECEEF2 100%);
+  color: var(--text);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 100vh; padding: 28px 20px;
+  gap: 18px;
+}
+
+.top-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-3);
+}
+
+.orb-zone {
+  position: relative; display: flex;
+  align-items: center; justify-content: center;
+  width: 140px; height: 140px;
+}
+.orb-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(134,199,154,0.25);
+  transition: transform 0.08s linear, opacity 0.4s ease;
+}
+.orb-ring-1 { width: 110px; height: 110px; opacity: 0.4; }
+.orb-ring-2 { width: 132px; height: 132px; opacity: 0.2; }
+.orb {
+  width: 64px; height: 64px; border-radius: 50%; position: relative; z-index: 2;
+  background: radial-gradient(ellipse at 38% 32%,
+    rgba(255,255,255,0.95) 0%,
+    rgba(218,221,236,0.75) 42%,
+    rgba(170,174,200,0.5) 100%);
+  box-shadow:
+    0 8px 40px rgba(40,44,80,0.14),
+    0 2px 8px rgba(40,44,80,0.08),
+    inset 0 1px 2px rgba(255,255,255,0.9);
+  transform-origin: center;
+  will-change: transform;
+}
+.phase-label {
+  position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-3);
+  white-space: nowrap;
+}
+
+.pattern-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pattern-chip {
+  background: rgba(255,255,255,0.38);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 6px 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; color: var(--text-3);
+  cursor: pointer; transition: all 0.18s var(--ease);
+  user-select: none;
+}
+.pattern-chip.active {
+  background: rgba(27,29,42,0.07);
+  border-color: rgba(27,29,42,0.2); color: var(--text-2);
+}
+.pattern-chip:hover:not(.active) { background: rgba(255,255,255,0.65); }
+
+.writing-panel {
+  width: 100%; max-width: 660px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 4px 28px rgba(40,44,80,0.08);
+  border-radius: 20px; padding: 28px 32px;
+  transition: box-shadow 0.6s ease;
+}
+.writing-panel.exhale-glow {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65),
+    0 6px 36px rgba(40,44,80,0.1),
+    0 0 0 1.5px rgba(134,199,154,0.18);
+}
+
+textarea {
+  width: 100%; border: none; background: transparent;
+  font-family: 'Manrope', sans-serif; font-size: 17px;
+  line-height: 1.78; color: var(--text);
+  resize: none; outline: none; min-height: 220px;
+}
+textarea::placeholder { color: var(--text-3); font-size: 16px; }
+
+.panel-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 18px; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.5); flex-wrap: wrap; gap: 10px;
+}
+.stats {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--text-3); letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+}
+.live-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--dot-live); box-shadow: 0 0 6px var(--dot-live);
+  margin-right: 6px; flex-shrink: 0;
+}
+.controls { display: flex; gap: 8px; align-items: center; }
+.btn-primary {
+  background: var(--accent-grad); color: white; border: none;
+  border-radius: 12px; padding: 9px 22px;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; letter-spacing: -0.01em;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  min-width: 80px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(35,38,47,0.28); }
+.btn-ghost {
+  background: rgba(255,255,255,0.4); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.04em; color: var(--text-3);
+  cursor: pointer; transition: all 0.15s var(--ease);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.65); color: var(--text-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .orb, .orb-ring { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-label">Orbioom &nbsp;·&nbsp; Breath Writer</div>
+
+<div class="orb-zone">
+  <div class="orb-ring orb-ring-2" id="ring2"></div>
+  <div class="orb-ring orb-ring-1" id="ring1"></div>
+  <div class="orb" id="orb"></div>
+  <div class="phase-label" id="phaseLabel">—</div>
+</div>
+
+<div class="pattern-row">
+  <div class="pattern-chip active" data-in="4" data-hold="0" data-out="4" onclick="setPattern(this)">4·4 equal</div>
+  <div class="pattern-chip" data-in="4" data-hold="4" data-out="6" onclick="setPattern(this)">4·4·6 box+</div>
+  <div class="pattern-chip" data-in="4" data-hold="7" data-out="8" onclick="setPattern(this)">4·7·8 calm</div>
+  <div class="pattern-chip" data-in="5" data-hold="0" data-out="5" onclick="setPattern(this)">5·5 slow</div>
+  <div class="pattern-chip" data-in="6" data-hold="0" data-out="6" onclick="setPattern(this)">6·6 deep</div>
+</div>
+
+<div class="writing-panel" id="writingPanel">
+  <textarea id="editor" placeholder="Begin when you are ready. The breath will guide you." spellcheck="true"></textarea>
+  <div class="panel-footer">
+    <div class="stats">
+      <span><span class="live-dot" id="liveDot" style="opacity:0.3"></span><span id="wordCount">0 words</span></span>
+      <span id="sessionTime">0:00</span>
+      <span id="breathCount">0 breaths</span>
+    </div>
+    <div class="controls">
+      <button class="btn-ghost" onclick="exportText()">export .txt</button>
+      <button class="btn-primary" id="toggleBtn" onclick="toggleSession()">begin</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let pat = { in: 4, hold: 0, out: 4 };
+let running = false;
+let sessionSec = 0, breaths = 0;
+let sessionInterval = null, animId = null, phaseTimeout = null;
+
+const orb = document.getElementById('orb');
+const ring1 = document.getElementById('ring1');
+const ring2 = document.getElementById('ring2');
+const phaseLabel = document.getElementById('phaseLabel');
+const panel = document.getElementById('writingPanel');
+const liveDot = document.getElementById('liveDot');
+
+function setPattern(el) {
+  document.querySelectorAll('.pattern-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  pat = { in: +el.dataset.in, hold: +el.dataset.hold, out: +el.dataset.out };
+  if (running) { stopSession(); startSession(); }
+}
+
+function toggleSession() {
+  if (running) stopSession(); else startSession();
+}
+
+function startSession() {
+  running = true;
+  liveDot.style.opacity = '1';
+  document.getElementById('toggleBtn').textContent = 'pause';
+  sessionInterval = setInterval(() => {
+    sessionSec++;
+    const m = Math.floor(sessionSec / 60), s = sessionSec % 60;
+    document.getElementById('sessionTime').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+  runPhase('in', performance.now());
+}
+
+function stopSession() {
+  running = false;
+  liveDot.style.opacity = '0.3';
+  document.getElementById('toggleBtn').textContent = 'begin';
+  clearInterval(sessionInterval);
+  cancelAnimationFrame(animId);
+  clearTimeout(phaseTimeout);
+  phaseLabel.textContent = 'paused';
+  panel.classList.remove('exhale-glow');
+}
+
+function runPhase(phase, startTime) {
+  if (!running) return;
+
+  const dur = phase === 'in' ? pat.in : phase === 'hold' ? pat.hold : pat.out;
+  if (phase === 'hold' && dur === 0) { runPhase('out', performance.now()); return; }
+
+  if (phase === 'in') { phaseLabel.textContent = 'inhale'; panel.classList.remove('exhale-glow'); }
+  else if (phase === 'hold') { phaseLabel.textContent = 'hold'; }
+  else { phaseLabel.textContent = 'exhale'; panel.classList.add('exhale-glow'); }
+
+  const ms = dur * 1000;
+
+  function tick(now) {
+    if (!running) return;
+    const t = Math.min(1, (now - startTime) / ms);
+    let scale, ringScale;
+
+    if (phase === 'in') {
+      scale = 1 + 0.25 * easeInOut(t);
+      ringScale = 1 + 0.18 * easeInOut(t);
+    } else if (phase === 'hold') {
+      scale = 1.25; ringScale = 1.18;
+    } else {
+      scale = 1.25 - 0.25 * easeInOut(t);
+      ringScale = 1.18 - 0.18 * easeInOut(t);
+    }
+
+    orb.style.transform = `scale(${scale.toFixed(3)})`;
+    ring1.style.transform = `scale(${ringScale.toFixed(3)})`;
+    ring2.style.transform = `scale(${(ringScale * 1.1).toFixed(3)})`;
+
+    if (t < 1) {
+      animId = requestAnimationFrame(tick);
+    } else {
+      if (phase === 'in') runPhase('hold', performance.now());
+      else if (phase === 'hold') runPhase('out', performance.now());
+      else { breaths++; document.getElementById('breathCount').textContent = `${breaths} breath${breaths !== 1 ? 's' : ''}`; runPhase('in', performance.now()); }
+    }
+  }
+  animId = requestAnimationFrame(tick);
+}
+
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+document.getElementById('editor').addEventListener('input', function() {
+  const w = this.value.trim().split(/\s+/).filter(x => x).length;
+  document.getElementById('wordCount').textContent = `${w} word${w !== 1 ? 's' : ''}`;
+});
+
+function exportText() {
+  const text = document.getElementById('editor').value;
+  if (!text.trim()) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+  a.download = `breath-writing-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+</script>
+</body>
+</html>
