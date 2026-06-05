@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axis — PCA Explorer · Orbioom</title>
+  <meta name="description" content="Interactive Principal Component Analysis workbench. Explore multivariate datasets via scores scatter, scree plot, and loadings biplot. Orbioom studio." />
+
+  <!-- Fonts: Manrope (UI) and JetBrains Mono (numbers/code) via Google Fonts -->
+  <!-- Loaded via <link> so file:// works; graceful fallback to system-ui / monospace -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- Loading overlay (shown until datasets ready) -->
+<div id="loading-overlay" role="status" aria-live="polite" aria-label="Loading Axis PCA Explorer">
+  <div class="loading-card">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading datasets…</span>
+  </div>
+</div>
+
+<!-- Tooltip (positioned by JS) -->
+<div id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<div id="app" role="main">
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header class="app-header glass" aria-label="Axis PCA Explorer header">
+    <h1>
+      <span class="logo-word">Axis</span>
+      <span style="color:var(--text-tertiary);font-weight:400;font-size:0.9rem">·</span>
+      <span style="color:var(--text-secondary);font-weight:500;font-size:1rem">PCA Explorer</span>
+    </h1>
+    <div>
+      <div class="header-tagline">Principal Component Analysis · Orbioom Studio · 2026</div>
+    </div>
+  </header>
+
+  <!-- ── Status banner ─────────────────────────────────────── -->
+  <div id="status-banner" class="status-banner" role="alert" aria-live="assertive"></div>
+
+  <!-- ── Main layout ────────────────────────────────────────── -->
+  <div class="main-layout">
+
+    <!-- ── Sidebar ──────────────────────────────────────────── -->
+    <aside class="sidebar" aria-label="Controls">
+
+      <!-- Dataset -->
+      <div class="ctrl-card glass">
+        <h3>Dataset</h3>
+        <label for="dataset-sel" class="visually-hidden">Choose dataset</label>
+        <select id="dataset-sel" class="ctrl-select" aria-label="Dataset selector">
+          <option value="">Loading…</option>
+        </select>
+      </div>
+
+      <!-- Features -->
+      <div class="ctrl-card glass">
+        <h3>Features</h3>
+        <div id="feature-list" class="feature-list" role="group" aria-label="Feature selection checkboxes">
+          <span class="color-tertiary text-sm">Loading features…</span>
+        </div>
+      </div>
+
+      <!-- Preprocessing -->
+      <div class="ctrl-card glass">
+        <h3>Preprocessing</h3>
+        <div class="toggle-row">
+          <span class="toggle-label" id="std-label">
+            Standardize (autoscale)
+            <span class="color-tertiary text-xs" style="display:block;margin-top:2px">z-score each feature</span>
+          </span>
+          <label class="toggle-switch" aria-label="Standardize features (z-score)">
+            <input type="checkbox" id="standardize-toggle" checked aria-labelledby="std-label" role="switch" />
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- PC Axes -->
+      <div class="ctrl-card glass">
+        <h3>PC Axes</h3>
+        <div class="pc-row">
+          <label for="sel-pcx">X:</label>
+          <select id="sel-pcx" aria-label="PC for horizontal axis">
+            <option value="0">PC1</option>
+          </select>
+        </div>
+        <div class="pc-row">
+          <label for="sel-pcy">Y:</label>
+          <select id="sel-pcy" aria-label="PC for vertical axis">
+            <option value="1">PC2</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Display -->
+      <div class="ctrl-card glass">
+        <h3>Display</h3>
+        <div class="range-row">
+          <label for="point-size" class="text-sm color-secondary">Point size</label>
+          <input type="range" id="point-size" min="2" max="12" value="5" step="1"
+                 aria-label="Point size for scatter plot" />
+          <span id="point-size-val" class="range-val">5</span>
+        </div>
+      </div>
+
+      <!-- CSV paste -->
+      <div class="ctrl-card glass">
+        <h3>Custom CSV</h3>
+        <p class="text-xs color-tertiary" style="margin-bottom:8px">
+          Paste CSV with a header row. Numeric columns become features;
+          a non-numeric column (e.g. "label") is used for coloring.
+        </p>
+        <label for="csv-input" class="visually-hidden">Paste CSV data</label>
+        <textarea id="csv-input" class="csv-area"
+          placeholder="x1,x2,x3,label&#10;1.2,3.4,0.5,classA&#10;…"
+          aria-label="Paste CSV data here"></textarea>
+        <button id="btn-load-csv" class="btn-ink mt-8" type="button">
+          Load CSV
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ── Content area ──────────────────────────────────────── -->
+    <div class="content-area">
+
+      <!-- Stats strip -->
+      <div class="stats-strip glass" role="region" aria-label="PCA computation statistics">
+        <div class="stat-item">
+          <span class="stat-label">Samples</span>
+          <span id="stat-n" class="stat-value">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Features</span>
+          <span id="stat-p" class="stat-value">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Compute</span>
+          <span id="stat-time" class="stat-value">—</span>
+        </div>
+        <div class="stat-item">
+          <span id="stat-pc1" class="stat-value">—</span>
+        </div>
+        <div class="stat-item">
+          <span id="stat-pc2" class="stat-value">—</span>
+        </div>
+        <div class="stat-item">
+          <span id="stat-cum" class="stat-value">—</span>
+        </div>
+        <div class="sanity-row" aria-label="Eigenvector sanity checks">
+          <span id="sanity-ortho" class="sanity-item"></span>
+          <span id="sanity-varsum" class="sanity-item"></span>
+        </div>
+      </div>
+
+      <!-- Scores scatter + Scree -->
+      <div class="plots-row">
+
+        <!-- Scatter -->
+        <div class="plot-card glass" role="region" aria-label="PC scores scatter plot">
+          <h2>Scores Scatter</h2>
+          <div class="canvas-wrap">
+            <canvas id="scatter-canvas"
+              style="width:100%;height:380px;"
+              aria-label="Scatter plot of samples projected onto selected principal components. Points colored by class label."
+              role="img"
+              tabindex="0">
+              <!-- Accessible fallback: keyboard users can read stats strip -->
+            </canvas>
+          </div>
+          <div id="legend-wrap" class="legend-wrap" aria-label="Class color legend" role="list"></div>
+          <div class="export-row" style="margin-top:10px">
+            <button id="btn-export-scatter" class="btn-secondary" type="button" aria-label="Export scatter plot as PNG">
+              Export PNG
+            </button>
+            <button id="btn-export-csv" class="btn-secondary" type="button" aria-label="Export PC scores as CSV">
+              Export Scores CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Scree -->
+        <div class="plot-card glass" role="region" aria-label="Scree plot of explained variance">
+          <h2>Scree Plot</h2>
+          <div class="canvas-wrap">
+            <canvas id="scree-canvas"
+              style="width:100%;height:220px;"
+              aria-label="Bar chart of explained variance per principal component, with cumulative variance line."
+              role="img"
+              tabindex="0">
+            </canvas>
+          </div>
+          <div class="export-row">
+            <button id="btn-export-scree" class="btn-secondary" type="button" aria-label="Export scree plot as PNG">
+              Export PNG
+            </button>
+          </div>
+
+          <!-- Biplot below scree -->
+          <h2 style="margin-top:16px">Loadings Biplot</h2>
+          <div class="biplot-canvas-wrap">
+            <canvas id="biplot-canvas"
+              style="width:100%;height:220px;"
+              aria-label="Biplot showing loading vectors of original features onto the selected principal components."
+              role="img"
+              tabindex="0">
+            </canvas>
+          </div>
+          <div class="export-row">
+            <button id="btn-export-biplot" class="btn-secondary" type="button" aria-label="Export biplot as PNG">
+              Export PNG
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Loadings table -->
+      <div class="loadings-panel glass" role="region" aria-label="Feature loadings table">
+        <h2>Feature Loadings</h2>
+        <p class="text-xs color-tertiary" style="margin-bottom:10px">
+          Each value is the correlation (eigenvector component) between the original feature
+          and the principal component. Bold columns = currently displayed PCs.
+          Mini bars show magnitude and direction (blue = positive, red = negative).
+        </p>
+        <div class="loadings-table-wrap">
+          <table class="loadings-table" aria-label="Feature loadings on each principal component">
+            <thead id="loadings-thead"></thead>
+            <tbody id="loadings-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Method & References -->
+      <div class="method-panel glass" role="region" aria-label="Method and references">
+        <h2>Method &amp; References</h2>
+        <div class="flex-row" style="margin-bottom:8px">
+          <button id="method-toggle" class="method-toggle-btn" type="button"
+                  aria-expanded="false" aria-controls="method-body">
+            Show details
+          </button>
+        </div>
+        <div id="method-body" class="method-body hidden">
+
+          <p><strong>What PCA does:</strong> Principal Component Analysis finds the directions
+          (principal components) in feature space along which the data varies the most.
+          Projecting data onto these directions gives a low-dimensional summary that preserves
+          as much variance as possible. The first PC captures the most variance; each subsequent
+          PC is orthogonal (uncorrelated) to all previous ones.</p>
+
+          <p class="mt-8"><strong>How to read the plots:</strong></p>
+          <ul>
+            <li><b>Scores scatter:</b> each point is one sample. Tight clusters = similar samples.
+            Separation along PC1 = the dominant pattern explains that split.</li>
+            <li><b>Scree plot:</b> bar height = fraction of total variance each PC explains.
+            The elbow point suggests how many PCs to retain. The red line is cumulative variance.</li>
+            <li><b>Loadings biplot:</b> arrows show how original features map onto the PCs.
+            Long arrow = feature contributes heavily to that PC.
+            Arrows pointing the same direction = positively correlated features.</li>
+          </ul>
+
+          <p class="mt-8"><strong>Computation steps (this tool):</strong></p>
+          <ul>
+            <li>1. <b>Mean-centering:</b> subtract each feature's mean so the origin is the centroid.</li>
+            <li>2. <b>Autoscaling (optional):</b> divide each feature by its sample standard deviation
+                (z-score). Recommended when features have different units or very different scales.
+                Makes the covariance matrix equivalent to the correlation matrix.</li>
+            <li>3. <b>Covariance matrix:</b> compute the p×p symmetric covariance matrix
+                C = (1/(n−1)) ZᵀZ, where Z is the centered/scaled n×p data matrix.</li>
+            <li>4. <b>Jacobi eigendecomposition:</b> iteratively apply Givens rotations to diagonalize C
+                (cyclic Jacobi algorithm; converges in a few sweeps for small p).
+                Eigenvalues (diagonal of the diagonalized matrix) = variances along each PC;
+                eigenvectors (accumulated rotation product) = PC directions (loadings).</li>
+            <li>5. <b>Sort &amp; project:</b> sort eigenpairs by eigenvalue descending;
+                multiply Z by the top eigenvectors to get scores.</li>
+          </ul>
+
+          <p class="mt-8"><strong>Honest simplifications:</strong> The Jacobi solver works
+          excellently for small p (≤ ~30). For very large p, SVD-based approaches are more efficient.
+          This tool uses sample covariance (ddof=1). Sign of eigenvectors is arbitrary
+          (flipping a PC axis does not change the geometry). The tool does not perform
+          cross-validation or significance testing.</p>
+
+          <p class="mt-8"><strong>Sanity checks:</strong> After decomposition, the tool verifies
+          (a) eigenvectors are orthonormal (|dot| &lt; 1e-8, |norm−1| &lt; 1e-8) and
+          (b) explained variance ratios sum to 1 (±1e-6). Results displayed in the stats strip.</p>
+
+          <p class="mt-8"><strong>References:</strong></p>
+          <ul class="ref-list">
+            <li>Pearson, K. (1901). On lines and planes of closest fit to systems of points in space.
+              <em>Philosophical Magazine</em>, 2(11), 559–572. [Original PCA paper]</li>
+            <li>Hotelling, H. (1933). Analysis of a complex of statistical variables into principal components.
+              <em>Journal of Educational Psychology</em>, 24(6), 417–441. [Statistical PCA formulation]</li>
+            <li>Golub, G. H., &amp; Van Loan, C. F. (2013). <em>Matrix Computations</em> (4th ed.).
+              §8.4 — Jacobi methods for symmetric eigenproblems. [Algorithm used here]</li>
+            <li>Fisher, R. A. (1936). The use of multiple measurements in taxonomic problems.
+              <em>Annals of Eugenics</em>, 7(2), 179–188. [Iris dataset provenance]</li>
+            <li>UCI Machine Learning Repository — Iris dataset:
+              <em>https://archive.ics.uci.edu/ml/datasets/iris</em></li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-layout -->
+
+</div><!-- /app -->
+
+<!-- Scripts (classic tags, works with file://) -->
+<script src="js/pca.js"></script>
+<script src="js/datasets.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
