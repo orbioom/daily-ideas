@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cadence — read your cron</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --glass:rgba(255,255,255,0.42);--glass-raised:rgba(255,255,255,0.78);
+    --border:rgba(255,255,255,0.7);--border-2:rgba(255,255,255,0.95);
+    --text:#1b1d2a;--text-2:#565a70;--text-3:#8b8fa3;
+    --accent-grad:linear-gradient(180deg,#3a3e4c,#23262f);
+    --dot-live:#86c79a;--blur:22px;--ease:cubic-bezier(0.16,1,0.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Manrope,system-ui,sans-serif;color:var(--text);min-height:100vh;
+    background:radial-gradient(1000px 640px at 15% -10%,#f4f5f9,transparent 60%),
+      radial-gradient(900px 560px at 100% 0,#e8eaf1,transparent 55%),
+      linear-gradient(180deg,#edeef3,#e7e9f0 60%,#eceef2);
+    background-attachment:fixed;padding:40px 20px 80px}
+  .wrap{max-width:880px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+  .orb{width:32px;height:32px;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%,#fff,#c8ccd8 42%,#6c7180);
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.8),0 4px 14px rgba(40,44,80,.18)}
+  .brand h1{font-size:20px;font-weight:700;letter-spacing:-.01em}
+  .sub{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3);letter-spacing:.03em;margin:0 0 24px 45px}
+  .panel{background:var(--glass);backdrop-filter:blur(var(--blur)) saturate(180%);
+    border:1px solid var(--border);border-radius:22px;padding:26px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 14px 44px rgba(40,44,80,.10);margin-bottom:20px}
+  .exprwrap{display:flex;gap:10px;align-items:stretch}
+  #expr{flex:1;font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;letter-spacing:.06em;
+    text-align:center;color:var(--text);background:var(--glass-raised);border:1px solid var(--border-2);
+    border-radius:14px;padding:16px;transition:border-color .2s var(--ease)}
+  #expr:focus{outline:none;border-color:#aab0c4}
+  #expr.bad{border-color:#d99;background:rgba(255,240,242,.7)}
+  .fieldhdr{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:10px}
+  .fieldhdr span{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)}
+  .desc{margin-top:18px;font-size:17px;color:var(--text);line-height:1.5;font-weight:500;min-height:26px}
+  .desc.err{color:#b5677d;font-size:14px;font-weight:500}
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{font-family:Manrope,sans-serif;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;
+    background:var(--glass);border:1px solid var(--border);border-radius:999px;padding:7px 13px;
+    transition:transform .2s var(--ease),color .2s}
+  .chip:hover{transform:translateY(-1px);color:var(--text)}
+  .chip .m{font-family:'JetBrains Mono',monospace;color:var(--text-3);font-size:11px;margin-left:6px}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);
+    font-family:'JetBrains Mono',monospace;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--dot-live);box-shadow:0 0 0 3px rgba(134,199,154,.22)}
+  .runs{display:flex;flex-direction:column;gap:0}
+  .run{display:flex;align-items:center;gap:16px;padding:13px 4px;border-bottom:1px solid rgba(40,44,80,.07)}
+  .run:last-child{border-bottom:none}
+  .run .when{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text);min-width:215px}
+  .run .rel{font-size:13px;color:var(--text-3)}
+  .run .gap{margin-left:auto;font-size:12px;color:var(--text-3);font-family:'JetBrains Mono',monospace}
+  /* timeline */
+  .timeline{position:relative;height:64px;margin-top:8px}
+  .axis{position:absolute;left:0;right:0;top:38px;height:1px;background:rgba(40,44,80,.16)}
+  .tick{position:absolute;top:30px;width:2px;height:16px;border-radius:2px;background:var(--text-2);
+    transform:translateX(-1px)}
+  .tick.first{background:var(--dot-live);box-shadow:0 0 0 4px rgba(134,199,154,.22)}
+  .tlab{position:absolute;top:0;font-size:10px;color:var(--text-3);font-family:'JetBrains Mono',monospace;transform:translateX(-50%);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="orb"></div><h1>Cadence</h1></div>
+  <p class="sub">type a cron expression — see what it means and when it fires next</p>
+
+  <div class="panel">
+    <div class="exprwrap">
+      <input id="expr" value="0 9 * * 1-5" spellcheck="false" autocomplete="off" />
+    </div>
+    <div class="fieldhdr"><span>minute</span><span>hour</span><span>day / month</span><span>month</span><span>day / week</span></div>
+    <div class="desc" id="desc"></div>
+    <div class="presets" id="presets"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="dot"></span>Next runs</h2>
+    <div class="timeline" id="timeline"></div>
+    <div class="runs" id="runs"></div>
+  </div>
+</div>
+
+<script src="cron.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const PRESETS=[
+  ["Every minute","* * * * *"],["Every 15 min","*/15 * * * *"],
+  ["Hourly","0 * * * *"],["Every 6 hours","0 */6 * * *"],
+  ["Weekdays 9am","0 9 * * 1-5"],["Daily midnight","0 0 * * *"],
+  ["Mondays 8am","0 8 * * 1"],["1st of month","30 8 1 * *"],
+  ["Sat & Sun noon","0 12 * * 6,0"],["Quarterly","0 0 1 1,4,7,10 *"],
+];
+function buildPresets(){
+  $("presets").innerHTML="";
+  PRESETS.forEach(([label,e])=>{
+    const c=document.createElement("div");c.className="chip";
+    c.innerHTML=label+'<span class="m">'+e+'</span>';
+    c.onclick=()=>{$("expr").value=e;update();};
+    $("presets").appendChild(c);
+  });
+}
+function relWords(d,from){
+  let s=Math.round((d-from)/1000);const sign=s<0?"ago":"from now";s=Math.abs(s);
+  const u=[[86400,"d"],[3600,"h"],[60,"m"]];let out=[];
+  for(const [sec,lab] of u){if(s>=sec){out.push(Math.floor(s/sec)+lab);s%=sec;}if(out.length>=2)break;}
+  if(!out.length)out=["<1m"];
+  return "in "+out.join(" ");
+}
+function fmtWhen(d){
+  return d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})
+    +"  "+d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+function update(){
+  const expr=$("expr").value;const inp=$("expr");const now=new Date();
+  let desc,runs;
+  try{ desc=Cadence.describe(expr); runs=Cadence.nextN(expr,7,now); inp.classList.remove("bad");
+       $("desc").classList.remove("err"); }
+  catch(err){ inp.classList.add("bad"); $("desc").classList.add("err");
+       $("desc").textContent="⚠ "+err.message; $("runs").innerHTML=""; $("timeline").innerHTML=""; return; }
+  $("desc").textContent=desc;
+  // list
+  const rb=$("runs");rb.innerHTML="";let prev=now;
+  runs.forEach((d,i)=>{
+    const row=document.createElement("div");row.className="run";
+    const gapMs=d-prev;const gap=i===0?"":"+"+human(gapMs);
+    row.innerHTML=`<span class="when">${fmtWhen(d)}</span>
+      <span class="rel">${relWords(d,now)}</span><span class="gap">${gap}</span>`;
+    rb.appendChild(row);prev=d;
+  });
+  // timeline
+  const tl=$("timeline");tl.innerHTML='<div class="axis"></div>';
+  if(runs.length){
+    const t0=now.getTime(),t1=runs[runs.length-1].getTime();const span=(t1-t0)||1;
+    runs.forEach((d,i)=>{
+      const x=((d.getTime()-t0)/span)*100;
+      const tk=document.createElement("div");tk.className="tick"+(i===0?" first":"");
+      tk.style.left=x+"%";tl.appendChild(tk);
+      if(i===0||i===runs.length-1){
+        const lab=document.createElement("div");lab.className="tlab";lab.style.left=x+"%";
+        lab.textContent=d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+        lab.style.transform=i===0?"translateX(0)":"translateX(-100%)";tl.appendChild(lab);
+      }
+    });
+  }
+}
+function human(ms){let s=Math.round(ms/1000);const u=[[86400,"d"],[3600,"h"],[60,"m"]];
+  for(const[sec,l]of u){if(s>=sec)return Math.round(s/sec)+l;}return "<1m";}
+$("expr").addEventListener("input",update);
+buildPresets();update();
+</script>
+</body>
+</html>

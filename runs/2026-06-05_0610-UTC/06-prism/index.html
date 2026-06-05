@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prism — see your CSV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --glass:rgba(255,255,255,0.42);--glass-raised:rgba(255,255,255,0.78);
+    --border:rgba(255,255,255,0.7);--border-2:rgba(255,255,255,0.95);
+    --text:#1b1d2a;--text-2:#565a70;--text-3:#8b8fa3;
+    --accent-grad:linear-gradient(180deg,#3a3e4c,#23262f);
+    --dot-live:#86c79a;--blur:22px;--ease:cubic-bezier(0.16,1,0.3,1);
+    --ink:#2b2e3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Manrope,system-ui,sans-serif;color:var(--text);min-height:100vh;
+    background:radial-gradient(1100px 700px at 12% -8%,#f4f5f9,transparent 60%),
+      radial-gradient(900px 600px at 100% 0,#e8eaf1,transparent 55%),
+      linear-gradient(180deg,#edeef3,#e7e9f0 60%,#eceef2);
+    background-attachment:fixed;padding:34px 20px 80px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .orb{width:32px;height:32px;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%,#fff,#c8ccd8 42%,#6c7180);
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.8),0 4px 14px rgba(40,44,80,.18)}
+  .brand h1{font-size:20px;font-weight:700}
+  .brand .mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em}
+  button,.btn{font-family:Manrope;font-weight:600;font-size:13.5px;cursor:pointer;border-radius:12px;border:1px solid var(--border);
+    padding:9px 15px;background:var(--glass);backdrop-filter:blur(var(--blur));color:var(--text);transition:transform .2s var(--ease)}
+  button:hover{transform:translateY(-1px)}
+  .btn-ink{background:var(--accent-grad);color:#fff;border:1px solid rgba(0,0,0,.2);box-shadow:0 6px 18px rgba(40,44,80,.22)}
+  .grid{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--glass);backdrop-filter:blur(var(--blur)) saturate(180%);border:1px solid var(--border);
+    border-radius:20px;padding:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 14px 40px rgba(40,44,80,.10)}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-family:'JetBrains Mono',monospace;font-weight:500;margin-bottom:14px}
+  label{display:block;font-size:12px;color:var(--text-2);margin:14px 0 5px;font-weight:600}
+  select,textarea{width:100%;font-family:Manrope;font-size:14px;color:var(--text);border:1px solid var(--border-2);
+    background:rgba(255,255,255,.6);border-radius:10px;padding:9px 11px}
+  select:focus,textarea:focus{outline:none;border-color:#aab0c4}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg .opt{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;
+    border:1px solid var(--border);background:var(--glass);border-radius:10px;padding:8px 4px;min-width:60px;transition:all .2s var(--ease)}
+  .seg .opt.on{background:var(--accent-grad);color:#fff;border-color:rgba(0,0,0,.2)}
+  .drop{border:1.5px dashed rgba(86,90,112,.35);border-radius:14px;padding:18px;text-align:center;color:var(--text-3);
+    font-size:13px;cursor:pointer;transition:all .2s var(--ease);background:rgba(255,255,255,.25)}
+  .drop.hot{border-color:var(--dot-live);background:rgba(134,199,154,.10);color:var(--text-2)}
+  .cols{margin-top:6px;max-height:180px;overflow:auto}
+  .col{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:8px;font-size:13px}
+  .col:hover{background:rgba(255,255,255,.4)}
+  .col .t{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(86,90,112,.12);color:var(--text-2)}
+  .col .t.num{background:rgba(134,199,154,.20);color:#3c7a55}
+  .chartwrap{position:relative}
+  canvas{width:100%;border-radius:14px;display:block}
+  .charttitle{font-size:16px;font-weight:700;margin-bottom:2px}
+  .chartsub{font-size:12px;color:var(--text-3);font-family:'JetBrains Mono',monospace;margin-bottom:14px}
+  .empty{color:var(--text-3);text-align:center;padding:80px 20px;font-size:14px}
+  .meta{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><div class="orb"></div>
+      <div><h1>Prism</h1><div class="mono">drop a csv · see it · stays on your device</div></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button id="sample">Load sample</button>
+      <button class="btn-ink" id="png">Save PNG</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Data</h2>
+      <div class="drop" id="drop">Drop a .csv here<br>or click to choose</div>
+      <input type="file" id="file" accept=".csv,text/csv" style="display:none" />
+      <label>Or paste CSV</label>
+      <textarea id="paste" rows="3" placeholder="month,sales&#10;Jan,120&#10;Feb,98"></textarea>
+      <button id="parsePaste" style="margin-top:8px;width:100%">Use pasted text</button>
+      <div class="cols" id="cols"></div>
+      <div class="meta" id="rowmeta"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Chart</h2>
+      <div class="seg" id="types">
+        <div class="opt on" data-t="bar">Bar</div>
+        <div class="opt" data-t="line">Line</div>
+        <div class="opt" data-t="scatter">Scatter</div>
+        <div class="opt" data-t="hist">Histogram</div>
+      </div>
+      <div id="axisControls">
+        <label id="xLabel">X axis</label>
+        <select id="x"></select>
+        <label id="yLabel">Y axis</label>
+        <select id="y"></select>
+        <label id="aggLabel">Aggregate</label>
+        <div class="seg" id="aggs">
+          <div class="opt on" data-a="sum">Sum</div>
+          <div class="opt" data-a="avg">Average</div>
+          <div class="opt" data-a="count">Count</div>
+        </div>
+      </div>
+      <div class="chartwrap" style="margin-top:18px">
+        <div class="charttitle" id="ctitle"></div>
+        <div class="chartsub" id="csub"></div>
+        <canvas id="cv" width="1500" height="820"></canvas>
+        <div class="empty" id="empty">Load a CSV to begin.</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let DATA=null;       // {headers:[], rows:[[...]], types:[]}
+let chartType="bar", agg="sum";
+
+/* ---------- CSV parser (handles quotes, commas, CRLF) ---------- */
+function parseCSV(text){
+  const rows=[];let row=[],field="",i=0,q=false;
+  text=text.replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+  while(i<text.length){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else q=false; }
+      else field+=c;
+    }else{
+      if(c==='"')q=true;
+      else if(c===','){row.push(field);field="";}
+      else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}
+      else field+=c;
+    }
+    i++;
+  }
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  return rows.filter(r=>r.length>1||(r.length===1&&r[0]!==""));
+}
+function isNum(v){return v!==""&&v!=null&&!isNaN(Number(v.replace?v.replace(/[,$%]/g,""):v));}
+function num(v){return Number(String(v).replace(/[,$%]/g,""));}
+
+function ingest(text){
+  const grid=parseCSV(text);
+  if(grid.length<2){alert("Need a header row and at least one data row.");return;}
+  const headers=grid[0];
+  const rows=grid.slice(1).filter(r=>r.length===headers.length);
+  const types=headers.map((_,c)=>{
+    const vals=rows.map(r=>r[c]).filter(v=>v!=="");
+    const nn=vals.filter(isNum).length;
+    return (vals.length&&nn/vals.length>0.8)?"num":"cat";
+  });
+  DATA={headers,rows,types};
+  buildColumnUI();
+  // sensible defaults: x = first categorical, y = first numeric
+  const firstCat=types.indexOf("cat"), firstNum=types.indexOf("num");
+  fillSelect($("x"),headers); fillSelect($("y"),headers);
+  $("x").selectedIndex=firstCat>=0?firstCat:0;
+  $("y").selectedIndex=firstNum>=0?firstNum:Math.min(1,headers.length-1);
+  $("rowmeta").textContent=`${rows.length} rows · ${headers.length} columns`;
+  render();
+}
+function fillSelect(sel,headers){sel.innerHTML="";headers.forEach((h,i)=>{
+  const o=document.createElement("option");o.value=i;o.textContent=h||("col"+i);sel.appendChild(o);});}
+function buildColumnUI(){
+  const box=$("cols");box.innerHTML="";
+  DATA.headers.forEach((h,i)=>{
+    const d=document.createElement("div");d.className="col";
+    d.innerHTML=`<span>${h||"col"+i}</span><span class="t ${DATA.types[i]}">${DATA.types[i]==="num"?"123":"abc"}</span>`;
+    box.appendChild(d);
+  });
+}
+
+/* ---------- aggregation ---------- */
+function aggregate(xi,yi){
+  const groups=new Map();
+  for(const r of DATA.rows){
+    const k=r[xi];const v=num(r[yi]);
+    if(!groups.has(k))groups.set(k,[]);
+    if(isNum(r[yi]))groups.get(k).push(v);
+  }
+  const labels=[...groups.keys()];
+  const values=labels.map(k=>{const a=groups.get(k);
+    if(agg==="count")return a.length;
+    if(!a.length)return 0;
+    const s=a.reduce((x,y)=>x+y,0);return agg==="avg"?s/a.length:s;});
+  return {labels,values};
+}
+function histogram(yi,bins=12){
+  const vals=DATA.rows.map(r=>num(r[yi])).filter((v,i)=>isNum(DATA.rows[i][yi]));
+  if(!vals.length)return{labels:[],values:[]};
+  const lo=Math.min(...vals),hi=Math.max(...vals),span=(hi-lo)||1;
+  const counts=new Array(bins).fill(0);
+  vals.forEach(v=>{let b=Math.floor((v-lo)/span*bins);if(b>=bins)b=bins-1;counts[b]++;});
+  const labels=counts.map((_,i)=>(lo+span*i/bins).toFixed(1));
+  return{labels,values:counts};
+}
+
+/* ---------- rendering ---------- */
+function render(){
+  if(!DATA){return;}
+  $("empty").style.display="none";
+  const xi=+$("x").value, yi=+$("y").value;
+  const scatter=chartType==="scatter", hist=chartType==="hist";
+  // toggle control visibility
+  $("aggLabel").style.display=$("aggs").style.display=(chartType==="bar"||chartType==="line")?"":"none";
+  $("xLabel").style.display=$("x").style.display=hist?"none":"";
+  $("yLabel").textContent=hist?"Value to bin":"Y axis";
+
+  let labels,values,points=null,title,sub;
+  if(hist){const h=histogram(yi);labels=h.labels;values=h.values;
+    title=`Distribution of ${DATA.headers[yi]}`;sub=`histogram · ${DATA.rows.length} rows`;}
+  else if(scatter){
+    points=DATA.rows.filter(r=>isNum(r[xi])&&isNum(r[yi])).map(r=>[num(r[xi]),num(r[yi])]);
+    title=`${DATA.headers[yi]} vs ${DATA.headers[xi]}`;sub=`scatter · ${points.length} points`;}
+  else{const a=aggregate(xi,yi);labels=a.labels;values=a.values;
+    title=`${agg} of ${DATA.headers[yi]} by ${DATA.headers[xi]}`;sub=`${chartType} · ${labels.length} groups`;}
+
+  $("ctitle").textContent=title;$("csub").textContent=sub;
+  draw({labels,values,points,scatter,hist,xlabel:DATA.headers[xi],ylabel:DATA.headers[yi]});
+}
+
+function draw(d){
+  const cv=$("cv"),ctx=cv.getContext("2d");
+  const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="rgba(255,255,255,0.55)";roundRect(ctx,0,0,W,H,24);ctx.fill();
+  const padL=90,padR=40,padT=40,padB=110;
+  const plotW=W-padL-padR,plotH=H-padT-padB;
+  const INK="#2b2e3a",GRID="rgba(40,44,80,0.10)",T2="#565a70",GREEN="#86c79a";
+  ctx.font="22px 'JetBrains Mono',monospace";ctx.fillStyle=T2;
+
+  let vals = d.scatter? d.points.map(p=>p[1]) : d.values;
+  if(!vals||!vals.length){ctx.fillStyle=T2;ctx.fillText("no numeric data for this selection",padL,H/2);return;}
+  let vmax=Math.max(...vals,0),vmin=Math.min(...vals,0);
+  if(vmax===vmin)vmax=vmin+1;
+  // y gridlines
+  ctx.textAlign="right";ctx.textBaseline="middle";
+  for(let g=0;g<=5;g++){
+    const yy=padT+plotH*(1-g/5);const v=vmin+(vmax-vmin)*g/5;
+    ctx.strokeStyle=GRID;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(W-padR,yy);ctx.stroke();
+    ctx.fillStyle="#8b8fa3";ctx.fillText(fmtNum(v),padL-14,yy);
+  }
+  const yOf=v=>padT+plotH*(1-(v-vmin)/(vmax-vmin));
+
+  if(d.scatter){
+    let xs=d.points.map(p=>p[0]);let xmin=Math.min(...xs),xmax=Math.max(...xs);if(xmin===xmax)xmax=xmin+1;
+    const xOf=x=>padL+plotW*((x-xmin)/(xmax-xmin));
+    ctx.fillStyle="rgba(43,46,58,0.55)";
+    d.points.forEach(p=>{ctx.beginPath();ctx.arc(xOf(p[0]),yOf(p[1]),6,0,7);ctx.fill();});
+    axisLabels(ctx,d.xlabel,d.ylabel,padL,W,H,padB);
+    return;
+  }
+
+  const n=d.labels.length;const slot=plotW/n;
+  if(d.hist||(!d.scatter&&chartTypeIsBar())){
+    const bw=Math.min(slot*0.7,120);
+    d.values.forEach((v,i)=>{
+      const x=padL+slot*i+(slot-bw)/2;const y=yOf(v);
+      const grad=ctx.createLinearGradient(0,y,0,padT+plotH);
+      grad.addColorStop(0,"#3a3e4c");grad.addColorStop(1,"#23262f");
+      ctx.fillStyle=grad;roundRect(ctx,x,y,bw,padT+plotH-y,8);ctx.fill();
+    });
+  }else{ // line
+    ctx.strokeStyle=INK;ctx.lineWidth=3;ctx.beginPath();
+    d.values.forEach((v,i)=>{const x=padL+slot*i+slot/2;const y=yOf(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.stroke();
+    ctx.fillStyle=GREEN;
+    d.values.forEach((v,i)=>{const x=padL+slot*i+slot/2;ctx.beginPath();ctx.arc(x,yOf(v),6,0,7);ctx.fill();});
+  }
+  // x labels
+  ctx.fillStyle="#565a70";ctx.textAlign="center";ctx.textBaseline="top";
+  ctx.font="20px 'JetBrains Mono',monospace";
+  const skip=Math.ceil(n/16);
+  d.labels.forEach((l,i)=>{ if(i%skip)return;
+    const x=padL+slot*i+slot/2;let s=String(l);if(s.length>10)s=s.slice(0,9)+"…";
+    ctx.save();ctx.translate(x,padT+plotH+14);
+    if(n>10){ctx.rotate(-0.5);ctx.textAlign="right";}
+    ctx.fillText(s,0,0);ctx.restore();});
+  axisLabels(ctx,d.hist?d.ylabel:d.xlabel,d.hist?"count":d.ylabel,padL,W,H,padB);
+}
+function chartTypeIsBar(){return chartType==="bar"||chartType==="hist";}
+function axisLabels(ctx,xl,yl){ /* kept minimal; titles shown in HTML */ }
+function roundRect(ctx,x,y,w,h,r){r=Math.min(r,w/2,Math.abs(h)/2);ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function fmtNum(v){const a=Math.abs(v);
+  if(a>=1e6)return(v/1e6).toFixed(1)+"M";if(a>=1e3)return(v/1e3).toFixed(1)+"k";
+  return Number.isInteger(v)?v:v.toFixed(1);}
+
+/* ---------- events ---------- */
+$("types").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;
+  [...$("types").children].forEach(c=>c.classList.remove("on"));o.classList.add("on");
+  chartType=o.dataset.t;render();});
+$("aggs").addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o)return;
+  [...$("aggs").children].forEach(c=>c.classList.remove("on"));o.classList.add("on");
+  agg=o.dataset.a;render();});
+$("x").onchange=$("y").onchange=render;
+$("drop").onclick=()=>$("file").click();
+$("file").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(ingest);};
+["dragover","dragenter"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.add("hot");}));
+["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("hot");}));
+$("drop").addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)f.text().then(ingest);});
+$("parsePaste").onclick=()=>{const t=$("paste").value.trim();if(t)ingest(t);};
+$("png").onclick=()=>{const a=document.createElement("a");a.download="prism-chart.png";a.href=$("cv").toDataURL();a.click();};
+
+const SAMPLE=`month,region,units,revenue
+Jan,North,120,14400
+Jan,South,98,11270
+Feb,North,135,16200
+Feb,South,110,12650
+Mar,North,142,17040
+Mar,South,128,14720
+Apr,North,158,18960
+Apr,South,141,16215
+May,North,171,20520
+May,South,150,17250
+Jun,North,166,19920
+Jun,South,162,18630`;
+$("sample").onclick=()=>{$("paste").value=SAMPLE;ingest(SAMPLE);};
+// preload sample
+ingest(SAMPLE);
+</script>
+</body>
+</html>
