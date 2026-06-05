@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compass — A* Pathfinding Visualizer | Orbioom</title>
+  <meta name="description" content="Interactive A* pathfinding visualizer. Explore how A* (Hart, Nilsson & Raphael 1968) finds shortest paths on a grid using heuristics. Compare with Dijkstra and Greedy Best-First." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div class="app-layout" role="main">
+
+  <!-- Header -->
+  <header class="app-header" role="banner">
+    <h1 class="app-title">Compass</h1>
+    <span class="app-subtitle">A* Pathfinding Visualizer — Hart, Nilsson &amp; Raphael 1968</span>
+  </header>
+
+  <!-- Screen reader live region for results -->
+  <div id="sr-result" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Main body -->
+  <div class="app-body">
+
+    <!-- ===== LEFT PANEL: Tools & Settings ===== -->
+    <aside class="glass panel-tools" aria-label="Tools and settings">
+
+      <!-- Drawing Tools -->
+      <section aria-labelledby="tools-heading">
+        <p id="tools-heading" class="panel-section-label">Drawing Tools</p>
+        <div class="tool-row" role="toolbar" aria-label="Drawing tools">
+          <button class="tool-btn" data-tool="wall"    aria-label="Paint walls" title="Paint walls (drag to draw)">
+            <span class="icon" aria-hidden="true">▪</span>Wall
+          </button>
+          <button class="tool-btn" data-tool="erase"   aria-label="Erase cells" title="Erase walls and terrain">
+            <span class="icon" aria-hidden="true">✕</span>Erase
+          </button>
+          <button class="tool-btn" data-tool="start"   aria-label="Set start cell" title="Click a cell to set start">
+            <span class="icon" aria-hidden="true">S</span>Start
+          </button>
+          <button class="tool-btn" data-tool="goal"    aria-label="Set goal cell" title="Click a cell to set goal">
+            <span class="icon" aria-hidden="true">G</span>Goal
+          </button>
+          <button class="tool-btn" data-tool="terrain" aria-label="Paint terrain weight" title="Paint heavy terrain">
+            <span class="icon" aria-hidden="true">≋</span>Terrain
+          </button>
+        </div>
+
+        <!-- Terrain weight picker (shown only in terrain mode) -->
+        <div id="terrain-weight-row" class="terrain-weight-row" style="display:none;" aria-label="Terrain weight">
+          <label for="terrain-weight">Weight:</label>
+          <select id="terrain-weight" class="ui-select" aria-label="Terrain cost multiplier" style="flex:1;">
+            <option value="2.0">×2 Moderate</option>
+            <option value="3.0" selected>×3 Heavy</option>
+            <option value="5.0">×5 Swamp</option>
+          </select>
+        </div>
+      </section>
+
+      <hr class="panel-divider" />
+
+      <!-- Algorithm settings -->
+      <section aria-labelledby="algo-heading">
+        <p id="algo-heading" class="panel-section-label">Algorithm</p>
+
+        <div style="margin-bottom:8px;">
+          <label for="heuristic-select" style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">
+            Heuristic
+          </label>
+          <select id="heuristic-select" class="ui-select" aria-label="Heuristic function">
+            <option value="manhattan" selected>Manhattan</option>
+            <option value="euclidean">Euclidean</option>
+            <option value="chebyshev">Chebyshev</option>
+            <option value="octile">Octile (8-conn.)</option>
+            <option value="zero">Zero (Dijkstra h=0)</option>
+          </select>
+          <div id="heuristic-note" class="heuristic-note" role="alert"></div>
+        </div>
+
+        <div style="margin-bottom:8px;">
+          <label for="connectivity-select" style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">
+            Connectivity
+          </label>
+          <select id="connectivity-select" class="ui-select" aria-label="Grid connectivity">
+            <option value="4" selected>4-connected (cardinal)</option>
+            <option value="8">8-connected (+ diagonal)</option>
+          </select>
+        </div>
+
+        <div class="toggle-row" style="margin-bottom:6px;">
+          <input type="checkbox" id="corner-cut-toggle" class="ui-toggle"
+            checked aria-label="Prevent corner cutting" />
+          <label for="corner-cut-toggle" style="font-size:12px;color:var(--text-mid);cursor:pointer;">
+            Prevent corner-cutting
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <input type="checkbox" id="compare-toggle" class="ui-toggle"
+            aria-label="Compare A* vs Dijkstra vs Greedy" />
+          <label for="compare-toggle" style="font-size:12px;color:var(--text-mid);cursor:pointer;">
+            Compare algorithms
+          </label>
+        </div>
+      </section>
+
+      <hr class="panel-divider" />
+
+      <!-- Speed -->
+      <section aria-labelledby="speed-heading">
+        <p id="speed-heading" class="panel-section-label">Animation Speed</p>
+        <div class="slider-row">
+          <label for="speed-slider" style="display:flex;justify-content:space-between;">
+            <span>Speed</span>
+            <span id="speed-label" style="font-family:var(--font-mono);">20 cells/frame</span>
+          </label>
+          <input type="range" id="speed-slider" class="ui-slider"
+            min="1" max="120" value="20" step="1"
+            aria-label="Animation speed in cells per frame"
+            aria-valuemin="1" aria-valuemax="120" aria-valuenow="20" />
+        </div>
+      </section>
+
+      <hr class="panel-divider" />
+
+      <!-- Maze & Terrain generators -->
+      <section aria-labelledby="gen-heading">
+        <p id="gen-heading" class="panel-section-label">Generators</p>
+
+        <div class="seed-row" style="margin-bottom:8px;">
+          <label for="seed-input">Maze seed</label>
+          <input type="number" id="seed-input" value="42" min="0" max="999999"
+            aria-label="Maze generator seed" />
+        </div>
+
+        <div class="btn-sm-row" style="margin-bottom:6px;">
+          <button id="btn-maze-div" class="btn-sm" aria-label="Generate recursive division maze">
+            Rec. Division
+          </button>
+          <button id="btn-maze-dfs" class="btn-sm" aria-label="Generate DFS maze">
+            DFS Maze
+          </button>
+        </div>
+
+        <div class="seed-row" style="margin-bottom:8px;">
+          <label for="terrain-seed-input">Terrain seed</label>
+          <input type="number" id="terrain-seed-input" value="99" min="0" max="999999"
+            aria-label="Terrain generator seed" />
+        </div>
+
+        <button id="btn-terrain" class="btn-sm" style="margin-bottom:6px;"
+          aria-label="Generate random terrain weights">
+          Random Terrain
+        </button>
+
+        <div class="btn-sm-row">
+          <button id="btn-clear-walls" class="btn-sm" aria-label="Clear all walls">
+            Clear Walls
+          </button>
+          <button id="btn-clear-terrain" class="btn-sm" aria-label="Clear terrain weights">
+            Clear Terrain
+          </button>
+        </div>
+      </section>
+
+      <hr class="panel-divider" />
+
+      <!-- Keyboard help -->
+      <section aria-labelledby="kbd-heading">
+        <p id="kbd-heading" class="panel-section-label">Keyboard</p>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">
+          <div><kbd>Arrow keys</kbd> — move cursor</div>
+          <div><kbd>Enter</kbd> / <kbd>Space</kbd> — place cell</div>
+          <div><kbd>Esc</kbd> — hide cursor</div>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ===== CENTER: Canvas ===== -->
+    <div class="canvas-area">
+      <div class="glass canvas-wrap" aria-label="Pathfinding grid">
+        <canvas id="grid-canvas"
+          role="img"
+          aria-label="Interactive pathfinding grid. Use arrow keys to move cursor and Enter to paint."
+          tabindex="0">
+          Your browser does not support HTML5 canvas.
+        </canvas>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar glass" role="group" aria-label="Playback controls">
+        <button id="btn-run"   class="btn-primary" aria-label="Run A* pathfinding animation">
+          ▶ Run
+        </button>
+        <button id="btn-step"  class="btn-action" aria-label="Step one expansion">Step</button>
+        <button id="btn-pause" class="btn-action" aria-label="Pause or resume animation">Pause</button>
+        <button id="btn-reset" class="btn-action" aria-label="Reset grid to default">Reset</button>
+
+        <div style="flex:1;"></div>
+
+        <button id="btn-export-png" class="btn-action" aria-label="Export grid as PNG image">
+          ↓ PNG
+        </button>
+        <button id="btn-export-csv" class="btn-action" aria-label="Export path as CSV">
+          ↓ CSV
+        </button>
+      </div>
+
+      <!-- Status bar -->
+      <div id="status-bar" class="status-bar" role="status" aria-live="polite">
+        Loading…
+      </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL: Metrics, Legend, Compare ===== -->
+    <aside class="glass panel-metrics" aria-label="Search metrics and results">
+
+      <!-- Metrics -->
+      <section aria-labelledby="metrics-heading">
+        <p id="metrics-heading" class="panel-section-label">Search Metrics</p>
+        <div class="metrics-grid" aria-label="Search result metrics">
+          <div class="metric-card">
+            <span class="metric-label">Nodes Expanded</span>
+            <span id="metric-expanded" class="metric-value" aria-live="polite">—</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Path Cost</span>
+            <span id="metric-cost" class="metric-value" aria-live="polite">—</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Steps</span>
+            <span id="metric-steps" class="metric-value" aria-live="polite">—</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Search Time</span>
+            <span id="metric-time" class="metric-value small" aria-live="polite">—</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Path Found</span>
+            <span id="metric-found" class="metric-value small" aria-live="polite">—</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Optimal?</span>
+            <span id="metric-admissible" class="metric-value small" aria-live="polite">—</span>
+          </div>
+        </div>
+      </section>
+
+      <hr class="panel-divider" />
+
+      <!-- Legend -->
+      <section aria-labelledby="legend-heading">
+        <p id="legend-heading" class="panel-section-label">Legend</p>
+        <div class="legend" role="list">
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#3A3E4C;" aria-hidden="true"></div>
+            <span>Start cell</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#5EF0B0;" aria-hidden="true"></div>
+            <span>Goal cell</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#23262F;" aria-hidden="true"></div>
+            <span>Wall (impassable)</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#C5CBE8;" aria-hidden="true"></div>
+            <span>Visited / expanded</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#E8C96A;" aria-hidden="true"></div>
+            <span>Open frontier</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#86C79A;" aria-hidden="true"></div>
+            <span>Shortest path found</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#C8B9A2;" aria-hidden="true"></div>
+            <span>Moderate terrain (×2)</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#A89270;" aria-hidden="true"></div>
+            <span>Heavy terrain (×3)</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <div class="legend-swatch" style="background:#7A6A55;" aria-hidden="true"></div>
+            <span>Swamp terrain (×5)</span>
+          </div>
+        </div>
+      </section>
+
+      <hr class="panel-divider" />
+
+      <!-- Compare panel -->
+      <section id="compare-panel" class="compare-panel" aria-labelledby="compare-heading">
+        <p id="compare-heading" class="panel-section-label">Algorithm Comparison</p>
+        <div id="compare-table-wrap" aria-live="polite"></div>
+        <p id="compare-note" class="compare-note" aria-live="polite"></p>
+      </section>
+
+      <!-- Method & References -->
+      <section aria-labelledby="method-heading">
+        <button id="btn-method" class="btn-sm" aria-expanded="false"
+          aria-controls="method-panel" style="margin-bottom:8px;">
+          Method &amp; References ↓
+        </button>
+        <div id="method-panel" class="method-panel" role="region" aria-label="Method and references">
+          <div class="method-text">
+            <h4>Algorithm: A* Best-First Search</h4>
+            <p>A* selects cells to expand by their <em>f-score</em>: <strong>f = g + h</strong>,
+            where <strong>g</strong> is the cost from start and <strong>h</strong> is a heuristic
+            estimate to the goal. The open set is stored in a <strong>binary min-heap</strong>
+            for O(log n) extraction.</p>
+
+            <h4>Heuristics implemented</h4>
+            <p>Manhattan (4-conn), Euclidean, Chebyshev, Octile (8-conn), Zero (Dijkstra).
+            An admissible heuristic never overestimates; A* with an admissible h is
+            guaranteed to find an <strong>optimal (minimum-cost)</strong> path.</p>
+
+            <h4>Variants</h4>
+            <p><strong>Dijkstra</strong> = A* with h=0 (uniform cost, always optimal).
+            <strong>Greedy Best-First</strong> = f=h (fast but not optimal).</p>
+
+            <h4>Primary Citation</h4>
+            <p><cite>Hart, P. E.; Nilsson, N. J.; Raphael, B. (1968).
+            "A Formal Basis for the Heuristic Determination of Minimum Cost Paths."
+            IEEE Transactions on Systems Science and Cybernetics,
+            SSC-4(2): 100–107. DOI:10.1109/TSSC.1968.300136</cite></p>
+
+            <h4>Honest notes</h4>
+            <p>With weighted terrain, Manhattan/Euclidean remain admissible only when
+            the minimum terrain cost is ≥ 1. Diagonal moves cost √2 × terrain.
+            Corner-cutting prevention is strict (both adjacent cardinal neighbors must be clear).
+            Grid bounded at 50×50 for animation performance.</p>
+          </div>
+
+          <!-- Sanity check output -->
+          <div class="sanity-wrap">
+            <p class="panel-section-label" style="margin-top:10px;">Internal Sanity Check</p>
+            <div id="sanity-result" aria-label="Sanity check results" role="status"></div>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer" role="contentinfo">
+    Compass by Orbioom — A* (Hart, Nilsson &amp; Raphael 1968) — No CDN, no server, pure HTML/CSS/JS
+  </footer>
+</div>
+
+<!-- Scripts — loaded in dependency order, classic <script> tags for file:// compatibility -->
+<script src="js/astar.js"></script>
+<script src="js/maze.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
