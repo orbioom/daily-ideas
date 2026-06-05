@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Envelope — zero-based monthly budgeting by Orbioom. Give every dollar a job." />
+  <meta name="color-scheme" content="light dark" />
+  <title>Envelope · Orbioom</title>
+
+  <!-- Google Fonts — Manrope + JetBrains Mono (degrade gracefully without internet) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP SHELL
+     ═══════════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Mobile hamburger -->
+  <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="2" y="5" width="16" height="2" rx="1" fill="currentColor"/>
+      <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor"/>
+      <rect x="2" y="13" width="16" height="2" rx="1" fill="currentColor"/>
+    </svg>
+  </button>
+
+  <!-- Mobile sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar" aria-label="Application sidebar">
+    <div id="sidebar-header">
+      <div class="brand-name">Envelope</div>
+      <div class="brand-sub">Orbioom · Budget</div>
+    </div>
+
+    <!-- Month selector -->
+    <div id="sidebar-month" style="padding: 12px 10px 4px;">
+      <div class="month-selector">
+        <button class="month-nav-btn" id="month-prev" aria-label="Previous month">‹</button>
+        <span class="month-label" id="month-label" role="button" tabindex="0"
+          aria-label="Current month (click to return to today)" title="Click to return to today">
+          Loading…
+        </span>
+        <button class="month-nav-btn" id="month-next" aria-label="Next month">›</button>
+      </div>
+    </div>
+
+    <nav role="navigation" aria-label="Main navigation">
+      <button class="nav-item active" data-view="dashboard" aria-current="page">
+        <span class="nav-icon" aria-hidden="true">◈</span>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="transactions" aria-current="false">
+        <span class="nav-icon" aria-hidden="true">↕</span>
+        Transactions
+      </button>
+      <button class="nav-item" data-view="accounts" aria-current="false">
+        <span class="nav-icon" aria-hidden="true">◉</span>
+        Accounts
+      </button>
+      <button class="nav-item" data-view="reports" aria-current="false">
+        <span class="nav-icon" aria-hidden="true">▨</span>
+        Reports
+      </button>
+      <hr class="divider" />
+      <button class="nav-item" data-view="settings" aria-current="false">
+        <span class="nav-icon" aria-hidden="true">⚙</span>
+        Settings
+      </button>
+    </nav>
+
+    <div id="sidebar-footer">
+      <div style="font-size:0.7rem;color:var(--text-tertiary);padding:0 4px;">
+        Data stored locally. No account needed.
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main id="main-content">
+
+    <!-- ════════════════════════
+         DASHBOARD VIEW
+         ════════════════════════ -->
+    <section id="view-dashboard" class="view active" role="main" aria-label="Dashboard">
+      <header class="view-header">
+        <div>
+          <h1 class="view-title">Budget</h1>
+          <div class="view-subtitle">Give every dollar a job.</div>
+        </div>
+        <div class="flex-gap">
+          <button class="btn btn-secondary btn-sm" id="add-tx-btn-dash"
+            aria-label="Add transaction">
+            + Transaction
+          </button>
+          <button class="btn btn-primary" id="add-envelope-btn"
+            aria-label="Add new budget envelope">
+            + Envelope
+          </button>
+        </div>
+      </header>
+
+      <!-- "To be budgeted" hero -->
+      <div class="glass-card hero-card" id="hero-card" aria-labelledby="tbb-label">
+        <div>
+          <div class="hero-label" id="tbb-label">To Be Budgeted</div>
+          <div class="hero-amount" id="hero-amount" aria-live="polite" aria-atomic="true">—</div>
+          <div class="hero-meta" id="hero-meta"></div>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-label">Income</div>
+            <div class="hero-stat-value text-mono" id="stat-income">—</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Budgeted</div>
+            <div class="hero-stat-value text-mono" id="stat-budgeted">—</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Spent</div>
+            <div class="hero-stat-value text-mono" id="stat-spent">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARIA live region for TBB -->
+      <div id="tbb-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+      <!-- Grouped envelopes -->
+      <div id="envelope-groups" aria-label="Budget envelopes by group"></div>
+    </section>
+
+    <!-- ════════════════════════
+         TRANSACTIONS VIEW
+         ════════════════════════ -->
+    <section id="view-transactions" class="view" hidden role="main" aria-label="Transactions">
+      <header class="view-header">
+        <div>
+          <h1 class="view-title">Transactions</h1>
+          <div class="view-subtitle">Every dollar in, every dollar out.</div>
+        </div>
+        <button class="btn btn-primary" id="add-tx-btn" aria-label="Add new transaction">
+          + Transaction
+        </button>
+      </header>
+
+      <!-- Filters -->
+      <div class="tx-filters glass-card card-pad section-gap" aria-label="Filter transactions">
+        <div class="form-group" style="min-width:160px">
+          <label class="form-label" for="filter-account">Account</label>
+          <select class="form-select" id="filter-account" aria-label="Filter by account">
+            <option value="">All Accounts</option>
+          </select>
+        </div>
+        <div class="form-group" style="min-width:180px">
+          <label class="form-label" for="filter-envelope">Envelope</label>
+          <select class="form-select" id="filter-envelope" aria-label="Filter by envelope">
+            <option value="">All Envelopes</option>
+          </select>
+        </div>
+        <div class="form-group" style="min-width:130px">
+          <label class="form-label" for="filter-type">Type</label>
+          <select class="form-select" id="filter-type" aria-label="Filter by type">
+            <option value="">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+            <option value="transfer">Transfer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Transaction table -->
+      <div class="glass-card tx-table-wrapper">
+        <table class="tx-table" aria-label="Transactions">
+          <thead>
+            <tr>
+              <th data-sort="date" scope="col">
+                Date <span class="sort-indicator" aria-hidden="true">↓</span>
+              </th>
+              <th data-sort="payee" scope="col">
+                Payee <span class="sort-indicator" aria-hidden="true"></span>
+              </th>
+              <th data-sort="type" scope="col">
+                Type <span class="sort-indicator" aria-hidden="true"></span>
+              </th>
+              <th scope="col">Account</th>
+              <th scope="col">Envelope</th>
+              <th data-sort="amount" scope="col" class="text-right">
+                Amount <span class="sort-indicator" aria-hidden="true"></span>
+              </th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="tx-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         ACCOUNTS VIEW
+         ════════════════════════ -->
+    <section id="view-accounts" class="view" hidden role="main" aria-label="Accounts">
+      <header class="view-header">
+        <div>
+          <h1 class="view-title">Accounts</h1>
+          <div class="view-subtitle">Your real-world balances, tracked.</div>
+        </div>
+        <button class="btn btn-primary" id="add-account-btn" aria-label="Add new account">
+          + Account
+        </button>
+      </header>
+
+      <div id="accounts-grid" class="account-grid" aria-label="Your accounts">
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         REPORTS VIEW
+         ════════════════════════ -->
+    <section id="view-reports" class="view" hidden role="main" aria-label="Reports">
+      <header class="view-header">
+        <div>
+          <h1 class="view-title">Reports</h1>
+          <div class="view-subtitle">Where the money actually went.</div>
+        </div>
+      </header>
+
+      <!-- Month summary -->
+      <div class="glass-card card-pad section-gap" id="report-summary" aria-label="Month summary">
+      </div>
+
+      <!-- Donut + bars grid -->
+      <div class="reports-grid">
+        <!-- Donut chart -->
+        <div class="glass-card chart-container" aria-label="Spending by group donut chart">
+          <h2 style="font-size:0.8rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;">
+            By Group
+          </h2>
+          <div class="chart-canvas-wrap">
+            <canvas id="donut-canvas" aria-label="Spending breakdown donut chart"></canvas>
+          </div>
+          <div class="chart-legend" id="donut-legend" aria-label="Chart legend"></div>
+        </div>
+
+        <!-- Bar chart -->
+        <div class="glass-card bar-chart-wrap" id="bar-chart-wrap" aria-label="Spending by group bar chart">
+          <h2 style="font-size:0.8rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;">
+            Spending by Group
+          </h2>
+        </div>
+      </div>
+
+      <!-- Top envelopes -->
+      <div class="glass-card top-envelopes-wrap section-gap" style="margin-top:24px;" id="top-envelopes-wrap" aria-label="Top envelopes by spending">
+        <h2 style="font-size:0.8rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;">
+          Top Envelopes by Usage
+        </h2>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         SETTINGS VIEW
+         ════════════════════════ -->
+    <section id="view-settings" class="view" hidden role="main" aria-label="Settings">
+      <header class="view-header">
+        <div>
+          <h1 class="view-title">Settings</h1>
+          <div class="view-subtitle">Preferences for your Envelope workspace.</div>
+        </div>
+        <button class="btn btn-primary" id="settings-save-btn" aria-label="Save settings">
+          Save Settings
+        </button>
+      </header>
+
+      <div class="settings-grid">
+
+        <!-- Preferences -->
+        <div class="glass-card card-pad settings-section">
+          <div class="settings-section-title">Preferences</div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Currency Symbol</div>
+              <div class="settings-desc">Used across all amounts.</div>
+            </div>
+            <div class="settings-control">
+              <input type="text" class="form-input" id="setting-currency"
+                aria-label="Currency symbol" maxlength="4"
+                style="width:70px;text-align:center;" />
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">First Day of Month</div>
+              <div class="settings-desc">When does your budget month begin?</div>
+            </div>
+            <div class="settings-control">
+              <select class="form-select" id="setting-fdom" aria-label="First day of month" style="width:80px">
+                <option value="1">1st</option>
+                <option value="15">15th</option>
+                <option value="25">25th</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Theme</div>
+              <div class="settings-desc">Light, dark, or follow system preference.</div>
+            </div>
+            <div class="settings-control">
+              <select class="form-select" id="setting-theme" aria-label="Color theme" style="width:120px">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Reduced Motion</div>
+              <div class="settings-desc">Disable all transitions and animations.</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch" aria-label="Reduced motion">
+                <input type="checkbox" id="setting-reduced-motion" role="switch"
+                  aria-checked="false" />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data & export -->
+        <div class="glass-card card-pad settings-section">
+          <div class="settings-section-title">Data &amp; Export</div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Export Budget</div>
+              <div class="settings-desc">Download a backup you can import later.</div>
+            </div>
+            <div class="settings-control flex-gap-sm">
+              <button class="btn btn-secondary btn-sm" id="export-json-btn"
+                aria-label="Export to JSON">Export JSON</button>
+              <button class="btn btn-secondary btn-sm" id="export-csv-btn"
+                aria-label="Export transactions to CSV">Export CSV</button>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Import Budget</div>
+              <div class="settings-desc">Restore from a previously exported JSON file.</div>
+            </div>
+            <div class="settings-control">
+              <button class="btn btn-secondary btn-sm" id="import-json-btn"
+                aria-label="Import from JSON file">Import JSON</button>
+              <input type="file" id="import-file" accept=".json" class="sr-only"
+                aria-hidden="true" tabindex="-1" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="glass-card card-pad settings-section danger-zone">
+          <div class="settings-section-title" style="color:var(--red)">Danger Zone</div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Reset to Sample Data</div>
+              <div class="settings-desc">Replace everything with the built-in example budget.</div>
+            </div>
+            <div class="settings-control">
+              <button class="btn btn-secondary btn-sm" id="reset-sample-btn"
+                aria-label="Reset to sample data">Reset to Sample</button>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-label-wrap">
+              <div class="settings-label">Clear All Data</div>
+              <div class="settings-desc">Permanently delete all accounts, envelopes, and transactions.</div>
+            </div>
+            <div class="settings-control">
+              <button class="btn btn-danger btn-sm" id="clear-all-btn"
+                aria-label="Clear all data">Clear All</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ── Account Modal ── -->
+<div class="modal-overlay" id="account-modal" role="dialog" aria-modal="true"
+  aria-labelledby="account-modal-title" style="display:none" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="account-modal-title">Add Account</h2>
+      <button class="btn btn-icon" id="account-cancel-btn"
+        aria-label="Close account dialog">✕</button>
+    </div>
+    <form class="modal-body" id="account-form" novalidate>
+      <input type="hidden" id="account-id" />
+
+      <div class="form-group">
+        <label class="form-label" for="account-name">Account Name</label>
+        <input type="text" class="form-input" id="account-name"
+          placeholder="e.g. Main Checking" maxlength="60"
+          autocomplete="off" required />
+        <div class="form-error" id="account-name-error" style="display:none" role="alert"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="account-type">Type</label>
+          <select class="form-select" id="account-type">
+            <option value="checking">Checking</option>
+            <option value="savings">Savings</option>
+            <option value="cash">Cash</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="account-balance">Starting Balance</label>
+          <input type="number" class="form-input mono" id="account-balance"
+            placeholder="0.00" step="0.01" min="-999999" max="9999999"
+            required />
+          <div class="form-error" id="account-balance-error" style="display:none" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="form-hint">
+        Starting balance is the account's balance before any tracked transactions.
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="account-cancel-btn-footer">
+        Cancel
+      </button>
+      <button class="btn btn-primary" id="account-save-btn">Save Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Envelope Modal ── -->
+<div class="modal-overlay" id="envelope-modal" role="dialog" aria-modal="true"
+  aria-labelledby="envelope-modal-title" style="display:none" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="envelope-modal-title">Add Envelope</h2>
+      <button class="btn btn-icon" id="envelope-cancel-btn"
+        aria-label="Close envelope dialog">✕</button>
+    </div>
+    <form class="modal-body" id="envelope-form" novalidate>
+      <input type="hidden" id="envelope-id" />
+
+      <div class="form-row">
+        <div class="form-group" style="flex:3">
+          <label class="form-label" for="envelope-name">Envelope Name</label>
+          <input type="text" class="form-input" id="envelope-name"
+            placeholder="e.g. Groceries" maxlength="60"
+            autocomplete="off" required />
+          <div class="form-error" id="envelope-name-error" style="display:none" role="alert"></div>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label" for="envelope-icon">Icon</label>
+          <input type="text" class="form-input" id="envelope-icon"
+            placeholder="🛒" maxlength="4" style="text-align:center;font-size:1.2rem;" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="envelope-amount">Monthly Budget</label>
+          <input type="number" class="form-input mono" id="envelope-amount"
+            placeholder="0.00" step="0.01" min="0" max="999999"
+            required />
+          <div class="form-error" id="envelope-amount-error" style="display:none" role="alert"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="envelope-group">Group</label>
+          <input type="text" class="form-input" id="envelope-group"
+            placeholder="e.g. Essentials" maxlength="40"
+            list="group-suggestions" autocomplete="off" />
+          <datalist id="group-suggestions">
+            <option value="Essentials" />
+            <option value="Lifestyle" />
+            <option value="Savings" />
+            <option value="General" />
+          </datalist>
+        </div>
+      </div>
+
+      <label class="form-check">
+        <input type="checkbox" id="envelope-rollover" />
+        <span>Roll over unused balance to next month</span>
+      </label>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="envelope-cancel-btn-footer">
+        Cancel
+      </button>
+      <button class="btn btn-primary" id="envelope-save-btn">Save Envelope</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Transaction Modal ── -->
+<div class="modal-overlay" id="tx-modal" role="dialog" aria-modal="true"
+  aria-labelledby="tx-modal-title" style="display:none" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="tx-modal-title">Add Transaction</h2>
+      <button class="btn btn-icon" id="tx-cancel-btn"
+        aria-label="Close transaction dialog">✕</button>
+    </div>
+    <form class="modal-body" id="tx-form" novalidate>
+      <input type="hidden" id="tx-id" />
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="tx-date">Date</label>
+          <input type="date" class="form-input mono" id="tx-date" required />
+          <div class="form-error" id="tx-date-error" style="display:none" role="alert"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tx-type">Type</label>
+          <select class="form-select" id="tx-type" required>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+            <option value="transfer">Transfer</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="tx-payee">Payee / Description</label>
+        <input type="text" class="form-input" id="tx-payee"
+          placeholder="e.g. Whole Foods" maxlength="100"
+          autocomplete="off" />
+        <div class="form-error" id="tx-payee-error" style="display:none" role="alert"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="tx-amount">Amount</label>
+          <input type="number" class="form-input mono" id="tx-amount"
+            placeholder="0.00" step="0.01" min="0.01" max="9999999"
+            required />
+          <div class="form-error" id="tx-amount-error" style="display:none" role="alert"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tx-account">Account</label>
+          <select class="form-select" id="tx-account" required>
+            <option value="">Select account…</option>
+          </select>
+          <div class="form-error" id="tx-account-error" style="display:none" role="alert"></div>
+        </div>
+      </div>
+
+      <!-- Envelope row (expenses only) -->
+      <div class="form-group" id="tx-envelope-row">
+        <label class="form-label" for="tx-envelope">Envelope (optional)</label>
+        <select class="form-select" id="tx-envelope">
+          <option value="">No envelope</option>
+        </select>
+      </div>
+
+      <!-- To-account row (transfers only) -->
+      <div class="form-group" id="tx-to-account-row" style="display:none">
+        <label class="form-label" for="tx-to-account">To Account</label>
+        <select class="form-select" id="tx-to-account">
+          <option value="">Select account…</option>
+        </select>
+        <div class="form-error" id="tx-to-account-error" style="display:none" role="alert"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="tx-notes">Notes (optional)</label>
+        <textarea class="form-textarea" id="tx-notes"
+          placeholder="Any additional context…" maxlength="500"
+          rows="2"></textarea>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="tx-cancel-btn-footer">
+        Cancel
+      </button>
+      <button class="btn btn-primary" id="tx-save-btn">Save Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Confirm Modal ── -->
+<div class="modal-overlay" id="confirm-overlay" role="dialog" aria-modal="true"
+  aria-labelledby="confirm-title" style="display:none" hidden>
+  <div class="modal confirm-modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="confirm-title">Confirm</h2>
+      <button class="btn btn-icon" id="confirm-cancel-btn"
+        aria-label="Cancel">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-text" id="confirm-message"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="confirm-cancel-btn-footer">
+        Cancel
+      </button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     UTILITY ELEMENTS
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- Toast region -->
+<div id="toast-region" aria-label="Notifications" role="log" aria-live="polite" aria-atomic="false"></div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay glass-card" id="loading-overlay" aria-live="polite" aria-atomic="true" role="status">
+  <div class="loading-card glass-card">
+    <div class="spinner" aria-hidden="true"></div>
+    <div class="loading-text">Working…</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS (classic, no bundler, works via file://)
+     ═══════════════════════════════════════════════════════════ -->
+<script src="storage.js"></script>
+<script src="seed.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
