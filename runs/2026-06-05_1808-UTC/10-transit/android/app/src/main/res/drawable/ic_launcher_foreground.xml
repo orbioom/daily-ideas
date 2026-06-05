@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A route winding toward a guiding orb — the journey motif, centered in the safe zone. -->
+    <path
+        android:strokeColor="#86C79A"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M40,82 C40,70 56,68 56,57 C56,47 42,46 42,36" />
+    <path
+        android:strokeColor="#5EF0B0"
+        android:strokeAlpha="0.55"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M40,82 L40,82" />
+    <!-- The guiding orb at the destination. -->
+    <path
+        android:fillColor="#5EF0B0"
+        android:pathData="M66,34 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M62,30 m-3.5,0 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0" />
+</vector>
