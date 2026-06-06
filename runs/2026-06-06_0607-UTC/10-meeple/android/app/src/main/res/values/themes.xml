@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Platform Material theme so we don't depend on the Material Components
+         XML library; Compose draws the real Orbioom theme on top. -->
+    <style name="Theme.Meeple" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/orb_mist</item>
+        <item name="android:statusBarColor">@color/orb_mist</item>
+        <item name="android:navigationBarColor">@color/orb_mist</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

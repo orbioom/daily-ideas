@@ -39,3 +39,13 @@ Canonical list of every idea this routine has ever built. The agent reads this b
 | 33 | Axis | sci | 2026-06-05_1808-UTC | PCA explorer: Jacobi eigendecomposition, standardize toggle, scores scatter + scree + loadings biplot, Iris + synthetic, PNG/CSV |
 | 34 | Compass | sci | 2026-06-05_1808-UTC | A* pathfinding visualizer: binary-heap A*/Dijkstra/Greedy, 5 heuristics, seeded maze/terrain, animated frontier + path, PNG export |
 | 35 | Transit | android | 2026-06-05_1808-UTC | Fuel & mileage log: vehicles own fill-ups, economy-between-full-tanks engine (partial-fill aware), Canvas trend charts, Compose/M3, DataStore/JSON |
+| 36 | Interval | ios | 2026-06-06_0607-UTC | Interval-timer builder: Routine owns ordered Segments + repeat-groups; Date-based WorkoutEngine, count-in, progress ring, Session history, SwiftData |
+| 37 | Apertura | ios | 2026-06-06_0607-UTC | Manual/film photography: real exposure math (EV=log2(N²/t), stop snapping, equivalent exposures) + Roll→Frame shot log, SwiftData |
+| 38 | Repertoire | ios | 2026-06-06_0607-UTC | Music practice companion: Piece→Spots, Sessions, Date-based metronome+timer, streaks/heatmap/time-by-piece insights, SwiftData |
+| 39 | Larder | ios | 2026-06-06_0607-UTC | Pantry inventory: Items/Locations/Categories, expiry-window bucketing + low-stock detection + generated shopping list with restock, SwiftData |
+| 40 | Strata | ios | 2026-06-06_0607-UTC | Climbing/bouldering logbook: V↔Font & YDS↔French grade-conversion engine, Sessions→Attempts, send pyramid + progression, SwiftData |
+| 41 | Crumb | ios | 2026-06-06_0607-UTC | Sourdough/bread companion: baker's-percentage solver (true hydration incl. levain), bake step-timeline scheduler, starter feeding log, SwiftData |
+| 42 | Keystone | webapp | 2026-06-06_0607-UTC | Project critical-path (CPM) planner: topo sort + forward/backward pass, slack, critical path, cycle detection, Gantt, localStorage |
+| 43 | Limpid | webapp | 2026-06-06_0607-UTC | Prose-clarity workbench: six readability formulas + live passive/adverb/filler/long-sentence highlighting over an overlay editor, localStorage |
+| 44 | Distill | tech | 2026-06-06_0607-UTC | In-browser order-3 PPMC + range-coder text compressor; live measured ratio vs gzip (CompressionStream), round-trip verified, Web Worker |
+| 45 | Meeple | android | 2026-06-06_0607-UTC | Board-game play & stats logger: Games/Players/Plays + win-rates/head-to-head/nemesis/streaks, scoring-type aware, Compose/M3, DataStore+JSON |

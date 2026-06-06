@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Limpid — a calm writing clarity workbench that scores and X-rays your prose as you type, fully local and private." />
+  <title>Limpid — writing clarity workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-theme="light">
+  <a class="skip-link" href="#editor-area">Skip to editor</a>
+
+  <header class="app-header" role="banner">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="" class="brand-mark" width="28" height="28" />
+      <div class="brand-text">
+        <span class="brand-name">Limpid</span>
+        <span class="brand-tag">writing clarity workbench</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" id="btn-theme" class="ghost-btn" aria-pressed="false" title="Toggle light/dark theme">
+        <span class="theme-icon" aria-hidden="true">◐</span>
+        <span class="btn-label">Theme</span>
+      </button>
+      <button type="button" id="btn-settings" class="ghost-btn" aria-haspopup="dialog">
+        <span aria-hidden="true">⚙</span>
+        <span class="btn-label">Settings</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Document sidebar -->
+    <aside class="sidebar glass" aria-label="Documents">
+      <div class="sidebar-head">
+        <h2 class="sidebar-title">Documents</h2>
+        <button type="button" id="btn-new-doc" class="icon-btn" title="New document" aria-label="New document">＋</button>
+      </div>
+      <ul id="doc-list" class="doc-list" role="listbox" aria-label="Your documents"></ul>
+      <div class="sidebar-foot">
+        <button type="button" id="btn-load-sample" class="ghost-btn small">Load sample</button>
+        <button type="button" id="btn-reset" class="ghost-btn small danger">Reset all</button>
+      </div>
+    </aside>
+
+    <!-- Editor -->
+    <section class="editor-col" id="editor-area" aria-label="Editor">
+      <div class="editor-toolbar glass">
+        <div class="doc-title-wrap">
+          <input type="text" id="doc-title" class="doc-title-input" aria-label="Document title" placeholder="Untitled" />
+        </div>
+        <div class="toolbar-actions">
+          <button type="button" id="btn-copy" class="ghost-btn small">Copy</button>
+          <div class="menu-wrap">
+            <button type="button" id="btn-export" class="ghost-btn small" aria-haspopup="menu" aria-expanded="false">Export ▾</button>
+            <div class="menu" id="export-menu" role="menu" hidden>
+              <button type="button" role="menuitem" data-export="txt">Text (.txt)</button>
+              <button type="button" role="menuitem" data-export="md">Markdown (.md)</button>
+              <button type="button" role="menuitem" data-export="json">Analysis (.json)</button>
+            </div>
+          </div>
+          <button type="button" id="btn-clear" class="ghost-btn small">Clear</button>
+        </div>
+      </div>
+
+      <div class="editor-shell glass">
+        <!-- Overlay-highlight technique: highlight layer behind a transparent textarea -->
+        <div class="editor-stack">
+          <div id="highlight-layer" class="highlight-layer" aria-hidden="true"></div>
+          <textarea id="editor" class="editor-input" spellcheck="true"
+            aria-label="Prose editor"
+            placeholder="Start writing or paste prose here…"></textarea>
+        </div>
+
+        <!-- Empty state overlay -->
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-card">
+            <div class="empty-mark" aria-hidden="true">✎</div>
+            <h2>Start writing</h2>
+            <p>Write or paste prose to see live clarity analysis — readability scores, sentence X-rays, and concrete spans to fix. Everything stays on this device.</p>
+            <div class="empty-actions">
+              <button type="button" id="empty-sample" class="ink-btn">Load a sample</button>
+              <button type="button" id="empty-write" class="ghost-btn">Start writing</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hover-readout glass" id="hover-readout" hidden aria-hidden="true"></div>
+    </section>
+
+    <!-- Analysis panel -->
+    <aside class="analysis-col" aria-label="Analysis">
+      <!-- Scores -->
+      <div class="panel glass">
+        <div class="panel-head">
+          <h2>Readability</h2>
+          <span id="ease-pill" class="pill" aria-live="polite">—</span>
+        </div>
+        <div class="goal-row">
+          <span class="goal-label">Target grade</span>
+          <span id="goal-indicator" class="goal-indicator" aria-live="polite">Set a target</span>
+        </div>
+        <div class="scores-grid" role="group" aria-label="Readability scores" aria-live="polite">
+          <div class="score">
+            <span class="score-name">Flesch Reading Ease</span>
+            <span class="score-value" id="s-fre">—</span>
+          </div>
+          <div class="score">
+            <span class="score-name">Flesch–Kincaid Grade</span>
+            <span class="score-value" id="s-fk">—</span>
+          </div>
+          <div class="score">
+            <span class="score-name">Gunning Fog</span>
+            <span class="score-value" id="s-fog">—</span>
+          </div>
+          <div class="score">
+            <span class="score-name">SMOG</span>
+            <span class="score-value" id="s-smog">—</span>
+          </div>
+          <div class="score">
+            <span class="score-name">Automated Readability</span>
+            <span class="score-value" id="s-ari">—</span>
+          </div>
+          <div class="score">
+            <span class="score-name">Coleman–Liau</span>
+            <span class="score-value" id="s-cl">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Highlights legend + toggles -->
+      <div class="panel glass">
+        <div class="panel-head"><h2>Highlights</h2></div>
+        <fieldset class="legend">
+          <legend class="sr-only">Highlight categories</legend>
+          <label class="legend-item">
+            <input type="checkbox" data-hl="long" />
+            <span class="swatch sw-long" aria-hidden="true"></span>
+            <span class="legend-label">Long sentences</span>
+            <span class="legend-count" id="c-long">0</span>
+          </label>
+          <label class="legend-item">
+            <input type="checkbox" data-hl="passive" />
+            <span class="swatch sw-passive" aria-hidden="true"></span>
+            <span class="legend-label">Passive voice</span>
+            <span class="legend-count" id="c-passive">0</span>
+          </label>
+          <label class="legend-item">
+            <input type="checkbox" data-hl="adverb" />
+            <span class="swatch sw-adverb" aria-hidden="true"></span>
+            <span class="legend-label">Adverbs</span>
+            <span class="legend-count" id="c-adverb">0</span>
+          </label>
+          <label class="legend-item">
+            <input type="checkbox" data-hl="filler" />
+            <span class="swatch sw-filler" aria-hidden="true"></span>
+            <span class="legend-label">Filler / weasel</span>
+            <span class="legend-count" id="c-filler">0</span>
+          </label>
+          <label class="legend-item">
+            <input type="checkbox" data-hl="complex" />
+            <span class="swatch sw-complex" aria-hidden="true"></span>
+            <span class="legend-label">Complex words</span>
+            <span class="legend-count" id="c-complex">0</span>
+          </label>
+        </fieldset>
+      </div>
+
+      <!-- Stats -->
+      <div class="panel glass">
+        <div class="panel-head"><h2>Statistics</h2></div>
+        <dl class="stats-grid">
+          <div class="stat"><dt>Words</dt><dd id="st-words">0</dd></div>
+          <div class="stat"><dt>Sentences</dt><dd id="st-sentences">0</dd></div>
+          <div class="stat"><dt>Paragraphs</dt><dd id="st-paragraphs">0</dd></div>
+          <div class="stat"><dt>Avg. sentence</dt><dd id="st-avg">—</dd></div>
+          <div class="stat"><dt>Length variance</dt><dd id="st-var">—</dd></div>
+          <div class="stat"><dt>Reading time</dt><dd id="st-time">—</dd></div>
+        </dl>
+        <div class="histogram-wrap">
+          <h3 class="mini-head">Sentence length distribution</h3>
+          <div class="histogram" id="histogram" role="img" aria-label="Sentence length distribution histogram"></div>
+        </div>
+        <div class="longest-wrap">
+          <h3 class="mini-head">Longest sentence</h3>
+          <p id="longest-sentence" class="longest-sentence">—</p>
+        </div>
+      </div>
+
+      <!-- Hardest sentences -->
+      <div class="panel glass">
+        <div class="panel-head"><h2>Hardest sentences</h2></div>
+        <ol class="hardest-list" id="hardest-list" aria-label="Hardest-to-read sentences ranked">
+          <li class="hardest-empty">Write something to rank sentences by difficulty.</li>
+        </ol>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="settings-overlay" hidden>
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="settings-title" id="settings-modal">
+      <div class="modal-head">
+        <h2 id="settings-title">Settings</h2>
+        <button type="button" id="settings-close" class="icon-btn" aria-label="Close settings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="set-threshold">Long-sentence word threshold</label>
+          <div class="range-row">
+            <input type="range" id="set-threshold" min="12" max="50" step="1" />
+            <output id="set-threshold-out" class="mono">25</output>
+          </div>
+          <p class="field-hint">Sentences longer than this are flagged as long.</p>
+        </div>
+        <div class="field">
+          <label for="set-grade">Target reading grade</label>
+          <div class="range-row">
+            <input type="range" id="set-grade" min="4" max="16" step="1" />
+            <output id="set-grade-out" class="mono">8</output>
+          </div>
+          <p class="field-hint">A calm green indicator appears when your grade is at or under this.</p>
+        </div>
+        <fieldset class="field">
+          <legend>Highlights on by default</legend>
+          <label class="check-row"><input type="checkbox" data-defhl="long" /> Long sentences</label>
+          <label class="check-row"><input type="checkbox" data-defhl="passive" /> Passive voice</label>
+          <label class="check-row"><input type="checkbox" data-defhl="adverb" /> Adverbs</label>
+          <label class="check-row"><input type="checkbox" data-defhl="filler" /> Filler / weasel words</label>
+          <label class="check-row"><input type="checkbox" data-defhl="complex" /> Complex words</label>
+        </fieldset>
+        <div class="field">
+          <label for="set-theme">Theme</label>
+          <select id="set-theme" class="select">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" id="settings-done" class="ink-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm modal (rename/delete) -->
+  <div class="modal-overlay" id="confirm-overlay" hidden>
+    <div class="modal glass narrow" role="dialog" aria-modal="true" aria-labelledby="confirm-title" id="confirm-modal">
+      <div class="modal-head">
+        <h2 id="confirm-title">Confirm</h2>
+        <button type="button" id="confirm-close" class="icon-btn" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message"></p>
+        <div class="field" id="confirm-input-wrap" hidden>
+          <label for="confirm-input">New name</label>
+          <input type="text" id="confirm-input" class="text-input" />
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" id="confirm-cancel" class="ghost-btn">Cancel</button>
+        <button type="button" id="confirm-ok" class="ink-btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="analysis.js"></script>
+  <script src="storage.js"></script>
+  <script src="seed.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+Meeple — Android build log
+==========================
+
+Build attempted in the cloud sandbox: YES
+Build completed in the cloud sandbox: NO (environment has no Android SDK; installing it
+                                          (~5 GB) was deliberately skipped per instruction)
+
+Command run (from android/):
+    chmod +x gradlew && ./gradlew assembleDebug
+
+What happened
+-------------
+The sandbox has no Android SDK installed (ANDROID_HOME and ANDROID_SDK_ROOT are both empty;
+there is no sdkmanager on PATH and no SDK directory). Without the Android SDK and the Android
+Gradle Plugin / build-tools (aapt2, the platform jars), assembleDebug cannot run to completion
+here. The ~5 GB Android SDK was deliberately NOT downloaded/installed, to avoid a multi-gigabyte
+download in an ephemeral sandbox.
+
+The Gradle wrapper itself is the proven, known-good one copied verbatim from the Transit slot
+(gradlew, gradlew.bat, gradle-wrapper.jar, gradle-wrapper.properties → Gradle 8.7).
+
+Versions — the known-good, mutually compatible set (unchanged from Transit)
+---------------------------------------------------------------------------
+  - Kotlin .................. 1.9.24
+  - Android Gradle Plugin ... 8.5.2
+  - Compose BOM ............. 2024.06.00  (governs all androidx.compose.* versions;
+                                           individual Compose artifacts are NOT pinned)
+  - Compose compiler ext .... 1.5.14      (configured via composeOptions — the correct
+                                           mechanism for Kotlin 1.9.x)
+  - Material 3 .............. via the BOM
+  - minSdk 26 / targetSdk 34 / compileSdk 34
+  - JVM target 17
+  - Gradle wrapper .......... 8.7
+
+Toolchain hygiene that guarantees a clean sync/build
+----------------------------------------------------
+  - The kotlin-compose Gradle plugin (org.jetbrains.kotlin.plugin.compose) is NOT applied —
+    it is for Kotlin 2.0+. On Kotlin 1.9.24 Compose is configured through
+    composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }.
+  - NO annotation processors: no Room, no KSP, no kapt. Persistence is a single JSON document
+    in app-internal storage (kotlinx.serialization — a compiler plugin, not an annotation
+    processor) plus DataStore Preferences for settings.
+  - The only Gradle plugins are com.android.application (8.5.2), org.jetbrains.kotlin.android
+    (1.9.24), and org.jetbrains.kotlin.plugin.serialization (1.9.24) — a coherent set.
+  - Every import resolves to a declared dependency: Compose UI/Material3 (BOM),
+    navigation-compose 2.7.7, lifecycle-runtime/viewmodel/runtime-compose 2.8.2,
+    activity-compose 1.9.0, datastore-preferences 1.1.1, kotlinx-serialization-json 1.6.3,
+    core-ktx 1.13.1, material-icons-extended (BOM).
+  - Compose-only UI, no XML layouts. All referenced resources exist:
+    mipmap/ic_launcher + ic_launcher_round adaptive icons with foreground/background/
+    monochrome layers (a meeple silhouette motif over the ink background), @color and
+    @string resources, and the platform Material parent theme (Theme.Meeple).
+
+Compile-correctness self-review (read as a compiler)
+----------------------------------------------------
+  - All @Composable functions are called only from Composable / setContent contexts.
+  - remember / rememberSaveable / LaunchedEffect-free state, collectAsStateWithLifecycle,
+    mutableStateListOf / mutableStateMapOf are used in valid scopes; enum UI state survives
+    via rememberSaveable's default (Serializable) saver.
+  - State is hoisted: MutableStateFlow lives in the ViewModels and is exposed read-only as
+    StateFlow; the generic UiState<T> (Loading/Empty/Content) is handled exhaustively in when.
+  - Nullable smart-casts that would cross a lambda boundary (favorite game id, nemesis id,
+    high-score holder id) are captured into local vals first, so no "smart cast impossible"
+    and no String?/String mismatch.
+  - All analytics guard against divide-by-zero: win rate is 0.0 when 0 plays; co-op win rate
+    only computed when gamePlays is non-empty; median/average return null on empty input.
+  - The Compose compiler plugin is NOT applied (correct for Kotlin 1.9.24).
+  - Anti-stub grep is clean (only "toDouble" matches the case-insensitive "todo" substring).
+
+How to build locally
+---------------------
+Option A — Android Studio (Koala or newer):
+    1. Open the `android/` folder.
+    2. Let Gradle sync (it fetches the AGP, Compose, and AndroidX artifacts).
+    3. Build > Build APK(s)   — or press Run with a device/emulator (API 26+).
+
+Option B — command line (with the Android SDK installed and ANDROID_HOME set):
+    cd android
+    ./gradlew assembleDebug
+
+Output APK path:
+    android/app/build/outputs/apk/debug/app-debug.apk

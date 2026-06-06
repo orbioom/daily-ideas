@@ -1,0 +1,240 @@
+/* Distill — Orbioom design system.
+   Calm, premium, Liquid Glass. Mist background (never pure white).
+   Manrope for UI, JetBrains Mono for all numbers. We name those families
+   first so they're used if installed locally; robust system fallbacks follow
+   (no CDN / no network, by design). */
+
+:root {
+  --ink:        #1B1D2A;
+  --ink-2:      #565A70;
+  --ink-3:      #8B8FA3;
+  --glass:      rgba(255, 255, 255, 0.42);
+  --glass-soft: rgba(255, 255, 255, 0.30);
+  --glass-line: rgba(255, 255, 255, 0.70);
+  --cta-a:      #3A3E4C;
+  --cta-b:      #23262F;
+  --win:        #86C79A;       /* rare magic accent — wins / round-trip only */
+  --win-tint:   rgba(134, 199, 154, 0.16);
+  --radius:     16px;
+  --radius-sm:  12px;
+  --shadow:     0 18px 50px rgba(27, 29, 42, 0.12);
+  --ease:       cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --font-ui:  "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  line-height: 1.55;
+  /* mist background — layered soft gradients, never pure white */
+  background:
+    radial-gradient(60% 55% at 18% 8%, rgba(196, 205, 224, 0.55), transparent 60%),
+    radial-gradient(55% 50% at 85% 0%, rgba(214, 207, 224, 0.45), transparent 62%),
+    radial-gradient(70% 60% at 60% 100%, rgba(200, 214, 214, 0.45), transparent 60%),
+    linear-gradient(180deg, #EEF0F4 0%, #E7E9EF 100%);
+  background-attachment: fixed;
+}
+
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; left: 12px; top: -48px;
+  background: var(--ink); color: #fff;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  z-index: 50; transition: top .2s var(--ease);
+  text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+/* ---- Hero ---- */
+.hero { padding: 64px 20px 18px; }
+.hero-inner { max-width: 760px; margin: 0 auto; }
+.eyebrow {
+  margin: 0 0 8px; font-size: 13px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+}
+h1 {
+  margin: 0 0 14px; font-size: clamp(40px, 7vw, 68px);
+  font-weight: 800; letter-spacing: -0.02em; line-height: 1.02;
+}
+.lede { margin: 0; font-size: clamp(16px, 2.1vw, 19px); color: var(--ink-2); max-width: 64ch; }
+.lede em { color: var(--ink); font-style: italic; }
+
+/* ---- Layout ---- */
+.wrap { max-width: 760px; margin: 0 auto; padding: 10px 20px 40px; display: grid; gap: 20px; }
+
+/* ---- Liquid Glass panels ---- */
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  padding: 26px;
+}
+.panel-title {
+  margin: 0 0 16px; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-2);
+}
+
+/* ---- Input ---- */
+.input {
+  width: 100%; min-height: 200px; resize: vertical;
+  font-family: var(--font-mono); font-size: 14px; line-height: 1.6;
+  color: var(--ink);
+  background: var(--glass-soft);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-sm);
+  padding: 16px; outline: none;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.input::placeholder { color: var(--ink-3); }
+.input:focus-visible {
+  border-color: rgba(58, 62, 76, 0.55);
+  box-shadow: 0 0 0 3px rgba(58, 62, 76, 0.18);
+}
+
+.byteinfo { margin: 10px 2px 18px; font-size: 12.5px; color: var(--ink-3); }
+
+/* ---- Controls ---- */
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.filewrap { display: inline-flex; }
+
+.cta {
+  font-family: var(--font-ui); font-size: 15px; font-weight: 700;
+  color: #fff; cursor: pointer;
+  background: linear-gradient(180deg, var(--cta-a), var(--cta-b));
+  border: none; border-radius: var(--radius-sm);
+  padding: 13px 30px;
+  box-shadow: 0 10px 24px rgba(35, 38, 47, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), opacity .2s var(--ease);
+}
+.cta:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(35, 38, 47, 0.38); }
+.cta:active { transform: translateY(0); }
+.cta:disabled { opacity: 0.55; cursor: progress; transform: none; }
+
+.ghost-btn {
+  font-family: var(--font-ui); font-size: 14px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer;
+  background: var(--glass-soft);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-sm);
+  padding: 11px 18px;
+  transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+}
+.ghost-btn:hover { color: var(--ink); border-color: rgba(58, 62, 76, 0.4); }
+
+.cta:focus-visible, .ghost-btn:focus-visible, .about-toggle:focus-visible {
+  outline: 3px solid rgba(58, 62, 76, 0.5);
+  outline-offset: 2px;
+}
+
+/* ---- Status + progress ---- */
+.status { margin: 18px 2px 0; font-size: 12.5px; color: var(--ink-2); min-height: 1.4em; }
+.status[data-kind="error"] { color: #9a3b3b; }
+.status[data-kind="busy"]  { color: var(--ink); }
+
+.progress {
+  margin-top: 14px; height: 8px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--cta-a), var(--cta-b));
+  border-radius: 999px;
+  transition: width .25s var(--ease);
+}
+
+/* ---- Results ---- */
+.verdict {
+  margin: 0 0 8px; font-size: 19px; font-weight: 700; color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.verdict.win { color: #4f8a64; }
+
+.roundtrip {
+  margin: 0 0 22px; font-size: 13.5px; font-weight: 600;
+  padding: 12px 14px; border-radius: var(--radius-sm);
+}
+.roundtrip.ok {
+  color: #3f7a54; background: var(--win-tint);
+  border: 1px solid rgba(134, 199, 154, 0.5);
+}
+.roundtrip.fail {
+  color: #9a3b3b; background: rgba(154, 59, 59, 0.10);
+  border: 1px solid rgba(154, 59, 59, 0.4);
+}
+
+.metrics {
+  margin: 0 0 20px; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;
+}
+.metric {
+  background: var(--glass-soft);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.metric.highlight { border-color: rgba(58, 62, 76, 0.22); background: rgba(255, 255, 255, 0.4); }
+.metric dt {
+  margin: 0 0 6px; font-size: 11.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+}
+.metric dd { margin: 0; font-size: 21px; font-weight: 600; color: var(--ink); }
+.metric.highlight dd { font-size: 24px; }
+
+.exports { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ---- About ---- */
+.about-panel .panel-title { margin: 0; }
+.about-toggle {
+  font: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--ink-2);
+  background: none; border: none; padding: 0; cursor: pointer;
+}
+.about-toggle:hover { color: var(--ink); }
+.about { margin-top: 18px; color: var(--ink-2); font-size: 15px; }
+.about p { margin: 0 0 14px; }
+.about strong { color: var(--ink); }
+.about em { color: var(--ink); font-style: italic; }
+.about-meta { font-size: 12.5px; color: var(--ink-3); }
+
+/* ---- Footer ---- */
+.foot { text-align: center; padding: 10px 20px 48px; }
+.foot p { margin: 0; font-size: 12px; color: var(--ink-3); }
+
+/* ---- Responsive ---- */
+@media (max-width: 560px) {
+  .hero { padding: 44px 18px 12px; }
+  .glass { padding: 20px; }
+  .controls { gap: 10px; }
+  .cta { width: 100%; }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#23262F</color>
+    <color name="orb_mist">#EDEEF3</color>
+    <color name="orb_ink">#1B1D2A</color>
+    <color name="orb_live">#86C79A</color>
+</resources>

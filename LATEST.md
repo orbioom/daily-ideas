@@ -1,50 +1,52 @@
-# Latest Run — 2026-06-05 1808 UTC
+# Orbioom Daily Ideas — Latest Run
 
-**Folder:** `runs/2026-06-05_1808-UTC/`
-**Shipped:** 8 fully-built, production-ready products (≥1 in every category) + 2 detailed iOS specs in `BACKLOG.md`.
-**No-repeat:** all 10 picks checked against `SHIPPED.md` (entries 1–27) — no repeats, paraphrases, or same-mechanic variations. New entries appended as #28–#35.
+**Run:** 2026-06-06_0607-UTC
+**Folder:** `runs/2026-06-06_0607-UTC/`
+**Output:** 10 production-ready products — 6 iOS, 2 SaaS, 1 tech innovation, 1 Android. All 10 built (none deferred).
 
-Each shipped product passed an anti-stub scan and a hand/automated verification trace (recorded in each slot's README "Self-review"). The four computational tools had their core math re-verified independently in Node before commit (results below).
+Each slot was built by a dedicated agent against the full Definition of Done, then independently re-verified here: anti-stub grep clean, no force-unwrap/`try!`/user-path `fatalError`, structural integrity (pbxproj ↔ source, Info.plist launch screen, AccentColor, Preview Content), and — for the engine-bearing web/tech slots — the core algorithm executed and asserted under Node 22.
+
+Shared tooling built once and reused (in `runs/2026-06-06_0607-UTC/_tools/`): `gen_pbxproj.py` (auto-discovers Swift files → valid Xcode 15 / iOS 17 project, the single biggest iOS build-failure source eliminated) and `make_icon.py` (12 on-brand mist→ink orb glyphs, stdlib-only PNG writer). Every iOS app's 1024 icon and every project file came from these tested tools.
 
 ---
 
-## A — iOS (slots 01–03)
+## A — iOS (6 / 6 built)
 
-- **Split** — built — `runs/2026-06-05_1808-UTC/01-split` — Shared-expense splitter; groups own members, expenses (equal/exact/shares), and recorded settlements, with greedy min-cash-flow "who pays whom" suggestions. SwiftData persistence; Decimal-only money math with exact integer-cent reconciliation. 6 feature screens + onboarding + 5 persisted settings. Real 1024×1024 on-brand app icon (two overlapping orbs), light/dark, VoiceOver, Reduce Motion.
-- **Repertoire** — spec — `BACKLOG.md` — Musician practice companion: Pieces own PracticeSpots; PracticeSessions log time; sample-accurate metronome + practice timer; streaks/tempo-progress insights. SwiftData. (Deferred for quality-floor protection — one strong iOS app shipped this run.)
-- **Larder** — spec — `BACKLOG.md` — Pantry/kitchen inventory: Items across Locations/Categories with expiry windowing + low-stock detection feeding a generated shopping list; local expiry notifications. SwiftData.
+- **Interval** — built — `01-interval/ios` — Interval-timer builder: a Routine owns ordered Segments (prepare/work/rest/cooldown) and repeat-groups; an absolute-`Date` WorkoutEngine drives a full-screen timer (count-in, progress ring, next-up, skip/+15s, keep-awake) and writes a Session log with streaks/finish-rate insights. SwiftData. 28 Swift files.
+- **Apertura** — built — `02-apertura/ios` — Manual & film photography: a pure exposure engine (`EV = log2(N²/t)`, ⅓/½/full-stop snapping, equivalent-exposure enumeration, honest DoF/blur/grain guidance) plus a Roll→Frame shot log with CSV/JSON export. SwiftData. 20 Swift files.
+- **Repertoire** — built — `03-repertoire/ios` — Musician's practice companion: Piece → PracticeSpots (tempo progress, mastery), Date-based metronome + practice timer that writes Sessions, and insights (current/longest streak, weekly minutes heatmap, time-by-piece, least-recently-practiced suggestion). SwiftData. 26 Swift files.
+- **Larder** — built — `04-larder/ios` — Pantry/kitchen inventory: Items across Locations/Categories with expiry-window bucketing (expired/soon/fresh), per-item low-stock detection, and a generated shopping list whose check-off restocks the larder. SwiftData. 25 Swift files.
+- **Strata** — built — `05-strata/ios` — Climbing/bouldering logbook: a grade-conversion engine (V↔Font, YDS↔French, canonical storage) over Sessions → Attempts → Climbs/Projects, with a send pyramid, flash/onsight rate, and hardest-send-by-month progression (Swift Charts). SwiftData. 28 Swift files.
+- **Crumb** — built — `06-crumb/ios` — Sourdough & bread companion: a baker's-percentage solver that decomposes the levain to compute true hydration, scales dough weight↔loaf count, and schedules a bake's step timeline forward-from-start or backward-from-finish; plus a starter feeding log. SwiftData. 30 Swift files.
 
-## B — Web / SaaS (slots 04–06)
+## B — SaaS (2 / 2 built)
 
-- **Envelope** — built — `runs/2026-06-05_1808-UTC/04-envelope` — Zero-based envelope budgeting. Accounts, envelopes (grouped, rollover), month-aware transactions; "To Be Budgeted" hero, grouped progress + overspend, reports (hand-drawn canvas donut / SVG bars). localStorage, JSON/CSV round-trip, light/dark, full a11y. _JS syntax-checked; only `placeholder=` HTML attrs (no stubs)._
-- **Recall** — built — `runs/2026-06-05_1808-UTC/05-recall` — SM-2 spaced-repetition flashcards. Decks/cards, study sessions with keyboard rating, 12-week SVG heatmap + 7-day due forecast. localStorage, JSON/CSV. _SM-2 verified in Node: n=0→I=1, n=1→I=6, n=2→I=15, Easy→EF 2.6, lapse handling correct._
-- **Renewal** — built — `runs/2026-06-05_1808-UTC/06-renewal` — Subscription & recurring-expense tracker. 6 billing cycles incl. custom-N-days, month-end-safe next-renewal stepping, calendar + donut, totals by category/method. localStorage, JSON/CSV. _Verified in Node: Jan-31 monthly → Feb 28 / Feb 29 (leap) / Mar 31; monthly↔yearly↔custom normalization correct._
+- **Keystone** — built — `07-keystone` — Project critical-path (CPM) planner: a real graph engine (topological sort → forward/backward pass → slack → critical-path extraction → cycle detection) recomputes the schedule live as you edit; Gantt + sortable table, multi-project, JSON/CSV export. Static, localStorage, offline. *Node-verified:* sample project duration 46d, every critical task has zero slack, cycle input handled without crash.
+- **Limpid** — built — `08-limpid` — Prose-clarity workbench: an overlay-highlight editor computing six readability formulas (Flesch, FK, Gunning Fog, SMOG, ARI, Coleman–Liau) with a real syllable counter, and inline passive/adverb/filler/complex/long-sentence spans; multi-document, persisted, exportable. Static, localStorage, offline. *Node-verified:* 40+ assertions pass; degenerate input → `—`, no divide-by-zero; spans align to source offsets.
 
-## C — Scientific / Technological, interactive UI (slots 07–09)
+## C — Technological innovation (1 / 1 built)
 
-- **Smooth** — built — `runs/2026-06-05_1808-UTC/07-smooth` — Savitzky–Golay smoothing & differentiation (Savitzky & Golay, *Anal. Chem.* 1964). Coefficients computed from the Vandermonde design matrix via normal equations + Gaussian elimination (no hardcoded tables); asymmetric boundary handling; live window/order/derivative; canvas chart, PNG/CSV. _Verified in Node: window-5/order-2 → [-3,12,17,12,-3]/35, smoothing sum 1, derivative sum 0, quadratic reproduced to 1e-15._
-- **Axis** — built — `runs/2026-06-05_1808-UTC/08-axis` — PCA explorer (Pearson 1901; Hotelling 1933) via Jacobi eigendecomposition. Standardize toggle, scores scatter + scree + loadings biplot; bundled Iris (Fisher 1936 / UCI) + seeded synthetic; PNG/CSV. _Verified in Node: standardized Iris PC1+PC2 = 95.81% (matches sklearn), eigenvectors orthonormal, variance sums to 1._
-- **Compass** — built — `runs/2026-06-05_1808-UTC/09-compass` — A* pathfinding visualizer (Hart, Nilsson & Raphael, *IEEE T-SSC* 1968) with a hand-written binary min-heap; Dijkstra & Greedy comparison; 5 heuristics; seeded maze/terrain generators; animated frontier + path; PNG export. _Verified in Node: all 5 built-in sanity checks pass (A*=Dijkstra optimal cost, admissible pruning, no-path, trivial, heap invariant)._
+- **Distill** — built — `09-distill` — A genuinely working in-browser **order-3 PPMC + 32-bit range coder** text/data compressor. It shows the **real compression ratio computed live on the user's input**, honestly benchmarked against the browser's built-in gzip (`CompressionStream`), with round-trip verification, all off the main thread in a Web Worker. *Node-verified:* on the committed sample, **Distill 2,031 B (2.51×) vs gzip-9 2,264 B (2.25×) → ~10.3% smaller**, and **11/11 round-trip cases pass exactly** (empty, unicode/emoji, all-256-bytes, 50 KB repetitive, high-entropy, determinism). Lossless, honest, real applied information theory.
 
-## D — Android (slot 10)
+## D — Android (1 / 1 built)
 
-- **Transit** — built — `runs/2026-06-05_1808-UTC/10-transit` — Fuel & mileage log. Vehicles own fill-ups; the engine computes fuel economy *between full tanks*, folding partial fills into the fuel total and flagging untrustworthy segments; cross-vehicle insights; self-drawn Compose Canvas trend charts. MVVM, DataStore + JSON (no Room/KSP), custom Orbioom Material 3 light/dark, adaptive icon (+ monochrome + round).
+- **Meeple** — built — `10-meeple/android` — Board-game play & stats logger: Games/Players/Plays + PlayerResults with a pure stats engine (winner resolution respecting highest/lowest/co-op scoring, per-game avg/median/high, per-player win rate, longest/current streak, **nemesis**, **head-to-head**, monthly trend). Compose + Material 3 tuned to Orbioom, DataStore + JSON persistence, **no Room/KSP**, Kotlin 1.9.24 / AGP 8.5.2 / Compose BOM 2024.06.00 / compiler ext 1.5.14 / Gradle 8.7. 27 Kotlin files.
 
 ---
 
 ## Build / APK status
 
-- **iOS (Split):** No Xcode in the sandbox — hand-compiled by careful source review. All 24 Swift files referenced in every required `project.pbxproj` section with unique IDs; icon is a valid 1024×1024 RGBA PNG; no force-unwraps/`try!` on user paths. Builds in Xcode 15+ (Cmd+R, iOS 17+ simulator).
-- **Android (Transit):** `./gradlew assembleDebug` ran — the wrapper fetched Gradle and started, then failed only at Android Gradle Plugin resolution (no Android SDK / no Google Maven in the sandbox; ~5 GB SDK deliberately not installed). Documented in `android/build-log.txt`. Versions are the known-good set (Kotlin 1.9.24, AGP 8.5.2, Compose BOM 2024.06.00, compiler ext 1.5.14, SDK 26/34/34); no annotation processors; Compose plugin not applied. Builds in Android Studio (sync → Build APK(s)).
-- **Web & Sci (6):** open `index.html` directly — no build, no server, no keys. All JS `node --check`-clean; all core algorithms independently re-verified (above).
+- **iOS (01–06):** No Xcode in the sandbox — each project was compile-reviewed by hand (imports, iOS-17 SDK symbols, property-wrapper/`@Query`/`modelContainer` wiring, navigation/sheet bindings) and assembled with the tested `gen_pbxproj.py`. Open `<App>.xcodeproj` in Xcode 15+, pick an iOS 17 simulator, Cmd+R (free signing).
+- **Android (10):** Gradle 8.7 wrapper ran in the sandbox; the build stops at AGP plugin resolution only because the sandbox has no Android SDK / Google Maven (SDK install deliberately skipped). Versions are the known-good set with no annotation processors and no Compose plugin on 1.9.x. See `10-meeple/android/build-log.txt`. Builds in Android Studio (sync → Build > Build APK(s)) → `app/build/outputs/apk/debug/app-debug.apk`.
+- **Web/Tech (07–09):** Every JS file passes `node --check`; each engine was executed and asserted under Node. Open `index.html` directly — no build, server, or API keys.
 
-## Top recommendation
+## Top recommendation this run
 
-**Compass (A* pathfinding visualizer).** It is the most complete expression of this run's bar: a genuinely rigorous, correctly-cited algorithm (real binary-heap A* plus Dijkstra/Greedy for contrast) made *visible and manipulable* — you paint walls and weighted terrain, pick a heuristic, and watch the frontier breathe outward before the path locks in with the brand's rare green "magic" flash. Its built-in sanity suite (A* optimal cost == Dijkstra) proves correctness, and the science-as-spectacle framing is exactly the Orbioom "conjured, not just coded" feeling. Close runners-up: Axis (PCA matching sklearn to the decimal) and Split (the only slot with a non-trivial *relational* model plus settlement optimization).
+**Distill (09).** It's the rare slot that delivers a measurable, honest "wow": a correct PPM+range-coder built from scratch that *actually beats gzip* on natural-language text (2.51× vs 2.25×, ~10% smaller), proven lossless across 11 adversarial round-trip cases, running entirely client-side in a Web Worker with the benefit computed live on the user's own input. It is real applied information theory you can feel, not a visualization — exactly the brief for the tech slot. Runner-up: **Strata**, the most differentiated iOS concept (a correct multi-system climbing-grade engine + send-pyramid analytics) with no near-neighbor in the registry.
 
 ## Research signals worth following next run
 
-- **Personal-finance "calm money" tools** keep surfacing on r/SideProject and PH — debt-payoff (snowball/avalanche) planners, sinking-funds, and net-worth-over-time trackers are wanted but mostly ship as spreadsheets; strong Category-B candidates that clear the substance floor.
-- **Local-first / no-account journaling & logging** (mood, symptoms, training load) remains a recurring r/androiddev + r/iosprogramming ask — good for the native slots, and the multi-entity + computed-trend angle keeps them above the floor.
-- **"See the algorithm" science tools** have room beyond what's shipped: Gillespie SSA (stochastic chemical kinetics), Kalman filtering on a tracked signal, Barnes–Hut n-body, hierarchical clustering dendrograms, and wavelet transforms are all named, citable, and highly visual — natural Category-C picks that avoid the already-shipped FFT/k-means/ODE/PCA/A* space.
-- **Spaced-repetition analytics** (forgetting-curve fitting, FSRS vs SM-2 comparison) came up while building Recall — a visual FSRS explorer would be a distinct, rigorous Category-C follow-up.
+- **Hobby logbooks with real domain math keep landing** (Cellar, Strata, Crumb): climbers, bakers, musicians, photographers want a relational record *plus* a correct calculator, not a notes app. Adjacent unbuilt veins: pottery/kiln firing schedules, homebrew/fermentation, analog-synth patch libraries, dive logs (NDL math).
+- **On-device "server-grade" capabilities in the browser** (Distill's thread): more wow lives in pure-JS implementations of things people assume need a backend — perceptual image dedupe, a real full-text search index, delta-sync diffing.
+- **Calm dev-tools that compute, not CRUD** (Keystone, Limpid): planners/analyzers with a genuine algorithm at the core outperform dashboards. Candidates: a dependency/critical-chain resource leveler, a regex-to-railroad-diagram explainer, a JSON-diff/3-way-merge tool.
+- **SaaS finance genre remains explicitly off-limits**; keep steering to workflow/creativity/analysis tools with a clear hook.

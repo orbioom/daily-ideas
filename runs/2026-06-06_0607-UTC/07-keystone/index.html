@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Keystone — Critical Path Planner</title>
+    <meta
+      name="description"
+      content="Keystone computes the Critical Path Method live: earliest/latest start & finish, slack, and the critical path that sets your project end date."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="app-header glass">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div class="brand-text">
+          <h1>Keystone</h1>
+          <p class="brand-sub">Critical-path planning, live</p>
+        </div>
+      </div>
+
+      <div class="project-bar">
+        <label class="visually-hidden" for="project-select">Active project</label>
+        <select id="project-select" class="project-select" aria-label="Active project"></select>
+        <button type="button" id="rename-project" class="btn btn-ghost" title="Rename project">Rename</button>
+        <button type="button" id="new-project" class="btn btn-ghost" title="New project">New</button>
+        <button type="button" id="delete-project" class="btn btn-ghost btn-danger" title="Delete project">Delete</button>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" id="open-settings" class="btn btn-ghost" aria-haspopup="dialog">Settings</button>
+        <button type="button" id="add-task" class="btn btn-ink">+ Add task</button>
+      </div>
+    </header>
+
+    <main id="main" class="app-main">
+      <!-- Cycle / error banner -->
+      <div id="error-banner" class="error-banner" role="alert" hidden></div>
+
+      <!-- Summary -->
+      <section class="summary glass" aria-label="Project summary">
+        <div class="summary-item">
+          <span class="summary-label">Total duration</span>
+          <span class="summary-value mono" id="sum-duration" aria-live="polite">0</span>
+          <span class="summary-unit mono" id="sum-unit">days</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Critical tasks</span>
+          <span class="summary-value mono" id="sum-critical" aria-live="polite">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total tasks</span>
+          <span class="summary-value mono" id="sum-tasks" aria-live="polite">0</span>
+        </div>
+        <div class="summary-item summary-path">
+          <span class="summary-label">Critical path</span>
+          <span class="summary-value-path" id="sum-path" aria-live="polite">—</span>
+        </div>
+      </section>
+
+      <!-- Empty state -->
+      <section id="empty-state" class="empty-state glass" hidden>
+        <div class="empty-illustration" aria-hidden="true"></div>
+        <h2>Add your first task</h2>
+        <p>
+          A project is a set of tasks with durations and dependencies. Keystone
+          computes the critical path — the chain that decides your end date — the
+          moment you start typing.
+        </p>
+        <div class="empty-actions">
+          <button type="button" id="empty-add-task" class="btn btn-ink">+ Add your first task</button>
+          <button type="button" id="empty-load-sample" class="btn btn-ghost">Load the sample project</button>
+        </div>
+      </section>
+
+      <!-- Views -->
+      <div id="views" class="views">
+        <div class="view-tabs" role="tablist" aria-label="Schedule views">
+          <button type="button" class="view-tab is-active" id="tab-timeline" role="tab" aria-selected="true" aria-controls="panel-timeline">Timeline</button>
+          <button type="button" class="view-tab" id="tab-table" role="tab" aria-selected="false" aria-controls="panel-table">Table</button>
+        </div>
+
+        <!-- Timeline / Gantt -->
+        <section id="panel-timeline" class="panel glass" role="tabpanel" aria-labelledby="tab-timeline">
+          <div class="timeline-scroll">
+            <div id="timeline" class="timeline"></div>
+          </div>
+          <div class="timeline-legend">
+            <span class="legend-item"><span class="swatch swatch-critical"></span>Critical (zero slack)</span>
+            <span class="legend-item"><span class="swatch swatch-normal"></span>Has slack</span>
+            <span class="legend-item legend-slack"><span class="swatch swatch-slack"></span>Slack / float</span>
+          </div>
+        </section>
+
+        <!-- Table -->
+        <section id="panel-table" class="panel glass" role="tabpanel" aria-labelledby="tab-table" hidden>
+          <div class="table-wrap">
+            <table class="task-table">
+              <thead>
+                <tr>
+                  <th scope="col">Task</th>
+                  <th scope="col" class="num">Dur</th>
+                  <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="es">ES<span class="sort-ind" aria-hidden="true"></span></button></th>
+                  <th scope="col" class="num">EF</th>
+                  <th scope="col" class="num">LS</th>
+                  <th scope="col" class="num">LF</th>
+                  <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="slack">Slack<span class="sort-ind" aria-hidden="true"></span></button></th>
+                  <th scope="col">Predecessors</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div class="data-actions">
+        <button type="button" id="export-json" class="btn btn-ghost">Export JSON</button>
+        <button type="button" id="export-csv" class="btn btn-ghost">Export CSV</button>
+        <button type="button" id="import-json" class="btn btn-ghost">Import JSON</button>
+        <input type="file" id="import-file" accept="application/json,.json" class="visually-hidden" />
+        <button type="button" id="reset-sample" class="btn btn-ghost">Reset to sample</button>
+        <button type="button" id="clear-all" class="btn btn-ghost btn-danger">Clear all</button>
+      </div>
+    </main>
+
+    <!-- Task modal -->
+    <div id="task-modal" class="modal-overlay" hidden>
+      <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+        <h2 id="task-modal-title">Add task</h2>
+        <form id="task-form" novalidate>
+          <div class="field">
+            <label for="task-name">Task name</label>
+            <input type="text" id="task-name" maxlength="120" autocomplete="off" required />
+            <p class="field-error" id="task-name-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="task-duration" id="duration-label">Duration (days)</label>
+            <input type="number" id="task-duration" min="0" max="9999" step="1" inputmode="numeric" required />
+            <p class="field-error" id="task-duration-error" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="task-preds">Predecessors</label>
+            <select id="task-preds" multiple size="6" class="preds-select"></select>
+            <p class="field-hint">Hold Ctrl/Cmd to select multiple. A task can't depend on itself or create a cycle.</p>
+            <p class="field-error" id="task-preds-error" role="alert"></p>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-ink" id="task-submit">Save task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Prompt modal (rename / new project) -->
+    <div id="prompt-modal" class="modal-overlay" hidden>
+      <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="prompt-modal-title">
+        <h2 id="prompt-modal-title">New project</h2>
+        <form id="prompt-form" novalidate>
+          <div class="field">
+            <label for="prompt-input" id="prompt-label">Project name</label>
+            <input type="text" id="prompt-input" maxlength="80" autocomplete="off" required />
+            <p class="field-error" id="prompt-error" role="alert"></p>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-ink" id="prompt-submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Confirm modal -->
+    <div id="confirm-modal" class="modal-overlay" hidden>
+      <div class="modal glass" role="alertdialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-body">
+        <h2 id="confirm-modal-title">Are you sure?</h2>
+        <p id="confirm-modal-body" class="confirm-body"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+          <button type="button" class="btn btn-ink btn-danger-solid" id="confirm-ok">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings modal -->
+    <div id="settings-modal" class="modal-overlay" hidden>
+      <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <h2 id="settings-modal-title">Settings</h2>
+        <div class="field">
+          <label for="set-unit">Time unit label</label>
+          <select id="set-unit">
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+            <option value="hours">Hours</option>
+          </select>
+          <p class="field-hint">Applies to the active project. Changes the label only — it doesn't rescale durations.</p>
+        </div>
+        <div class="field field-toggle">
+          <label class="switch">
+            <input type="checkbox" id="set-slack" />
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-label">Show slack bars on the timeline</span>
+          </label>
+        </div>
+        <div class="field field-toggle">
+          <label class="switch">
+            <input type="checkbox" id="set-dark" />
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-label">Calm dark variant</span>
+          </label>
+        </div>
+        <div class="field field-toggle">
+          <label class="switch">
+            <input type="checkbox" id="set-confirm" />
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-label">Confirm before deleting</span>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ink" data-close-modal>Done</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="cpm.js"></script>
+    <script src="seed.js"></script>
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

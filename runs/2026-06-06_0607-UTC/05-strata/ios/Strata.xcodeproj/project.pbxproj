@@ -1,0 +1,376 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F8EA35A750C4177F316B1ECC /* StrataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BBEDA029B1CF0E19D042D /* StrataApp.swift */; };
+		2FFA7045C440F889B743CF3F /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F0F6DD609EE0A3FADBCD57 /* Attempt.swift */; };
+		1DD75BDD93B859FC87362653 /* Climb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B72D668464A74382CD4684E /* Climb.swift */; };
+		07FF6A3708D95A1C7AC30F93 /* Discipline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F62C24B77AD4FA6F67DF9C1 /* Discipline.swift */; };
+		1112CE9D394E4C27329ACC8B /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70BFE0511040846DAC219CC /* Location.swift */; };
+		9272D3EF70400F048C5D8389 /* Outcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7B270BBC2F3F7FA1355569 /* Outcome.swift */; };
+		F3D33F5C17BD322962674885 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D822B2FD25D016D4DFAFEE /* Session.swift */; };
+		CC9CE5812CD5FAC5BADF9E04 /* Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8D3CB0EC162D5DE9EAA454 /* Brand.swift */; };
+		F856D0F20CCCC1D9D170F77B /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E7991A9B0C19768D0D41EC /* Analytics.swift */; };
+		8809740CE13ACDB9210F0E57 /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9448F8CC2B8D5FD12FAB1AF7 /* Exporter.swift */; };
+		8ABF561ADA43068BBCB4238C /* GradeScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51ED378B6E6F6A35D588A6E8 /* GradeScale.swift */; };
+		1C256034CB597D787254AE6D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DB2FADC2AA57B15B1EBCDC /* Haptics.swift */; };
+		D36FBC5C723A48B0EC9D8547 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D7BEC91B3594CDED8414DE /* SampleData.swift */; };
+		C5ADFA138218C5370A09DD27 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2769B56B506F92A9EC0B0AD6 /* SettingsStore.swift */; };
+		2B6869BA1B6777E933544D9D /* ClimbDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CDAB61D761690FE7F1C438C /* ClimbDetailView.swift */; };
+		D6446DC0C6CE6C9468070829 /* ClimbEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F25FD441B07A51363B91DD /* ClimbEditView.swift */; };
+		9BEFEF092642C5055F992FD9 /* ClimbsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0797551D707FDA871BB37691 /* ClimbsView.swift */; };
+		2C76DB56163520482061DDC6 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C4D4E2DCC5F9CA6E2CF90C /* Components.swift */; };
+		4DCC0110E3216906824BF8A5 /* GradePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09E426EA6445F6003503EED8 /* GradePicker.swift */; };
+		D7D6939D93D2BA7DFDB867E3 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2E333DBCF4D9512FC979B4 /* InsightsView.swift */; };
+		19C93352AF31EE3E5280391F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77A2A17B8BA2354FF8110AB /* OnboardingView.swift */; };
+		9D04D54C2DD811DCF782D248 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EE222121CD6F08E637D4EA5 /* RootView.swift */; };
+		FD392F72F2FDB008F174D1A7 /* AddAttemptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49A6816881463FC3E79043D /* AddAttemptView.swift */; };
+		9BDEF86211A841F6F9054EDC /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00950F819FD4CB402A22AECE /* SessionDetailView.swift */; };
+		6B2C0FFA51FD08115AF0F55C /* LocationEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C541DE074F7DF314D794D7 /* LocationEditView.swift */; };
+		18244E3D798351C900013E75 /* SessionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32EA763E0B61B7611D498FB6 /* SessionEditView.swift */; };
+		0E57C944531D7EF22597F575 /* SessionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96405CF2201CA5B4E3C627B /* SessionsListView.swift */; };
+		C51E099FDFCD6A42A16224C6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9407BEE8B8BCA23C42831541 /* SettingsView.swift */; };
+		44BE0160A81EA8065772CB6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 592629F0244A5846AB5C79DD /* Assets.xcassets */; };
+		35C83EAA5A1B508FE07687EB /* Preview Content in Resources */ = {isa = PBXBuildFile; fileRef = 2AB78418B784E2B778594893 /* Preview Content */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		85673086EF6CFD3A1F8591AF /* Strata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strata.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		920BBEDA029B1CF0E19D042D /* StrataApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "StrataApp.swift"; path = "StrataApp.swift"; sourceTree = "<group>"; };
+		54F0F6DD609EE0A3FADBCD57 /* Attempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Attempt.swift"; path = "Models/Attempt.swift"; sourceTree = "<group>"; };
+		2B72D668464A74382CD4684E /* Climb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Climb.swift"; path = "Models/Climb.swift"; sourceTree = "<group>"; };
+		7F62C24B77AD4FA6F67DF9C1 /* Discipline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discipline.swift"; path = "Models/Discipline.swift"; sourceTree = "<group>"; };
+		B70BFE0511040846DAC219CC /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Location.swift"; path = "Models/Location.swift"; sourceTree = "<group>"; };
+		DB7B270BBC2F3F7FA1355569 /* Outcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Outcome.swift"; path = "Models/Outcome.swift"; sourceTree = "<group>"; };
+		C1D822B2FD25D016D4DFAFEE /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Session.swift"; path = "Models/Session.swift"; sourceTree = "<group>"; };
+		AF8D3CB0EC162D5DE9EAA454 /* Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Brand.swift"; path = "Theme/Brand.swift"; sourceTree = "<group>"; };
+		61E7991A9B0C19768D0D41EC /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Analytics.swift"; path = "Utilities/Analytics.swift"; sourceTree = "<group>"; };
+		9448F8CC2B8D5FD12FAB1AF7 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Exporter.swift"; path = "Utilities/Exporter.swift"; sourceTree = "<group>"; };
+		51ED378B6E6F6A35D588A6E8 /* GradeScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GradeScale.swift"; path = "Utilities/GradeScale.swift"; sourceTree = "<group>"; };
+		33DB2FADC2AA57B15B1EBCDC /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Haptics.swift"; path = "Utilities/Haptics.swift"; sourceTree = "<group>"; };
+		E3D7BEC91B3594CDED8414DE /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SampleData.swift"; path = "Utilities/SampleData.swift"; sourceTree = "<group>"; };
+		2769B56B506F92A9EC0B0AD6 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SettingsStore.swift"; path = "ViewModels/SettingsStore.swift"; sourceTree = "<group>"; };
+		8CDAB61D761690FE7F1C438C /* ClimbDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ClimbDetailView.swift"; path = "Views/Climbs/ClimbDetailView.swift"; sourceTree = "<group>"; };
+		F8F25FD441B07A51363B91DD /* ClimbEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ClimbEditView.swift"; path = "Views/Climbs/ClimbEditView.swift"; sourceTree = "<group>"; };
+		0797551D707FDA871BB37691 /* ClimbsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ClimbsView.swift"; path = "Views/Climbs/ClimbsView.swift"; sourceTree = "<group>"; };
+		32C4D4E2DCC5F9CA6E2CF90C /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Components.swift"; path = "Views/Components/Components.swift"; sourceTree = "<group>"; };
+		09E426EA6445F6003503EED8 /* GradePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GradePicker.swift"; path = "Views/Components/GradePicker.swift"; sourceTree = "<group>"; };
+		1C2E333DBCF4D9512FC979B4 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "InsightsView.swift"; path = "Views/Insights/InsightsView.swift"; sourceTree = "<group>"; };
+		D77A2A17B8BA2354FF8110AB /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "OnboardingView.swift"; path = "Views/Onboarding/OnboardingView.swift"; sourceTree = "<group>"; };
+		3EE222121CD6F08E637D4EA5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "RootView.swift"; path = "Views/RootView.swift"; sourceTree = "<group>"; };
+		E49A6816881463FC3E79043D /* AddAttemptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AddAttemptView.swift"; path = "Views/SessionDetail/AddAttemptView.swift"; sourceTree = "<group>"; };
+		00950F819FD4CB402A22AECE /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SessionDetailView.swift"; path = "Views/SessionDetail/SessionDetailView.swift"; sourceTree = "<group>"; };
+		96C541DE074F7DF314D794D7 /* LocationEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "LocationEditView.swift"; path = "Views/Sessions/LocationEditView.swift"; sourceTree = "<group>"; };
+		32EA763E0B61B7611D498FB6 /* SessionEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SessionEditView.swift"; path = "Views/Sessions/SessionEditView.swift"; sourceTree = "<group>"; };
+		E96405CF2201CA5B4E3C627B /* SessionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SessionsListView.swift"; path = "Views/Sessions/SessionsListView.swift"; sourceTree = "<group>"; };
+		9407BEE8B8BCA23C42831541 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SettingsView.swift"; path = "Views/Settings/SettingsView.swift"; sourceTree = "<group>"; };
+		592629F0244A5846AB5C79DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2AB78418B784E2B778594893 /* Preview Content */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		69BE8A4D8E4D9DA4E7DB3928 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E50290A24C49A459B43487C5 = {
+			isa = PBXGroup;
+			children = (
+				69F8D45498D7E20DA99BB780 /* Strata */,
+				FBDC4F23F93125BBEEAE800C /* Products */,
+				AB5D76948E8B8022B6DC48C4 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		69F8D45498D7E20DA99BB780 /* Strata */ = {
+			isa = PBXGroup;
+			children = (
+				920BBEDA029B1CF0E19D042D /* StrataApp.swift */,
+				54F0F6DD609EE0A3FADBCD57 /* Attempt.swift */,
+				2B72D668464A74382CD4684E /* Climb.swift */,
+				7F62C24B77AD4FA6F67DF9C1 /* Discipline.swift */,
+				B70BFE0511040846DAC219CC /* Location.swift */,
+				DB7B270BBC2F3F7FA1355569 /* Outcome.swift */,
+				C1D822B2FD25D016D4DFAFEE /* Session.swift */,
+				AF8D3CB0EC162D5DE9EAA454 /* Brand.swift */,
+				61E7991A9B0C19768D0D41EC /* Analytics.swift */,
+				9448F8CC2B8D5FD12FAB1AF7 /* Exporter.swift */,
+				51ED378B6E6F6A35D588A6E8 /* GradeScale.swift */,
+				33DB2FADC2AA57B15B1EBCDC /* Haptics.swift */,
+				E3D7BEC91B3594CDED8414DE /* SampleData.swift */,
+				2769B56B506F92A9EC0B0AD6 /* SettingsStore.swift */,
+				8CDAB61D761690FE7F1C438C /* ClimbDetailView.swift */,
+				F8F25FD441B07A51363B91DD /* ClimbEditView.swift */,
+				0797551D707FDA871BB37691 /* ClimbsView.swift */,
+				32C4D4E2DCC5F9CA6E2CF90C /* Components.swift */,
+				09E426EA6445F6003503EED8 /* GradePicker.swift */,
+				1C2E333DBCF4D9512FC979B4 /* InsightsView.swift */,
+				D77A2A17B8BA2354FF8110AB /* OnboardingView.swift */,
+				3EE222121CD6F08E637D4EA5 /* RootView.swift */,
+				E49A6816881463FC3E79043D /* AddAttemptView.swift */,
+				00950F819FD4CB402A22AECE /* SessionDetailView.swift */,
+				96C541DE074F7DF314D794D7 /* LocationEditView.swift */,
+				32EA763E0B61B7611D498FB6 /* SessionEditView.swift */,
+				E96405CF2201CA5B4E3C627B /* SessionsListView.swift */,
+				9407BEE8B8BCA23C42831541 /* SettingsView.swift */,
+				592629F0244A5846AB5C79DD /* Assets.xcassets */,
+				2AB78418B784E2B778594893 /* Preview Content */,
+			);
+			path = Strata;
+			sourceTree = "<group>";
+		};
+		FBDC4F23F93125BBEEAE800C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85673086EF6CFD3A1F8591AF /* Strata.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AB5D76948E8B8022B6DC48C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0E8A3AD980EC179856012B7E /* Strata */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D8AD3EF59D5AF3A47F516C5A /* Build configuration list for PBXNativeTarget "Strata" */;
+			buildPhases = (
+				4E57AE888889001C06A4F7E8 /* Sources */,
+				69BE8A4D8E4D9DA4E7DB3928 /* Frameworks */,
+				D6C9E8A172005E68A1DD674F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Strata;
+			productName = Strata;
+			productReference = 85673086EF6CFD3A1F8591AF /* Strata.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		98F54143AB4E86B28C3AFEE0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					0E8A3AD980EC179856012B7E = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 642847098F0B60C253877A57 /* Build configuration list for PBXProject "Strata" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E50290A24C49A459B43487C5;
+			productRefGroup = FBDC4F23F93125BBEEAE800C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0E8A3AD980EC179856012B7E /* Strata */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D6C9E8A172005E68A1DD674F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35C83EAA5A1B508FE07687EB /* Preview Content in Resources */,
+				44BE0160A81EA8065772CB6A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4E57AE888889001C06A4F7E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F8EA35A750C4177F316B1ECC /* StrataApp.swift in Sources */,
+				2FFA7045C440F889B743CF3F /* Attempt.swift in Sources */,
+				1DD75BDD93B859FC87362653 /* Climb.swift in Sources */,
+				07FF6A3708D95A1C7AC30F93 /* Discipline.swift in Sources */,
+				1112CE9D394E4C27329ACC8B /* Location.swift in Sources */,
+				9272D3EF70400F048C5D8389 /* Outcome.swift in Sources */,
+				F3D33F5C17BD322962674885 /* Session.swift in Sources */,
+				CC9CE5812CD5FAC5BADF9E04 /* Brand.swift in Sources */,
+				F856D0F20CCCC1D9D170F77B /* Analytics.swift in Sources */,
+				8809740CE13ACDB9210F0E57 /* Exporter.swift in Sources */,
+				8ABF561ADA43068BBCB4238C /* GradeScale.swift in Sources */,
+				1C256034CB597D787254AE6D /* Haptics.swift in Sources */,
+				D36FBC5C723A48B0EC9D8547 /* SampleData.swift in Sources */,
+				C5ADFA138218C5370A09DD27 /* SettingsStore.swift in Sources */,
+				2B6869BA1B6777E933544D9D /* ClimbDetailView.swift in Sources */,
+				D6446DC0C6CE6C9468070829 /* ClimbEditView.swift in Sources */,
+				9BEFEF092642C5055F992FD9 /* ClimbsView.swift in Sources */,
+				2C76DB56163520482061DDC6 /* Components.swift in Sources */,
+				4DCC0110E3216906824BF8A5 /* GradePicker.swift in Sources */,
+				D7D6939D93D2BA7DFDB867E3 /* InsightsView.swift in Sources */,
+				19C93352AF31EE3E5280391F /* OnboardingView.swift in Sources */,
+				9D04D54C2DD811DCF782D248 /* RootView.swift in Sources */,
+				FD392F72F2FDB008F174D1A7 /* AddAttemptView.swift in Sources */,
+				9BDEF86211A841F6F9054EDC /* SessionDetailView.swift in Sources */,
+				6B2C0FFA51FD08115AF0F55C /* LocationEditView.swift in Sources */,
+				18244E3D798351C900013E75 /* SessionEditView.swift in Sources */,
+				0E57C944531D7EF22597F575 /* SessionsListView.swift in Sources */,
+				C51E099FDFCD6A42A16224C6 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		920C57D0DA386BF254949DF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DB9D43B9A41A7AF4CFA1BF4A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		B52D0FFB021E8F69445DE3D1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Strata/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Strata/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.strata;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = ;
+		};
+		777513FA364619292C6CE7C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Strata/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Strata/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.orbioom.strata;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		642847098F0B60C253877A57 /* Build configuration list for PBXProject "Strata" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				920C57D0DA386BF254949DF9 /* Debug */,
+				DB9D43B9A41A7AF4CFA1BF4A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D8AD3EF59D5AF3A47F516C5A /* Build configuration list for PBXNativeTarget "Strata" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B52D0FFB021E8F69445DE3D1 /* Debug */,
+				777513FA364619292C6CE7C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
+}

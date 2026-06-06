@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Distill — real entropy compression, measured honestly</title>
+  <meta name="description" content="Distill compresses your own text in the browser with a real PPM context model and range coder, and shows the live ratio versus gzip — verified lossless.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#input">Skip to input</a>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Orbioom · applied information theory</p>
+      <h1>Distill</h1>
+      <p class="lede">
+        A genuine context-modeling compressor running entirely in your browser.
+        It learns the patterns in <em>your</em> text with an order-3 PPM model,
+        encodes it with a range coder, and shows the real compression ratio —
+        measured live, compared honestly against gzip, and verified lossless.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel glass" aria-labelledby="input-h">
+      <h2 id="input-h" class="panel-title">Your input</h2>
+      <label class="visually-hidden" for="input">Text to compress</label>
+      <textarea id="input" class="input" spellcheck="false"
+        placeholder="Type or paste text here — or load a .txt file. The sample loads automatically."></textarea>
+      <p id="byteInfo" class="byteinfo mono" aria-live="polite">No input yet.</p>
+
+      <div class="controls">
+        <button id="compressBtn" class="cta" type="button">Compress</button>
+
+        <span class="filewrap">
+          <label class="ghost-btn" for="fileInput">Load .txt…</label>
+          <input id="fileInput" type="file" accept=".txt,text/plain" class="visually-hidden">
+        </span>
+
+        <span class="filewrap">
+          <label class="ghost-btn" for="distillUpload">Open .distill…</label>
+          <input id="distillUpload" type="file" accept=".distill,application/octet-stream" class="visually-hidden">
+        </span>
+
+        <button id="clearBtn" class="ghost-btn" type="button">Clear</button>
+      </div>
+
+      <p id="status" class="status mono" role="status" aria-live="polite" data-kind="idle">Starting up…</p>
+
+      <div id="progress" class="progress" role="progressbar"
+           aria-label="Compression progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </section>
+
+    <section id="results" class="panel glass" aria-labelledby="results-h" hidden>
+      <h2 id="results-h" class="panel-title">Result</h2>
+
+      <p id="verdict" class="verdict" aria-live="polite"></p>
+      <p id="roundtrip" class="roundtrip" aria-live="polite"></p>
+
+      <dl class="metrics">
+        <div class="metric">
+          <dt>Original</dt>
+          <dd id="m-orig" class="mono">—</dd>
+        </div>
+        <div class="metric highlight">
+          <dt>Distill</dt>
+          <dd id="m-distill" class="mono">—</dd>
+        </div>
+        <div class="metric highlight">
+          <dt>Distill ratio</dt>
+          <dd id="m-ratio" class="mono">—</dd>
+        </div>
+        <div class="metric">
+          <dt>Bits / byte</dt>
+          <dd id="m-bpb" class="mono">—</dd>
+        </div>
+        <div class="metric">
+          <dt>gzip</dt>
+          <dd id="m-gzip" class="mono">—</dd>
+        </div>
+        <div class="metric">
+          <dt>gzip ratio</dt>
+          <dd id="m-gzipratio" class="mono">—</dd>
+        </div>
+        <div class="metric">
+          <dt>Compress time</dt>
+          <dd id="m-time" class="mono">—</dd>
+        </div>
+      </dl>
+
+      <div class="exports">
+        <button id="exportDistill" class="ghost-btn" type="button">Download .distill</button>
+        <button id="exportJson" class="ghost-btn" type="button">Download result JSON</button>
+      </div>
+    </section>
+
+    <section class="panel glass about-panel" aria-labelledby="about-h">
+      <h2 id="about-h" class="panel-title">
+        <button id="aboutToggle" class="about-toggle" type="button" aria-expanded="false" aria-controls="about">
+          How it works / About
+        </button>
+      </h2>
+      <div id="about" class="about" hidden>
+        <p>
+          <strong>PPM (Prediction by Partial Matching).</strong> Distill reads your bytes
+          one at a time and, for each one, asks: given the previous up-to-three bytes
+          (the <em>context</em>), how likely is each possible next byte? It keeps frequency
+          counts per context. Natural language is deeply predictable — after
+          <span class="mono">q</span> comes <span class="mono">u</span>, after
+          <span class="mono">th</span> comes <span class="mono">e</span> — so these
+          predictions get sharp, and sharp predictions cost few bits.
+        </p>
+        <p>
+          <strong>Escape &amp; exclusion (PPMC).</strong> When the model has never seen the
+          next byte in the current context, it emits a small <em>escape</em> and falls back
+          to a shorter context, and ultimately to a uniform model over all 256 byte values
+          plus an end-of-stream marker. Symbols already ruled out higher up are
+          <em>excluded</em> from the lower-order estimates, which tightens the probabilities.
+          This fallback chain is what guarantees every possible input is codable — and that
+          the coder is exactly lossless.
+        </p>
+        <p>
+          <strong>Range coding.</strong> Those probabilities drive a 32-bit carry-less range
+          coder, the arithmetic-coding family that turns a stream of probabilities into a
+          near-optimal stream of bits. It is deterministic: the same input always produces
+          the same bytes.
+        </p>
+        <p>
+          <strong>The gzip comparison is honest.</strong> The gzip figure is produced by your
+          browser's own built-in <span class="mono">CompressionStream('gzip')</span> — no
+          fabricated numbers. Everything you see is computed live on your actual input. On
+          natural-language prose Distill typically beats gzip's ratio because it models longer
+          context than gzip's LZ77 + Huffman pipeline; on tiny or already-dense/random data,
+          gzip's lighter header often wins, and Distill says so plainly.
+        </p>
+        <p>
+          <strong>Verified lossless.</strong> After compressing, Distill immediately
+          decompresses its own output inside the worker and checks it byte-for-byte against
+          your input. The green check only appears when that check passes.
+        </p>
+        <p class="about-meta mono">
+          Engine: order-3 PPMC + carry-less range coder · runs in a Web Worker ·
+          inputs capped at 512 KB for a responsive demo · no network, no keys, no CDN.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="mono">Distill · built for Orbioom · everything runs locally in your browser.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
