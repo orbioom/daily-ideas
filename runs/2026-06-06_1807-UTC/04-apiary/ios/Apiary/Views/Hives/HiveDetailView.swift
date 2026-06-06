@@ -8,14 +8,27 @@ struct HiveDetailView: View {
     @AppStorage("massUnit") private var massRaw = MassUnit.kg.rawValue
     @Bindable var hive: Hive
 
-    @State private var showEdit = false
     @State private var confirmDelete = false
-    @State private var editingInspection: Inspection?
-    @State private var editingTreatment: Treatment?
-    @State private var editingHarvest: Harvest?
-    @State private var addInspection = false
-    @State private var addTreatment = false
-    @State private var addHarvest = false
+    @State private var sheet: Sheet?
+
+    /// A single enum drives every sheet on this screen — more reliable than
+    /// stacking several independent `.sheet` modifiers on one view.
+    enum Sheet: Identifiable {
+        case editHive
+        case addInspection, addTreatment, addHarvest
+        case editInspection(Inspection), editTreatment(Treatment), editHarvest(Harvest)
+        var id: String {
+            switch self {
+            case .editHive: return "editHive"
+            case .addInspection: return "addInspection"
+            case .addTreatment: return "addTreatment"
+            case .addHarvest: return "addHarvest"
+            case .editInspection(let i): return "i-\(i.persistentModelID.hashValue)"
+            case .editTreatment(let t): return "t-\(t.persistentModelID.hashValue)"
+            case .editHarvest(let h): return "h-\(h.persistentModelID.hashValue)"
+            }
+        }
+    }
 
     private var mass: MassUnit { MassUnit(rawValue: massRaw) ?? .kg }
     private var inspections: [Inspection] { hive.inspections.sorted { $0.date > $1.date } }
@@ -33,22 +46,22 @@ struct HiveDetailView: View {
                 if let latest = hive.latestInspection { latestCard(latest) }
                 if miteSeries.filter({ $0.mitesPer300 > 0 }).count >= 2 { miteChart }
 
-                listSection(title: "Inspections", add: { addInspection = true }) {
+                listSection(title: "Inspections", add: { sheet = .addInspection }) {
                     if inspections.isEmpty { emptyRow("No inspections logged yet.") }
                     ForEach(inspections) { i in
-                        Button { editingInspection = i } label: { inspectionRow(i) }.buttonStyle(.plain)
+                        Button { sheet = .editInspection(i) } label: { inspectionRow(i) }.buttonStyle(.plain)
                     }
                 }
-                listSection(title: "Treatments", add: { addTreatment = true }) {
+                listSection(title: "Treatments", add: { sheet = .addTreatment }) {
                     if treatments.isEmpty { emptyRow("No treatments recorded.") }
                     ForEach(treatments) { t in
-                        Button { editingTreatment = t } label: { treatmentRow(t) }.buttonStyle(.plain)
+                        Button { sheet = .editTreatment(t) } label: { treatmentRow(t) }.buttonStyle(.plain)
                     }
                 }
-                listSection(title: "Harvests", add: { addHarvest = true }) {
+                listSection(title: "Harvests", add: { sheet = .addHarvest }) {
                     if harvests.isEmpty { emptyRow("No harvests recorded.") }
                     ForEach(harvests) { h in
-                        Button { editingHarvest = h } label: { harvestRow(h) }.buttonStyle(.plain)
+                        Button { sheet = .editHarvest(h) } label: { harvestRow(h) }.buttonStyle(.plain)
                     }
                 }
 
@@ -61,14 +74,18 @@ struct HiveDetailView: View {
         }
         .background(Brand.pageBackground)
         .navigationTitle(hive.name).navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Edit") { showEdit = true } } }
-        .sheet(isPresented: $showEdit) { HiveEditView(hive: hive) }
-        .sheet(isPresented: $addInspection) { InspectionEditView(inspection: nil, hive: hive) }
-        .sheet(isPresented: $addTreatment) { TreatmentEditView(treatment: nil, hive: hive) }
-        .sheet(isPresented: $addHarvest) { HarvestEditView(harvest: nil, hive: hive) }
-        .sheet(item: $editingInspection) { InspectionEditView(inspection: $0, hive: hive) }
-        .sheet(item: $editingTreatment) { TreatmentEditView(treatment: $0, hive: hive) }
-        .sheet(item: $editingHarvest) { HarvestEditView(harvest: $0, hive: hive) }
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Edit") { sheet = .editHive } } }
+        .sheet(item: $sheet) { which in
+            switch which {
+            case .editHive: HiveEditView(hive: hive)
+            case .addInspection: InspectionEditView(inspection: nil, hive: hive)
+            case .addTreatment: TreatmentEditView(treatment: nil, hive: hive)
+            case .addHarvest: HarvestEditView(harvest: nil, hive: hive)
+            case .editInspection(let i): InspectionEditView(inspection: i, hive: hive)
+            case .editTreatment(let t): TreatmentEditView(treatment: t, hive: hive)
+            case .editHarvest(let h): HarvestEditView(harvest: h, hive: hive)
+            }
+        }
         .alert("Delete this hive?", isPresented: $confirmDelete) {
             Button("Delete", role: .destructive) {
                 context.delete(hive); try? context.save(); Haptics.warning(); dismiss()

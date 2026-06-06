@@ -53,8 +53,8 @@ struct TasksView: View {
                                   queenlessHives.map { ($0.name, "Marked queenless — needs a plan", $0) })
                             group("Overdue inspection", "eye.trianglebadge.exclamationmark", Brand.info,
                                   overdueInspections.map { h in
-                                    let d = BeeLogic.daysSinceInspection(h)
-                                    return (h.name, d == nil ? "Never inspected" : "Last seen \(d!)d ago", h) })
+                                    let detail = BeeLogic.daysSinceInspection(h).map { "Last seen \($0)d ago" } ?? "Never inspected"
+                                    return (h.name, detail, h) })
                         }
                         .padding(16)
                     }
