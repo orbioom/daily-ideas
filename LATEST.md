@@ -1,57 +1,25 @@
-# Orbioom Daily Ideas — Latest Run
+# Latest run — 2026-06-07_0608-UTC
 
-**Run:** 2026-06-07_0010-UTC
-**Folder:** `runs/2026-06-07_0010-UTC/`
-**Output:** 6 production-ready native iOS apps (SwiftUI 5, iOS 17+, SwiftData), all Orbioom design language with distinct per-app accents.
-
-Each app ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), a real 1024² on-brand `AppIcon`, `AccentColor`, launch screen, onboarding gate, ≥4 substantive feature screens, a Settings screen with ≥3 persisted prefs, empty/loading/success/error states, light + dark, Dynamic Type, VoiceOver, Reduce Motion, and gated haptics. Build locally: `brew install xcodegen` → `cd <app>/ios && xcodegen generate` → open in Xcode 15+ → Cmd+R.
+**6 production-ready native iOS apps**, slots 01–06, in `runs/2026-06-07_0608-UTC/`. All built to the iOS Definition of Done (Orbioom design language; SwiftUI 5 + SwiftData; onboarding gate, empty/loading/error/success states, ≥4 feature screens, ≥3 functional Settings prefs, full Dynamic Type / VoiceOver / Reduce Motion, light & dark, designed app icons). Each ships a XcodeGen `project.yml` (run `xcodegen generate`, then open in Xcode 15+).
 
 ## The six apps
-
-- **Oche** — built — `runs/2026-06-07_0010-UTC/01-oche` — a calm darts companion: a pure checkout engine that solves any 2–170 finish on a double (with bogey-number detection and a full 170→2 chart), match logging leg-by-leg into three-dart average / checkout % / best leg, and a live double-practice mode that surfaces the finish you keep missing.
-- **Caliber** — built — `runs/2026-06-07_0010-UTC/02-caliber` — a mechanical-watch accuracy log: a least-squares regression of your timing readings into a true daily rate, a per-position breakdown (a timegrapher built from the wrist), COSC-style grading, drift projection, and service-due tracking across the collection.
-- **Tilth** — built — `runs/2026-06-07_0010-UTC/03-tilth` — a frost-date succession garden planner: your two frost dates drive every sow / transplant / harvest / last-safe-sow date and a guarded succession series; beds own plantings with a status flow, and a harvest-by-month forecast.
-- **Riffle** — built — `runs/2026-06-07_0010-UTC/04-riffle` — a fly-tying and fishing log: patterns own their tying recipes and box stock, catches log conditions and the fly that worked, and a hatch chart matches what's emerging this month to the flies in your box by type and hook size.
-- **Zenith** — built — `runs/2026-06-07_0010-UTC/05-zenith` — a telescope optics companion: magnification / true field / exit pupil for any scope-and-eyepiece combination, per-scope resolving power and limiting magnitude, an observing log, and a seasonal target list with a framing-aware eyepiece recommender.
-- **Plateau** — built — `runs/2026-06-07_0010-UTC/06-plateau` — a sous-vide companion that times a cook from first principles: a Heisler heat-equation come-up time plus a D/z pasteurization hold, a relaunch-safe countdown timer, a doneness/pasteurization guide, and a cook log.
+- **Links** — built — `01-links` — Golf handicap & round logbook: a real World Handicap System engine (best 8 of 20, Net Double Bogey capping, chronological processing) over a hole-by-hole scorecard, courses/tees, and scoring insights.
+- **Plume** — built — `02-plume` — Birdwatching life list & sightings: a 65-bird catalog, automatic lifer detection, life/year lists in checklist order, trips, and seasonal insights.
+- **Capo** — built — `03-capo` — Chord transposer & setlist manager: a key-aware transposition engine (correct enharmonics, slash chords, Nashville numbers, capo-shape math), a chords-over-lyrics renderer, setlists with per-slot transpose/capo, and a swipeable performance view.
+- **Cone** — built — `04-cone` — Pottery studio: percentage→grams glaze batch scaling, firing ramp schedules with time + energy-cost estimates, an Orton cone-temperature reference + shrinkage calculator, and a piece-stage workflow.
+- **Cog** — built — `05-cog` — Bike maintenance & component wear: a distance+time wear engine that projects replacement dates from ride history, a cross-bike health overview, and a service/spend history.
+- **Vial** — built — `06-vial` — Medication & refill tracker: a dose-schedule engine with today's checklist, supply countdown to a refill-by date, and adherence trends (overall/daily/per-med).
 
 ## Top recommendation
+**Capo.** It has the deepest, most reusable domain logic (a genuine music-theory engine: pitch-class parsing, key-aware enharmonic spelling, Nashville numbers, capo math) wrapped in the most visually distinctive feature — a live chords-over-lyrics chart that transposes as you tap — and serves a large, paying audience (worship/cover/gigging musicians) underserved by clunky or paywalled apps. Strong hook, clear why-now, immediately demoable.
 
-**Plateau.** It's the strongest mix of a genuinely hard, correct engine and an
-everyday hook. The come-up time is a real one-term transient-conduction solution
-(shape-aware, calibrated to Baldwin's water-bath tables) and the safety hold is a
-real D/z thermal-death-time model — yet the surface is a single number every
-sous-vide cook actually wants ("how long, minimum?"), wrapped in a timer that
-survives a relaunch. Runner-up: **Caliber**, whose least-squares daily-rate and
-positional analysis turn a watch enthusiast's scattered readings into a clean,
-chartable answer that no free app does calmly.
+Runners-up: **Links** (the WHS math is the kind of correctness moat casual apps skip) and **Cog** (a sticky, genuinely useful "before it breaks" tool with daily re-use).
+
+## Self-review
+Anti-stub grep clean across all six. Three parallel by-hand compile-review passes (one per pair of apps) returned no compile errors and no crash paths — SwiftData wiring, iOS 17 API usage, `Picker` tags, `.onChange` two-parameter form, `Layout`/`Canvas`, and division/`.infinity` guards all verified. No Xcode in the sandbox, so correctness is by inspection.
 
 ## Research signals worth following next run
-
-- **Validated hobby/profession verticals still without a calm offline app** (after
-  this run took darts, watch-accuracy, frost-succession gardening, fly-fishing,
-  visual astronomy, and sous-vide): pottery is *served* (Glaizit, Pottery Notes), so
-  skip it; remaining strong gaps are leathercraft project/leather-yield planning,
-  model-paint inventory (Warhammer ranges), darts *contesting*/checkout already done
-  so pivot to **archery sight-tape interpolation**, **disc-golf handicap scorecards**,
-  **sailing rule-of-twelfths tide + passage timing**, **cycling gear-inch/Q-factor +
-  component wear log**, and **fountain-pen/ink pairing inventory**.
-- **"A calculator that's actually a tool" keeps over-delivering** — every standout
-  this run is a domain where practitioners do real math by hand (checkout set-cover,
-  least-squares rate, frost-relative date algebra, optics, heat equation). Pick a
-  field with hand-math and make it calm.
-- **Persisted, relaunch-safe live timers** (Plateau's countdown computed from a
-  stored start date) are a reusable pattern worth carrying forward to any
-  cook/brew/interval domain.
-
-## Notes
-
-- All engines are pure value types off the view layer — `CheckoutEngine`, `RateEngine`,
-  `FrostMath`, `RiffleLogic`/`Optics`, `PlateauMath` — so they're independently
-  testable.
-- The icon generator gained six new glyphs (dart, dial, sprout, fly, scope, thermo)
-  in `_tools/make_icon.py`; each app has its own accent glow (green, brass, green,
-  water-blue, indigo, amber) over the shared mist→ink orb ground.
-- The only `try!` in any app is the in-memory `ModelContainer` bootstrap fallback in
-  each `@main` — not a user path. No force-unwraps on user paths; anti-stub grep
-  clean across all 103 Swift files.
+- **Disc golf** scorecard + rating (PDGA-style) — same appetite as ball golf, fewer good native apps.
+- **Net-worth / asset-allocation snapshots** — finance is well-covered for budgeting/debt but a calm allocation+history tracker is open.
+- **Pottery/maker adjacencies** validated: kiln-share scheduling, leatherworking project costing, screen-printing ink mixer all surfaced as niche-but-devoted.
+- **Freediving apnea CO₂/O₂ tables** (distinct from scuba), **chess opening-repertoire trainer**, and a **gig/expense mileage log for musicians** all scored well on substance but were cut for distinctness this run.
