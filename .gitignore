@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Xcode — generated locally from project.yml via gen.sh; never commit
+**/ios/*.xcodeproj/
+**/xcuserdata/
+*.xcuserstate
+**/project.xcworkspace/xcuserdata/
+
+# Android build output
+**/build-apk/*.apk
+**/.gradle/
+**/app/build/
+local.properties
