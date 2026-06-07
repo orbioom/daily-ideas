@@ -10,6 +10,13 @@ struct PackWeights {
     var bigThree: Double = 0    // shelter + sleep + pack (subset of base)
 }
 
+/// Weight held in one category — Identifiable for charts and lists.
+struct CatWeight: Identifiable {
+    var id: String { category.rawValue }
+    let category: GearCategory
+    let grams: Double
+}
+
 /// Pure weight math over pack-list entries.
 enum PackMath {
 
@@ -29,7 +36,7 @@ enum PackMath {
     }
 
     /// Weight by category across all (non-worn) entries — for the breakdown chart.
-    static func byCategory(_ entries: [PackEntry]) -> [(category: GearCategory, grams: Double)] {
+    static func byCategory(_ entries: [PackEntry]) -> [CatWeight] {
         var map: [GearCategory: Double] = [:]
         for e in entries {
             guard let g = e.gear, !g.isWorn else { continue }
@@ -37,7 +44,7 @@ enum PackMath {
         }
         return GearCategory.allCases.compactMap { c in
             guard let g = map[c], g > 0 else { return nil }
-            return (c, g)
+            return CatWeight(category: c, grams: g)
         }.sorted { $0.grams > $1.grams }
     }
 

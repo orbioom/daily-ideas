@@ -22,7 +22,8 @@ struct ReferenceView: View {
     private var colorChart: some View {
         VStack(alignment: .leading, spacing: 10) {
             SectionTitle(text: "Resistor colour code")
-            ForEach(Array(EE.bandColors.enumerated()), id: \.offset) { i, name in
+            ForEach(EE.bandColors.indices, id: \.self) { i in
+                let name = EE.bandColors[i]
                 HStack(spacing: 10) {
                     Circle().fill(swatch(name)).frame(width: 16, height: 16)
                         .overlay(Circle().strokeBorder(Brand.hairline, lineWidth: 1))
@@ -31,7 +32,7 @@ struct ReferenceView: View {
                     Text("digit \(i)").font(Brand.mono(12)).foregroundStyle(Brand.text3)
                     Text("×10^\(i)").font(Brand.mono(12)).foregroundStyle(Brand.text2).frame(width: 56, alignment: .trailing)
                 }
-                if name != EE.bandColors.last { Divider().overlay(Brand.hairline) }
+                if i != EE.bandColors.count - 1 { Divider().overlay(Brand.hairline) }
             }
             Text("Gold ×0.1 (±5%) · Silver ×0.01 (±10%)")
                 .font(.caption).foregroundStyle(Brand.text3).padding(.top, 4)
@@ -51,13 +52,13 @@ struct ReferenceView: View {
     private var siPrefixCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionTitle(text: "SI prefixes")
-            ForEach(prefixes, id: \.0) { p in
+            ForEach(prefixes.indices, id: \.self) { i in
                 HStack {
-                    Text(p.0).font(.subheadline).foregroundStyle(Brand.text)
+                    Text(prefixes[i].0).font(.subheadline).foregroundStyle(Brand.text)
                     Spacer()
-                    Text(p.1).font(Brand.mono(13)).foregroundStyle(Brand.text2)
+                    Text(prefixes[i].1).font(Brand.mono(13)).foregroundStyle(Brand.text2)
                 }
-                if p.0 != prefixes.last?.0 { Divider().overlay(Brand.hairline) }
+                if i != prefixes.count - 1 { Divider().overlay(Brand.hairline) }
             }
         }.glassCard()
     }
@@ -65,12 +66,12 @@ struct ReferenceView: View {
     private var formulaCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionTitle(text: "Formulas")
-            ForEach(formulas, id: \.0) { f in
+            ForEach(formulas.indices, id: \.self) { i in
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(f.0).font(.subheadline.weight(.medium)).foregroundStyle(Brand.text)
-                    Text(f.1).font(Brand.mono(13)).foregroundStyle(Brand.text2)
+                    Text(formulas[i].0).font(.subheadline.weight(.medium)).foregroundStyle(Brand.text)
+                    Text(formulas[i].1).font(Brand.mono(13)).foregroundStyle(Brand.text2)
                 }
-                if f.0 != formulas.last?.0 { Divider().overlay(Brand.hairline) }
+                if i != formulas.count - 1 { Divider().overlay(Brand.hairline) }
             }
         }.glassCard()
     }

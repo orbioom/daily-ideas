@@ -29,7 +29,9 @@ struct SnapshotDetailView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     SectionTitle(text: "Allocation at this date")
-                    ForEach(allocation, id: \.0) { cls, value in
+                    ForEach(allocation.indices, id: \.self) { i in
+                        let cls = allocation[i].0
+                        let value = allocation[i].1
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Label(cls.rawValue, systemImage: cls.symbol)

@@ -59,8 +59,8 @@ struct ResistorCalcView: View {
             RoundedRectangle(cornerRadius: 4).fill(Color(hex: 0xD8C9A0)).frame(height: 44)
                 .overlay(
                     HStack(spacing: 8) {
-                        ForEach(Array(bands.enumerated()), id: \.offset) { _, c in
-                            RoundedRectangle(cornerRadius: 2).fill(swatch(c)).frame(width: 12)
+                        ForEach(bands.indices, id: \.self) { i in
+                            RoundedRectangle(cornerRadius: 2).fill(swatch(bands[i])).frame(width: 12)
                         }
                     }.padding(.horizontal, 18)
                 )

@@ -9,12 +9,12 @@ struct InsightsView: View {
     @Query(sort: \PackList.createdAt) private var lists: [PackList]
     @AppStorage("cairn.unit") private var unit = "g"
 
-    private var catalogByCat: [(category: GearCategory, grams: Double)] {
+    private var catalogByCat: [CatWeight] {
         var map: [GearCategory: Double] = [:]
         for g in gear { map[g.category, default: 0] += g.weightGrams }
         return GearCategory.allCases.compactMap { c in
             guard let v = map[c], v > 0 else { return nil }
-            return (c, v)
+            return CatWeight(category: c, grams: v)
         }.sorted { $0.grams > $1.grams }
     }
     private var heaviest: [GearItem] {
@@ -59,7 +59,7 @@ struct InsightsView: View {
     private var catalogCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle(text: "Catalog by category")
-            Chart(catalogByCat, id: \.category) { row in
+            Chart(catalogByCat) { row in
                 BarMark(x: .value("Grams", row.grams),
                         y: .value("Category", row.category.rawValue))
                     .foregroundStyle(row.category.tint)

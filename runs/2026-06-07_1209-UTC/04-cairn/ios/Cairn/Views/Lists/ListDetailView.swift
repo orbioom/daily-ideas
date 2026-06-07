@@ -10,7 +10,7 @@ struct ListDetailView: View {
     @State private var showAdd = false
 
     private var w: PackWeights { PackMath.weights(for: list.entries) }
-    private var byCat: [(category: GearCategory, grams: Double)] { PackMath.byCategory(list.entries) }
+    private var byCat: [CatWeight] { PackMath.byCategory(list.entries) }
 
     private var grouped: [(GearCategory, [PackEntry])] {
         GearCategory.allCases.compactMap { c in
@@ -30,8 +30,8 @@ struct ListDetailView: View {
                                    title: "Empty list",
                                    message: "Add gear from your catalog to start building this pack.")
                 } else {
-                    ForEach(grouped, id: \.0) { cat, items in
-                        categorySection(cat, items)
+                    ForEach(grouped.indices, id: \.self) { i in
+                        categorySection(grouped[i].0, grouped[i].1)
                     }
                 }
                 Button { showAdd = true } label: {
@@ -86,7 +86,7 @@ struct ListDetailView: View {
     private var breakdownCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle(text: "Where the weight is")
-            Chart(byCat, id: \.category) { row in
+            Chart(byCat) { row in
                 SectorMark(angle: .value("Grams", row.grams),
                            innerRadius: .ratio(0.58), angularInset: 1.5)
                     .cornerRadius(4)
@@ -95,7 +95,7 @@ struct ListDetailView: View {
             .frame(height: 170)
             .accessibilityLabel("Weight breakdown by category")
             VStack(spacing: 6) {
-                ForEach(byCat, id: \.category) { row in
+                ForEach(byCat) { row in
                     HStack(spacing: 10) {
                         Circle().fill(row.category.tint).frame(width: 9, height: 9)
                         Text(row.category.rawValue).font(.subheadline).foregroundStyle(Brand.text2)

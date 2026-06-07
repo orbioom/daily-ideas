@@ -45,7 +45,7 @@ struct PartsView: View {
                                 StatTile(value: "\(lowStock)", label: "Low stock",
                                          accent: lowStock > 0 ? Brand.warn : Brand.live)
                             }
-                            ForEach(grouped, id: \.0) { kind, items in section(kind, items) }
+                            ForEach(grouped.indices, id: \.self) { i in section(grouped[i].0, grouped[i].1) }
                         }
                         .padding()
                     }

@@ -44,8 +44,8 @@ struct GearView: View {
                                 StatTile(value: WeightFmt.compact(totalWeight, unit: unit), label: "Catalog weight")
                             }
                             filterBar
-                            ForEach(grouped, id: \.0) { cat, items in
-                                categorySection(cat, items)
+                            ForEach(grouped.indices, id: \.self) { i in
+                                categorySection(grouped[i].0, grouped[i].1)
                             }
                         }
                         .padding()
@@ -61,7 +61,7 @@ struct GearView: View {
             }
             .sheet(isPresented: $showNew) { GearEditView(gear: nil) }
             .sheet(item: $editing) { g in GearEditView(gear: g) }
-            .confirmationDialog("Delete this item? It will be removed from your lists too.",
+            .confirmationDialog("Delete this item from your catalog? Lists using it will show it as removed.",
                                 isPresented: Binding(get: { pendingDelete != nil },
                                                      set: { if !$0 { pendingDelete = nil } }),
                                 titleVisibility: .visible) {

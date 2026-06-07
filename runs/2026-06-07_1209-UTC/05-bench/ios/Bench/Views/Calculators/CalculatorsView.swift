@@ -134,7 +134,9 @@ struct ScaledField: View {
                 .keyboardType(.decimalPad).multilineTextAlignment(.trailing)
                 .frame(width: 90).textFieldStyle(.roundedBorder)
             Picker(label, selection: $scale) {
-                ForEach(options, id: \.1) { Text($0.0).tag($0.1) }
+                ForEach(options.indices, id: \.self) { i in
+                    Text(options[i].0).tag(options[i].1)
+                }
             }.pickerStyle(.menu).tint(Brand.text2).frame(width: 64)
         }
     }

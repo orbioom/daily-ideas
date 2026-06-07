@@ -3,16 +3,15 @@ import SwiftData
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
-    @AppStorage("cairn.hapticsEnabled") private var hapticsEnabled = true
-    @AppStorage("cairn.appearance") private var appearance = "system"
-    @AppStorage("cairn.unit") private var unit = "g"
-    @AppStorage("cairn.includeWornInTotal") private var includeWornInTotal = false
-    @AppStorage("cairn.confirmDeletes") private var confirmDeletes = true
-    @Query private var gear: [GearItem]
-    @Query private var lists: [PackList]
+    @AppStorage("gambit.hapticsEnabled") private var hapticsEnabled = true
+    @AppStorage("gambit.appearance") private var appearance = "system"
+    @AppStorage("gambit.autoRollMonsters") private var autoRollMonsters = true
+    @AppStorage("gambit.hideDownedEnemies") private var hideDownedEnemies = false
+    @AppStorage("gambit.confirmDeletes") private var confirmDeletes = true
+    @Query private var encounters: [Encounter]
+    @Query private var blocks: [StatBlock]
+    @Query private var rolls: [DiceLog]
     @State private var showResetConfirm = false
-
-    private let units = [("g", "Grams"), ("kg", "Kilograms"), ("oz", "Ounces"), ("lboz", "Lb + oz")]
 
     var body: some View {
         NavigationStack {
@@ -24,16 +23,6 @@ struct SettingsView: View {
                             .onChange(of: hapticsEnabled) { _, v in Haptics.enabled = v; if v { Haptics.tap() } }
                         Divider().overlay(Brand.hairline)
                         HStack {
-                            Text("Weight unit").foregroundStyle(Brand.text)
-                            Spacer()
-                            Picker("Unit", selection: $unit) {
-                                ForEach(units.indices, id: \.self) { i in
-                                    Text(units[i].1).tag(units[i].0)
-                                }
-                            }.pickerStyle(.menu).tint(Brand.text2)
-                        }
-                        Divider().overlay(Brand.hairline)
-                        HStack {
                             Text("Appearance").foregroundStyle(Brand.text)
                             Spacer()
                             Picker("Appearance", selection: $appearance) {
@@ -41,17 +30,21 @@ struct SettingsView: View {
                             }.pickerStyle(.menu).tint(Brand.text2)
                         }
                         Divider().overlay(Brand.hairline)
-                        Toggle("Show skin-out as headline total", isOn: $includeWornInTotal)
+                        Toggle("Auto-roll enemy initiative", isOn: $autoRollMonsters)
+                        Divider().overlay(Brand.hairline)
+                        Toggle("Dim downed enemies", isOn: $hideDownedEnemies)
                         Divider().overlay(Brand.hairline)
                         Toggle("Confirm before deleting", isOn: $confirmDeletes)
                     }
                     .tint(Brand.live).glassCard()
 
                     VStack(alignment: .leading, spacing: 8) {
-                        SectionTitle(text: "Catalog")
-                        InfoRow(label: "Gear items", value: "\(gear.count)", mono: true)
+                        SectionTitle(text: "Library")
+                        InfoRow(label: "Encounters", value: "\(encounters.count)", mono: true)
                         Divider().overlay(Brand.hairline)
-                        InfoRow(label: "Pack lists", value: "\(lists.count)", mono: true)
+                        InfoRow(label: "Stat blocks", value: "\(blocks.count)", mono: true)
+                        Divider().overlay(Brand.hairline)
+                        InfoRow(label: "Dice rolls logged", value: "\(rolls.count)", mono: true)
                     }.glassCard()
 
                     VStack(alignment: .leading, spacing: 10) {
@@ -63,7 +56,7 @@ struct SettingsView: View {
 
                     VStack(alignment: .leading, spacing: 8) {
                         SectionTitle(text: "About")
-                        Text("Cairn keeps a reusable gear catalog and turns each pack list into a clear base / total / skin-out weight breakdown — all offline.")
+                        Text("Gambit runs tabletop combat — initiative, HP and conditions — with a built-in dice roller, all offline.")
                             .font(.caption).foregroundStyle(Brand.text2)
                         Text("Version 1.0 · Orbioom").font(Brand.mono(11)).foregroundStyle(Brand.text3)
                     }.glassCard()
@@ -72,7 +65,7 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .background(Brand.pageBackground)
-            .confirmationDialog("Erase all gear and lists? This cannot be undone.",
+            .confirmationDialog("Erase all encounters, stat blocks and dice history? This cannot be undone.",
                                 isPresented: $showResetConfirm, titleVisibility: .visible) {
                 Button("Erase everything", role: .destructive) { erase() }
                 Button("Cancel", role: .cancel) { }
@@ -82,9 +75,10 @@ struct SettingsView: View {
 
     private func erase() {
         do {
-            try context.delete(model: PackEntry.self)
-            try context.delete(model: PackList.self)
-            try context.delete(model: GearItem.self)
+            try context.delete(model: Combatant.self)
+            try context.delete(model: Encounter.self)
+            try context.delete(model: StatBlock.self)
+            try context.delete(model: DiceLog.self)
             try context.save()
         } catch { }
         Haptics.warning()

@@ -1,25 +1,26 @@
-# Latest run — 2026-06-07_0608-UTC
+# Latest run — 2026-06-07_1209-UTC
 
-**6 production-ready native iOS apps**, slots 01–06, in `runs/2026-06-07_0608-UTC/`. All built to the iOS Definition of Done (Orbioom design language; SwiftUI 5 + SwiftData; onboarding gate, empty/loading/error/success states, ≥4 feature screens, ≥3 functional Settings prefs, full Dynamic Type / VoiceOver / Reduce Motion, light & dark, designed app icons). Each ships a XcodeGen `project.yml` (run `xcodegen generate`, then open in Xcode 15+).
+**6 production-ready native iOS apps**, slots 01–06, in `runs/2026-06-07_1209-UTC/`. All built to the iOS Definition of Done (Orbioom design language; SwiftUI 5 + SwiftData; onboarding gate, empty/loading/error/success states, ≥4 feature screens, ≥3 functional Settings prefs, full Dynamic Type / VoiceOver / Reduce Motion, light & dark, designed app icons). Each ships a XcodeGen `project.yml` (run `xcodegen generate`, then open in Xcode 15+).
 
 ## The six apps
-- **Links** — built — `01-links` — Golf handicap & round logbook: a real World Handicap System engine (best 8 of 20, Net Double Bogey capping, chronological processing) over a hole-by-hole scorecard, courses/tees, and scoring insights.
-- **Plume** — built — `02-plume` — Birdwatching life list & sightings: a 65-bird catalog, automatic lifer detection, life/year lists in checklist order, trips, and seasonal insights.
-- **Capo** — built — `03-capo` — Chord transposer & setlist manager: a key-aware transposition engine (correct enharmonics, slash chords, Nashville numbers, capo-shape math), a chords-over-lyrics renderer, setlists with per-slot transpose/capo, and a swipeable performance view.
-- **Cone** — built — `04-cone` — Pottery studio: percentage→grams glaze batch scaling, firing ramp schedules with time + energy-cost estimates, an Orton cone-temperature reference + shrinkage calculator, and a piece-stage workflow.
-- **Cog** — built — `05-cog` — Bike maintenance & component wear: a distance+time wear engine that projects replacement dates from ride history, a cross-bike health overview, and a service/spend history.
-- **Vial** — built — `06-vial` — Medication & refill tracker: a dose-schedule engine with today's checklist, supply countdown to a refill-by date, and adherence trends (overall/daily/per-med).
+- **Chains** — built — `01-chains` — Disc-golf scorecard with a transparent SSA-based round-rating engine, courses/holes, a live hole-by-hole scorecard, and rating-trend + trouble-hole insights.
+- **Ledger** — built — `02-ledger` — On-device net-worth and asset-allocation tracker: accounts net to one number, snapshots plot a trend, and an allocation engine shows drift vs targets with exact rebalance amounts.
+- **Static** — built — `03-static` — Freediving apnea trainer that derives CO₂/O₂ tables from your max breath-hold and guides each session with a calm full-screen timer; logs sessions and a personal-best trend.
+- **Cairn** — built — `04-cairn` — Ultralight backpacking pack-weight planner: a reusable gear catalog, pack lists, and a base/total/skin-out/big-three weight breakdown with category and cross-list insights.
+- **Bench** — built — `05-bench` — A pocket electronics lab: seven maker calculators (Ohm's law, resistor colour code, LED dropper, divider, 555 astable, RC filter, battery life) with a saved-calc notebook and a parts inventory.
+- **Gambit** — built — `06-gambit` — A tabletop combat manager: encounters with initiative order, HP and 5e conditions, a reusable bestiary, and a built-in dice roller with advantage/disadvantage and history.
 
 ## Top recommendation
-**Capo.** It has the deepest, most reusable domain logic (a genuine music-theory engine: pitch-class parsing, key-aware enharmonic spelling, Nashville numbers, capo math) wrapped in the most visually distinctive feature — a live chords-over-lyrics chart that transposes as you tap — and serves a large, paying audience (worship/cover/gigging musicians) underserved by clunky or paywalled apps. Strong hook, clear why-now, immediately demoable.
+**Ledger.** It pairs the broadest paying audience (anyone tracking money) with a genuine correctness moat the budgeting-app crowd skips — a real allocation/rebalancing engine (drift in percentage points, exact dollar moves to hit target weights) on top of an honest net-worth time series — and it's emphatically local-first, which is exactly the unmet "privacy, no bank logins" ask in the research. Strong hook, immediately demoable from seeded data.
 
-Runners-up: **Links** (the WHS math is the kind of correctness moat casual apps skip) and **Cog** (a sticky, genuinely useful "before it breaks" tool with daily re-use).
+Runners-up: **Chains** (the rating engine is the kind of math casual disc-golf apps avoid, with a clear devoted audience) and **Bench** (a sticky daily-reuse maker tool whose pure `EE` engine + notebook + parts bin is unusually substantial for a "calculator" app).
 
 ## Self-review
-Anti-stub grep clean across all six. Three parallel by-hand compile-review passes (one per pair of apps) returned no compile errors and no crash paths — SwiftData wiring, iOS 17 API usage, `Picker` tags, `.onChange` two-parameter form, `Layout`/`Canvas`, and division/`.infinity` guards all verified. No Xcode in the sandbox, so correctness is by inspection.
+Anti-stub grep clean across all six (only the standard in-memory `ModelContainer` fallback uses `try!`). A focused compile-review caught and fixed a real, pervasive issue before commit: SwiftUI/Swift Charts `ForEach`/`Chart` ids using **tuple key paths** (`\.0`, `\.category`, `\.offset`, `\.element.id`), which the Swift compiler rejects — all 11 sites were converted to index-based ids or `Identifiable` structs. Remaining checks (SwiftData relationships + `@Query`, two-parameter `onChange`, `SectorMark`/iOS-17 APIs, division/`.infinity`/`isFinite` guards, optional handling on user paths) verified by hand against the iOS 17 SDK. No Xcode in the sandbox, so correctness is by inspection.
 
 ## Research signals worth following next run
-- **Disc golf** scorecard + rating (PDGA-style) — same appetite as ball golf, fewer good native apps.
-- **Net-worth / asset-allocation snapshots** — finance is well-covered for budgeting/debt but a calm allocation+history tracker is open.
-- **Pottery/maker adjacencies** validated: kiln-share scheduling, leatherworking project costing, screen-printing ink mixer all surfaced as niche-but-devoted.
-- **Freediving apnea CO₂/O₂ tables** (distinct from scuba), **chess opening-repertoire trainer**, and a **gig/expense mileage log for musicians** all scored well on substance but were cut for distinctness this run.
+- **Disc golf adjacency confirmed**: a putting-practice tracker and a bag/disc-flight catalog both surfaced as wanted but were cut for distinctness.
+- **Freediving depth/Frenzel/equalisation log** (distinct from the dry-table trainer shipped here) and a **spearfishing catch + dive-conditions log** scored well.
+- **Maker space**: a 3D-print cost/slice-time estimator, a Raspberry-Pi GPIO pinout reference, and a CNC feeds-and-speeds calculator all have devoted audiences.
+- **TTRPG**: a loot/treasure + magic-item generator and a campaign session-notes/NPC tracker are natural companions to Gambit.
+- **Finance**: an FIRE / coast-FIRE projection tool and a simple options-position P&L tracker remain open for a calm, local-first treatment.
