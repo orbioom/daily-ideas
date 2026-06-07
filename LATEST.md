@@ -1,33 +1,57 @@
 # Orbioom Daily Ideas — Latest Run
 
-**Run:** 2026-06-06_1807-UTC
-**Folder:** `runs/2026-06-06_1807-UTC/`
-**Output:** 6 production-ready native iOS apps (SwiftUI 5, iOS 17+, SwiftData), all Orbioom design language.
+**Run:** 2026-06-07_0010-UTC
+**Folder:** `runs/2026-06-07_0010-UTC/`
+**Output:** 6 production-ready native iOS apps (SwiftUI 5, iOS 17+, SwiftData), all Orbioom design language with distinct per-app accents.
 
-Each app ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), a real 1024² on-brand `AppIcon`, `AccentColor`, launch screen, onboarding gate, ≥4 substantive feature screens, a Settings screen with ≥3 persisted prefs, empty/loading/success/error states, light + dark, Dynamic Type, VoiceOver, Reduce Motion, and haptics. Build locally: `brew install xcodegen` → `cd <app>/ios && xcodegen generate` → open in Xcode 15+ → Cmd+R.
+Each app ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), a real 1024² on-brand `AppIcon`, `AccentColor`, launch screen, onboarding gate, ≥4 substantive feature screens, a Settings screen with ≥3 persisted prefs, empty/loading/success/error states, light + dark, Dynamic Type, VoiceOver, Reduce Motion, and gated haptics. Build locally: `brew install xcodegen` → `cd <app>/ios && xcodegen generate` → open in Xcode 15+ → Cmd+R.
 
 ## The six apps
 
-- **Beacon** — built — `runs/2026-06-06_1807-UTC/01-beacon` — amateur radio QSO logbook: Maidenhead grid encode/decode with great-circle distance & bearing, POTA/SOTA outings that own contacts (with activation targets), band/mode/grid insights, and a standalone grid calculator with a compass rose.
-- **Spool** — built — `runs/2026-06-06_1807-UTC/02-spool` — 3D-printing filament & print tracker: spools track grams/length remaining, logging a print deducts material and computes filament + electricity cost, a mass↔length calculator from real densities, printers, low-stock alerts, and spend insights.
-- **Stride** — built — `runs/2026-06-06_1807-UTC/03-stride` — running paces & race calculator + log: Riegel race prediction, Daniels VDOT training paces, an even/negative-split race planner, and a run log with weekly mileage and a 14-day chart — all driven by one shared benchmark.
-- **Apiary** — built — `runs/2026-06-06_1807-UTC/04-apiary` — beekeeping hive log: apiaries → hives → inspections/treatments/harvests, queen-marking colors, a colony-health read, swarm risk, the ~3% varroa threshold, treatment remove-by windows, a Tasks aggregator, and mite/honey charts.
-- **Jigger** — built — `runs/2026-06-06_1807-UTC/05-jigger` — home-bar "what can I make" matcher: your shelf vs every recipe, a match engine that finds makeable / one-away drinks and ranks the single bottle that unlocks the most cocktails, plus a servings scaler.
-- **Curfew** — built — `runs/2026-06-06_1807-UTC/06-curfew` — caffeine half-life & sleep tracker: a first-order decay engine (live level, 24-hour curve, time-to-threshold, and an inverted "last safe time" solver), a drink catalog with quick-add, daily-log charts, and a bedtime curfew calculator.
+- **Oche** — built — `runs/2026-06-07_0010-UTC/01-oche` — a calm darts companion: a pure checkout engine that solves any 2–170 finish on a double (with bogey-number detection and a full 170→2 chart), match logging leg-by-leg into three-dart average / checkout % / best leg, and a live double-practice mode that surfaces the finish you keep missing.
+- **Caliber** — built — `runs/2026-06-07_0010-UTC/02-caliber` — a mechanical-watch accuracy log: a least-squares regression of your timing readings into a true daily rate, a per-position breakdown (a timegrapher built from the wrist), COSC-style grading, drift projection, and service-due tracking across the collection.
+- **Tilth** — built — `runs/2026-06-07_0010-UTC/03-tilth` — a frost-date succession garden planner: your two frost dates drive every sow / transplant / harvest / last-safe-sow date and a guarded succession series; beds own plantings with a status flow, and a harvest-by-month forecast.
+- **Riffle** — built — `runs/2026-06-07_0010-UTC/04-riffle` — a fly-tying and fishing log: patterns own their tying recipes and box stock, catches log conditions and the fly that worked, and a hatch chart matches what's emerging this month to the flies in your box by type and hook size.
+- **Zenith** — built — `runs/2026-06-07_0010-UTC/05-zenith` — a telescope optics companion: magnification / true field / exit pupil for any scope-and-eyepiece combination, per-scope resolving power and limiting magnitude, an observing log, and a seasonal target list with a framing-aware eyepiece recommender.
+- **Plateau** — built — `runs/2026-06-07_0010-UTC/06-plateau` — a sous-vide companion that times a cook from first principles: a Heisler heat-equation come-up time plus a D/z pasteurization hold, a relaunch-safe countdown timer, a doneness/pasteurization guide, and a cook log.
 
 ## Top recommendation
 
-**Curfew.** It pairs the broadest possible audience (anyone who drinks coffee and cares about sleep) with a genuinely non-trivial, correct engine — first-order pharmacokinetics that not only sums the decay of every dose but *inverts* it to answer the question people actually have ("how late can I have this?"). The live "in your system now" number and the bedtime curve make an invisible thing legible. Runner-up: **Jigger**, whose unlock-ranked shopping list ("buy this one bottle → make N more drinks") is a delightful, sticky hook on top of a real set-matching engine.
+**Plateau.** It's the strongest mix of a genuinely hard, correct engine and an
+everyday hook. The come-up time is a real one-term transient-conduction solution
+(shape-aware, calibrated to Baldwin's water-bath tables) and the safety hold is a
+real D/z thermal-death-time model — yet the surface is a single number every
+sous-vide cook actually wants ("how long, minimum?"), wrapped in a timer that
+survives a relaunch. Runner-up: **Caliber**, whose least-squares daily-rate and
+positional analysis turn a watch enthusiast's scattered readings into a clean,
+chartable answer that no free app does calmly.
 
 ## Research signals worth following next run
 
-- **r/somebodymakethis / somebodymakethis.org** continues to be a live, upvoted feed of unmet app needs — a strong source for the next batch.
-- **Offline-first, one-time-purchase, "your data never leaves the phone" framing is still the dominant ask** in 2026 roundups (LocalOneLabs, VoiceScriber, MainlandMoment). Every app this run leans into it.
-- **Validated hobby/profession verticals still without a calm offline app:** ham radio (built Beacon), 3D printing (built Spool), beekeeping (built Apiary) — remaining: pottery/kiln firing schedules + glaze recipes, fly-tying/fishing logs, ham-radio *contesting* scoring, model-paint inventory (Warhammer), leathercraft, sailing passage/sail-trim logs, disc-golf scorecards with handicap, darts checkout trainer, tarot/journaling.
-- **"A calculator that's actually a tool" keeps working** (this run: Maidenhead geodesy, filament density math, VDOT/Riegel, varroa thresholds, cocktail set-cover, caffeine pharmacokinetics). Pick a domain where practitioners do real math by hand and make it calm and offline.
+- **Validated hobby/profession verticals still without a calm offline app** (after
+  this run took darts, watch-accuracy, frost-succession gardening, fly-fishing,
+  visual astronomy, and sous-vide): pottery is *served* (Glaizit, Pottery Notes), so
+  skip it; remaining strong gaps are leathercraft project/leather-yield planning,
+  model-paint inventory (Warhammer ranges), darts *contesting*/checkout already done
+  so pivot to **archery sight-tape interpolation**, **disc-golf handicap scorecards**,
+  **sailing rule-of-twelfths tide + passage timing**, **cycling gear-inch/Q-factor +
+  component wear log**, and **fountain-pen/ink pairing inventory**.
+- **"A calculator that's actually a tool" keeps over-delivering** — every standout
+  this run is a domain where practitioners do real math by hand (checkout set-cover,
+  least-squares rate, frost-relative date algebra, optics, heat equation). Pick a
+  field with hand-math and make it calm.
+- **Persisted, relaunch-safe live timers** (Plateau's countdown computed from a
+  stored start date) are a reusable pattern worth carrying forward to any
+  cook/brew/interval domain.
 
 ## Notes
 
-- All math engines are pure value types (`GridMath`, `CostMath`, `PaceMath`, `BeeLogic`, `MatchEngine`, `CaffeineMath`) — testable and off the view layer.
-- The only `try!` in any app is the in-memory `ModelContainer` bootstrap fallback in each `@main` — not a user path. No `TODO`/stub markers; anti-stub grep clean. The single guarded force-unwrap was refactored away.
-- A shared, copied-per-app theme (`Theme/Brand.swift`) and `Utilities/Haptics.swift` keep the Orbioom language consistent across all six; new icon glyphs (signal, spool, hexcomb, glass, moon, track) were added to the deterministic stdlib icon generator.
+- All engines are pure value types off the view layer — `CheckoutEngine`, `RateEngine`,
+  `FrostMath`, `RiffleLogic`/`Optics`, `PlateauMath` — so they're independently
+  testable.
+- The icon generator gained six new glyphs (dart, dial, sprout, fly, scope, thermo)
+  in `_tools/make_icon.py`; each app has its own accent glow (green, brass, green,
+  water-blue, indigo, amber) over the shared mist→ink orb ground.
+- The only `try!` in any app is the in-memory `ModelContainer` bootstrap fallback in
+  each `@main` — not a user path. No force-unwraps on user paths; anti-stub grep
+  clean across all 103 Swift files.
