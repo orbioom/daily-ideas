@@ -1,26 +1,25 @@
-# Latest run — 2026-06-07_1209-UTC
+# Latest Run — 2026-06-07 1809 UTC
 
-**6 production-ready native iOS apps**, slots 01–06, in `runs/2026-06-07_1209-UTC/`. All built to the iOS Definition of Done (Orbioom design language; SwiftUI 5 + SwiftData; onboarding gate, empty/loading/error/success states, ≥4 feature screens, ≥3 functional Settings prefs, full Dynamic Type / VoiceOver / Reduce Motion, light & dark, designed app icons). Each ships a XcodeGen `project.yml` (run `xcodegen generate`, then open in Xcode 15+).
+Folder: `runs/2026-06-07_1809-UTC/` — 6 production-ready native iOS apps, slots 01–06, all built. All Orbioom design language, all SwiftUI + SwiftData (iOS 17), no external dependencies, no accounts, fully on-device. Each ships a XcodeGen `project.yml` (run `xcodegen generate`, then open in Xcode 15+).
 
 ## The six apps
-- **Chains** — built — `01-chains` — Disc-golf scorecard with a transparent SSA-based round-rating engine, courses/holes, a live hole-by-hole scorecard, and rating-trend + trouble-hole insights.
-- **Ledger** — built — `02-ledger` — On-device net-worth and asset-allocation tracker: accounts net to one number, snapshots plot a trend, and an allocation engine shows drift vs targets with exact rebalance amounts.
-- **Static** — built — `03-static` — Freediving apnea trainer that derives CO₂/O₂ tables from your max breath-hold and guides each session with a calm full-screen timer; logs sessions and a personal-best trend.
-- **Cairn** — built — `04-cairn` — Ultralight backpacking pack-weight planner: a reusable gear catalog, pack lists, and a base/total/skin-out/big-three weight breakdown with category and cross-list insights.
-- **Bench** — built — `05-bench` — A pocket electronics lab: seven maker calculators (Ohm's law, resistor colour code, LED dropper, divider, 555 astable, RC filter, battery life) with a saved-calc notebook and a parts inventory.
-- **Gambit** — built — `06-gambit` — A tabletop combat manager: encounters with initiative order, HP and 5e conditions, a reusable bestiary, and a built-in dice roller with advantage/disadvantage and history.
+
+- **Datum** — built — `runs/2026-06-07_1809-UTC/01-datum` — Aircraft weight & balance planner: build an aircraft (empty weight/arm, loading stations, CG envelope, fuel) and each flight shows total weight, CG and in/out-of-envelope status at ramp/takeoff/landing/zero-fuel, with a plotted CG envelope chart + density-altitude tool.
+- **Ramp** — built — `runs/2026-06-07_1809-UTC/02-ramp` — Cycling training-load tracker: every ride → TSS, building Fitness (CTL) / Fatigue (ATL) / Form (TSB) on a TrainingPeaks-style Performance Management Chart, plus FTP history, Coggan power zones and W/kg — fully offline, no Strava.
+- **Apogee** — built — `runs/2026-06-07_1809-UTC/03-apogee` — Model-rocketry flight planner & logbook: pick a rocket + a real catalog motor → predicted altitude, max velocity, recommended ejection delay, thrust-to-weight and caliber stability margin (two-phase drag sim), then log predicted-vs-actual flights.
+- **Reserve** — built — `runs/2026-06-07_1809-UTC/04-reserve` — Off-grid power budget planner for vanlife/RV/boat/cabin: loads → daily Wh/Ah, days of autonomy, solar harvest, net surplus/deficit, recharge time, inverter headroom, plus a battery/solar sizing recommender and appliance catalog.
+- **Gauge** — built — `runs/2026-06-07_1809-UTC/05-gauge` — String tension calculator for guitarists/bassists/luthiers: per-string and total neck tension from gauge/material/tuning/scale-length, set balance, a set + tuning library, and a forward/reverse (suggested-gauge) calculator.
+- **Latent** — built — `runs/2026-06-07_1809-UTC/06-latent` — Darkroom film-development companion: recipes + chemistry temperature + push/pull → adjusted dev time, then a calm relaunch-safe multi-phase process timer (dev/stop/fix/wash) with agitation cues, plus a session log and film/developer catalog.
 
 ## Top recommendation
-**Ledger.** It pairs the broadest paying audience (anyone tracking money) with a genuine correctness moat the budgeting-app crowd skips — a real allocation/rebalancing engine (drift in percentage points, exact dollar moves to hit target weights) on top of an honest net-worth time series — and it's emphatically local-first, which is exactly the unmet "privacy, no bank logins" ask in the research. Strong hook, immediately demoable from seeded data.
 
-Runners-up: **Chains** (the rating engine is the kind of math casual disc-golf apps avoid, with a clear devoted audience) and **Bench** (a sticky daily-reuse maker tool whose pure `EE` engine + notebook + parts bin is unusually substantial for a "calculator" app).
-
-## Self-review
-Anti-stub grep clean across all six (only the standard in-memory `ModelContainer` fallback uses `try!`). A focused compile-review caught and fixed a real, pervasive issue before commit: SwiftUI/Swift Charts `ForEach`/`Chart` ids using **tuple key paths** (`\.0`, `\.category`, `\.offset`, `\.element.id`), which the Swift compiler rejects — all 11 sites were converted to index-based ids or `Identifiable` structs. Remaining checks (SwiftData relationships + `@Query`, two-parameter `onChange`, `SectorMark`/iOS-17 APIs, division/`.infinity`/`isFinite` guards, optional handling on user paths) verified by hand against the iOS 17 SDK. No Xcode in the sandbox, so correctness is by inspection.
+**Ramp.** It hits the strongest combination of a passionate, paying audience (data-driven cyclists/triathletes) and a genuine unmet need: the TrainingPeaks PMC (CTL/ATL/TSB) is the metric people care about most, yet getting it without a subscription or a Strava round-trip is painful. The engine (TSS → exponentially-weighted fitness/fatigue/form, power zones, W/kg) is real sports science, the Performance Management Chart is a strong Swift Charts showpiece, and the whole thing is on-device and free. **Datum** is the close runner-up — pilots already pay $10+ for W&B apps, and a calm, correct, offline one with a proper envelope plot is immediately useful and safety-relevant.
 
 ## Research signals worth following next run
-- **Disc golf adjacency confirmed**: a putting-practice tracker and a bag/disc-flight catalog both surfaced as wanted but were cut for distinctness.
-- **Freediving depth/Frenzel/equalisation log** (distinct from the dry-table trainer shipped here) and a **spearfishing catch + dive-conditions log** scored well.
-- **Maker space**: a 3D-print cost/slice-time estimator, a Raspberry-Pi GPIO pinout reference, and a CNC feeds-and-speeds calculator all have devoted audiences.
-- **TTRPG**: a loot/treasure + magic-item generator and a campaign session-notes/NPC tracker are natural companions to Gambit.
-- **Finance**: an FIRE / coast-FIRE projection tool and a simple options-position P&L tracker remain open for a calm, local-first treatment.
+
+- **Aviation adjacent:** pilots also ask for a clean offline E6B flight computer (wind triangle, true airspeed, density altitude, fuel) and a VFR fuel/endurance planner — distinct from Datum's W&B records angle.
+- **Endurance training:** running/triathlon equivalents of Ramp (rTSS/hrTSS), and a "taper planner" that projects TSB to a target race date, are frequently requested.
+- **Off-grid/maker:** electrician NEC helpers (voltage drop over distance, conduit fill, wire ampacity) are a different professional audience from Reserve's energy budgeting.
+- **Analog photo:** a reciprocity-failure + long-exposure calculator, and a darkroom print-exposure / test-strip timer, would pair naturally with Latent.
+- **Music/luthier:** a fret-position / intonation & compensation calculator and a multiscale (fanned-fret) layout tool extend Gauge's physics into adjacent niches.
+- **General:** hobby logbook+engine apps for a specific passionate niche remain the most reliable "download, keep, pay for" shape — the constraint is finding domains with real math not yet in SHIPPED.md.
