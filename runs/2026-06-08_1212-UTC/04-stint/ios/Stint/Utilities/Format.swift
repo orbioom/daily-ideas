@@ -36,6 +36,13 @@ enum Format {
         return f
     }()
 
+    static let shortTime: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .none
+        f.timeStyle = .short
+        return f
+    }()
+
     // MARK: - Ordinal
 
     static func ordinal(_ n: Int) -> String {
