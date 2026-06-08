@@ -156,6 +156,54 @@ def make_icon(path):
         d.ellipse([cx-90, cy-280, cx+330, cy+180], fill=(top[0],top[1],top[2],255))
         for (sx,sy,sr) in [(cx-300,cy-200,18),(cx-240,cy+220,12),(cx+250,cy+250,16),(cx+300,cy-120,10)]:
             d.ellipse([sx-sr,sy-sr,sx+sr,sy+sr], fill=(green[0],green[1],green[2],255))
+    elif motif == "book":  # journal — open book with a ribbon bookmark
+        # two facing pages with a spine gap
+        d.polygon([(cx,cy-210),(cx-330,cy-150),(cx-330,cy+240),(cx,cy+200)], fill=light)
+        d.polygon([(cx,cy-210),(cx+330,cy-150),(cx+330,cy+240),(cx,cy+200)], fill=silver)
+        d.line([(cx,cy-205),(cx,cy+200)], fill=(top[0],top[1],top[2],255), width=12)
+        for k in range(1,5):  # text lines on left page
+            yy = cy-110 + k*64
+            d.line([(cx-280,yy),(cx-40,yy-26)], fill=(top[0],top[1],top[2],150), width=12)
+        # green ribbon bookmark
+        d.polygon([(cx+150,cy-180),(cx+200,cy-180),(cx+175,cy+90),(cx+150,cy+50),(cx+200,cy+50)],
+                  fill=(green[0],green[1],green[2],255))
+    elif motif == "pin":  # travel — map pin (teardrop) with hole + dashed path
+        d.ellipse([cx-160, cy-260, cx+160, cy+60], fill=light)
+        d.polygon([(cx-150,cy-30),(cx+150,cy-30),(cx,cy+250)], fill=light)
+        d.ellipse([cx-70, cy-170, cx+70, cy-30], fill=(top[0],top[1],top[2],255))
+        d.ellipse([cx-34, cy-134, cx+34, cy-66], fill=(green[0],green[1],green[2],255))
+        for k in range(5):  # dashed path curving away
+            ang = math.radians(20 + k*16)
+            bx = cx + 120 + k*46
+            by = cy + 200 - k*8
+            d.ellipse([bx-12,by-12,bx+12,by+12], fill=(silver[0],silver[1],silver[2],200))
+    elif motif == "clock":  # time tracker — clock face with hands, green tick
+        bb = [cx-250, cy-250, cx+250, cy+250]
+        d.ellipse(bb, outline=light, width=34)
+        for k in range(12):
+            a = math.radians(k*30)
+            x1 = cx + 200*math.cos(a); y1 = cy + 200*math.sin(a)
+            x2 = cx + 230*math.cos(a); y2 = cy + 230*math.sin(a)
+            d.line([(x1,y1),(x2,y2)], fill=(silver[0],silver[1],silver[2],220), width=12)
+        d.line([(cx,cy),(cx, cy-150)], fill=light, width=24)  # minute
+        d.line([(cx,cy),(cx+110, cy+40)], fill=(green[0],green[1],green[2],255), width=24)  # hour
+        d.ellipse([cx-22,cy-22,cx+22,cy+22], fill=light)
+    elif motif == "hanger":  # wardrobe — clothes hanger
+        # hook
+        d.arc([cx-50, cy-260, cx+50, cy-160], 200, 360, fill=silver, width=22)
+        d.line([(cx,cy-160),(cx,cy-90)], fill=silver, width=22)
+        # triangle bar
+        d.line([(cx,cy-90),(cx-300,cy+90)], fill=light, width=34, joint="curve")
+        d.line([(cx,cy-90),(cx+300,cy+90)], fill=light, width=34, joint="curve")
+        d.line([(cx-300,cy+90),(cx+300,cy+90)], fill=(green[0],green[1],green[2],255), width=34)
+    elif motif == "pan":  # recipe — frying pan from above with handle
+        d.ellipse([cx-250, cy-250, cx+250, cy+250], outline=light, width=40)
+        d.ellipse([cx-180, cy-180, cx+180, cy+180], fill=(top[0],top[1],top[2],255))
+        # handle to the upper-right
+        d.line([(cx+200,cy-200),(cx+360,cy-360)], fill=silver, width=46)
+        # three "ingredients" dots inside
+        for (ox,oy,c) in [(-70,-30,light),(70,-50,silver),(0,70,(green[0],green[1],green[2],255))]:
+            d.ellipse([cx+ox-44, cy+oy-44, cx+ox+44, cy+oy+44], fill=c)
 
     img = img.filter(ImageFilter.GaussianBlur(0.4))
     img = img.convert("RGBA")
