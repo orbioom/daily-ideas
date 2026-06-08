@@ -204,6 +204,30 @@ def make_icon(path):
         # three "ingredients" dots inside
         for (ox,oy,c) in [(-70,-30,light),(70,-50,silver),(0,70,(green[0],green[1],green[2],255))]:
             d.ellipse([cx+ox-44, cy+oy-44, cx+ox+44, cy+oy+44], fill=c)
+    elif motif == "board":  # day planner — vertical timeline rail with stacked blocks
+        railx = cx - 250
+        d.line([(railx, cy-300),(railx, cy+300)], fill=(silver[0],silver[1],silver[2],220), width=10)
+        blocks = [(-260, 150, light), (-70, 110, silver), (70, 170, (green[0],green[1],green[2],255))]
+        for (oy, h, c) in blocks:
+            y0 = cy + oy
+            d.ellipse([railx-26, y0+h/2-26, railx+26, y0+h/2+26], fill=c)
+            d.rounded_rectangle([railx+70, y0, railx+520, y0+h], radius=34, fill=c)
+    elif motif == "bump":  # pregnancy — mother curve with a baby orbit dot
+        d.arc([cx-300, cy-300, cx+300, cy+300], 40, 320, fill=light, width=34)
+        d.ellipse([cx-150, cy-30, cx+230, cy+350], outline=silver, width=30)
+        d.ellipse([cx+20, cy+90, cx+150, cy+220], fill=(green[0],green[1],green[2],255))
+    elif motif == "gauge":  # car — speedometer arc with needle
+        bb = [cx-260, cy-260, cx+260, cy+260]
+        d.arc(bb, 150, 390, fill=silver, width=40)
+        d.arc(bb, 150, 250, fill=light, width=40)
+        d.arc(bb, 250, 300, fill=(green[0],green[1],green[2],255), width=40)
+        ang = math.radians(285)
+        d.line([(cx, cy),(cx+230*math.cos(ang), cy+230*math.sin(ang))], fill=light, width=22)
+        d.ellipse([cx-30, cy-30, cx+30, cy+30], fill=light)
+    elif motif == "rings":  # wedding — two interlocking bands, one luminous green
+        d.ellipse([cx-300, cy-130, cx-20, cy+150], outline=light, width=40)
+        d.ellipse([cx+20, cy-130, cx+300, cy+150], outline=(green[0],green[1],green[2],255), width=40)
+        d.ellipse([cx-150, cy-300, cx-90, cy-240], fill=(light[0],light[1],light[2],255))
 
     img = img.filter(ImageFilter.GaussianBlur(0.4))
     img = img.convert("RGBA")
