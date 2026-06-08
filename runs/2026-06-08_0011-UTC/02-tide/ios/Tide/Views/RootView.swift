@@ -1,0 +1,39 @@
+import SwiftUI
+import SwiftData
+
+struct RootView: View {
+    @Environment(\.modelContext) private var context
+    @AppStorage("tide.onboarded") private var onboarded = false
+    @AppStorage("tide.haptics") private var haptics = true
+
+    var body: some View {
+        ZStack {
+            if onboarded {
+                MainTabs()
+            } else {
+                OnboardingView(done: Binding(get: { onboarded }, set: { onboarded = $0 }))
+            }
+        }
+        .tint(Brand.text)
+        .task { Activity.ensureDefaults(in: context) }
+        .onAppear { Haptics.enabled = haptics }
+        .onChange(of: haptics) { _, v in Haptics.enabled = v }
+    }
+}
+
+struct MainTabs: View {
+    var body: some View {
+        TabView {
+            LogView()
+                .tabItem { Label("Log", systemImage: "cloud.sun.fill") }
+            CalendarView()
+                .tabItem { Label("Calendar", systemImage: "calendar") }
+            InsightsView()
+                .tabItem { Label("Insights", systemImage: "chart.xyaxis.line") }
+            ActivitiesView()
+                .tabItem { Label("Activities", systemImage: "tag.fill") }
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+        }
+    }
+}
