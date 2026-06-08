@@ -101,6 +101,61 @@ def make_icon(path):
         d.ellipse([cx-130, cy-270, cx+330, cy+210], fill=(int((top[0]+bot[0])/2),int((top[1]+bot[1])/2),int((top[2]+bot[2])/2),255))
         # small accent dot (ovulation)
         d.ellipse([cx-210, cy+150, cx-150, cy+210], fill=(green[0],green[1],green[2],255))
+    elif motif == "check":  # habit — calendar grid of completion squares, last one lit green
+        cols, rows = 4, 4
+        gap = 40; cell = 150
+        gw = cols*cell + (cols-1)*gap
+        ox = cx - gw/2; oy = cy - (rows*cell + (rows-1)*gap)/2
+        lit = {(0,0),(1,0),(2,0),(0,1),(2,1),(3,1),(1,2),(2,2),(0,3),(1,3),(2,3),(3,3)}
+        for r in range(rows):
+            for c in range(cols):
+                x0 = ox + c*(cell+gap); y0 = oy + r*(cell+gap)
+                last = (c==cols-1 and r==rows-1)
+                if last:
+                    fill = (green[0],green[1],green[2],255)
+                elif (c,r) in lit:
+                    fill = light
+                else:
+                    fill = (light[0],light[1],light[2],55)
+                d.rounded_rectangle([x0,y0,x0+cell,y0+cell], radius=34, fill=fill)
+    elif motif == "dawn":  # sobriety — rising sun over horizon with rays
+        horizon = cy + 150
+        d.ellipse([cx-150, horizon-150, cx+150, horizon+150], fill=(green[0],green[1],green[2],255))
+        for k in range(8):
+            a = math.radians(180 + k*(180/7))
+            x1 = cx + 200*math.cos(a); y1 = horizon + 200*math.sin(a)
+            x2 = cx + 300*math.cos(a); y2 = horizon + 300*math.sin(a)
+            d.line([(x1,y1),(x2,y2)], fill=light, width=22)
+        d.rectangle([0, horizon, S, S], fill=(top[0],top[1],top[2],255))
+        d.line([(cx-360,horizon),(cx+360,horizon)], fill=silver, width=16)
+    elif motif == "leaf":  # plant — single leaf with central vein + water drop
+        pts = []
+        for i in range(0,101):
+            t = i/100.0
+            w = 230*math.sin(math.pi*t)
+            y = cy-300 + t*600
+            pts.append((cx-w, y))
+        for i in range(100,-1,-1):
+            t = i/100.0
+            w = 230*math.sin(math.pi*t)
+            y = cy-300 + t*600
+            pts.append((cx+w, y))
+        d.polygon(pts, fill=(green[0],green[1],green[2],255))
+        d.line([(cx,cy-280),(cx,cy+280)], fill=(light[0],light[1],light[2],230), width=14)
+        for s in range(1,5):
+            yy = cy-280 + s*110
+            d.line([(cx,yy),(cx+70, yy-50)], fill=(light[0],light[1],light[2],180), width=9)
+            d.line([(cx,yy),(cx-70, yy-50)], fill=(light[0],light[1],light[2],180), width=9)
+    elif motif == "drop":  # baby — soft droplet/teardrop with highlight
+        d.ellipse([cx-200, cy-100, cx+200, cy+300], fill=light)
+        d.polygon([(cx,cy-320),(cx-150,cy+60),(cx+150,cy+60)], fill=light)
+        d.ellipse([cx-150, cy-30, cx+250, cy+370], fill=(top[0],top[1],top[2],0))
+        d.ellipse([cx+40, cy+90, cx+130, cy+180], fill=(green[0],green[1],green[2],255))
+    elif motif == "night":  # sleep — crescent moon + stars
+        d.ellipse([cx-230, cy-230, cx+230, cy+230], fill=light)
+        d.ellipse([cx-90, cy-280, cx+330, cy+180], fill=(top[0],top[1],top[2],255))
+        for (sx,sy,sr) in [(cx-300,cy-200,18),(cx-240,cy+220,12),(cx+250,cy+250,16),(cx+300,cy-120,10)]:
+            d.ellipse([sx-sr,sy-sr,sx+sr,sy+sr], fill=(green[0],green[1],green[2],255))
 
     img = img.filter(ImageFilter.GaussianBlur(0.4))
     img = img.convert("RGBA")
