@@ -228,6 +228,38 @@ def make_icon(path):
         d.ellipse([cx-300, cy-130, cx-20, cy+150], outline=light, width=40)
         d.ellipse([cx+20, cy-130, cx+300, cy+150], outline=(green[0],green[1],green[2],255), width=40)
         d.ellipse([cx-150, cy-300, cx-90, cy-240], fill=(light[0],light[1],light[2],255))
+    elif motif == "stretch":  # mobility — a limber bending limb with joints + motion arc
+        d.line([(cx-230,cy+250),(cx-120,cy-30)], fill=light, width=40, joint="curve")
+        d.line([(cx-120,cy-30),(cx+220,cy-180)], fill=light, width=40, joint="curve")
+        for (px_,py_,c) in [(cx-230,cy+250,silver),(cx-120,cy-30,(green[0],green[1],green[2],255)),(cx+220,cy-180,light)]:
+            d.ellipse([px_-44,py_-44,px_+44,py_+44], fill=c)
+        d.arc([cx-60, cy-180, cx+300, cy+120], 200, 320, fill=(silver[0],silver[1],silver[2],180), width=16)
+    elif motif == "paw":  # pet — paw print, one toe luminous
+        d.ellipse([cx-150, cy-30, cx+150, cy+250], fill=light)  # main pad
+        for (ox,oy,c) in [(-180,-120,light),(-60,-220,light),(70,-220,(green[0],green[1],green[2],255)),(190,-120,light)]:
+            d.ellipse([cx+ox-70, cy+oy-70, cx+ox+70, cy+oy+70], fill=c)
+    elif motif == "target":  # savings goal — concentric target, center luminous
+        for i,r in enumerate([300, 210, 120]):
+            col = light if i % 2 == 0 else silver
+            d.ellipse([cx-r,cy-r,cx+r,cy+r], outline=col, width=36)
+        d.ellipse([cx-56,cy-56,cx+56,cy+56], fill=(green[0],green[1],green[2],255))
+    elif motif == "candle":  # trading — candlesticks with wicks
+        for (ox, top_off, h, c) in [(-260,-40,200,silver),(-90,-150,250,(green[0],green[1],green[2],255)),(90,10,150,light),(250,-90,210,silver)]:
+            bx = cx + ox
+            d.line([(bx, cy+top_off-70),(bx, cy+top_off+h+70)], fill=c, width=14)
+            d.rounded_rectangle([bx-46, cy+top_off, bx+46, cy+top_off+h], radius=16, fill=c)
+    elif motif == "sprout":  # chores/kids — a seedling with reward star
+        d.line([(cx, cy+260),(cx, cy-40)], fill=silver, width=30)
+        d.ellipse([cx-230, cy-30, cx-10, cy+150], fill=(green[0],green[1],green[2],255))
+        d.ellipse([cx+10, cy-90, cx+230, cy+90], fill=light)
+        sx, sy, sr = cx, cy-160, 84
+        d.polygon([(sx,sy-sr),(sx+sr*0.32,sy-sr*0.32),(sx+sr,sy),(sx+sr*0.32,sy+sr*0.32),
+                   (sx,sy+sr),(sx-sr*0.32,sy+sr*0.32),(sx-sr,sy),(sx-sr*0.32,sy-sr*0.32)], fill=light)
+    elif motif == "people":  # personal CRM — overlapping people, centre luminous
+        for (ox, c) in [(-150, silver),(150, light),(0, (green[0],green[1],green[2],255))]:
+            hx_ = cx+ox; hy = cy-110
+            d.pieslice([hx_-150, hy+40, hx_+150, hy+360], 180, 360, fill=c)
+            d.ellipse([hx_-80, hy-80, hx_+80, hy+80], fill=c)
 
     img = img.filter(ImageFilter.GaussianBlur(0.4))
     img = img.convert("RGBA")
