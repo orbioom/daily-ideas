@@ -260,6 +260,30 @@ def make_icon(path):
             hx_ = cx+ox; hy = cy-110
             d.pieslice([hx_-150, hy+40, hx_+150, hy+360], 180, 360, fill=c)
             d.ellipse([hx_-80, hy-80, hx_+80, hy+80], fill=c)
+    elif motif == "flame":  # challenge — a rising flame with an inner luminous core
+        outer = [(cx, cy-320),(cx+190, cy-60),(cx+150, cy+170),(cx, cy+300),
+                 (cx-150, cy+170),(cx-190, cy-60)]
+        d.polygon(outer, fill=light)
+        inner = [(cx, cy-150),(cx+110, cy+40),(cx+70, cy+190),(cx, cy+250),
+                 (cx-70, cy+190),(cx-110, cy+40)]
+        d.polygon(inner, fill=(green[0],green[1],green[2],255))
+    elif motif == "gift":  # gifting — a wrapped present with bow + ribbon
+        d.rounded_rectangle([cx-250, cy-110, cx+250, cy+270], radius=30, fill=light)
+        d.rectangle([cx-40, cy-110, cx+40, cy+270], fill=(green[0],green[1],green[2],255))  # vertical ribbon
+        d.rectangle([cx-250, cy+50, cx+250, cy+130], fill=(green[0],green[1],green[2],255))  # horizontal ribbon
+        # bow loops
+        d.ellipse([cx-150, cy-230, cx-10, cy-90], outline=(green[0],green[1],green[2],255), width=34)
+        d.ellipse([cx+10, cy-230, cx+150, cy-90], outline=(green[0],green[1],green[2],255), width=34)
+        d.ellipse([cx-34, cy-170, cx+34, cy-102], fill=silver)
+    elif motif == "cube":  # home inventory — isometric box/cube, one face luminous
+        # top face
+        d.polygon([(cx, cy-260),(cx+260, cy-110),(cx, cy+40),(cx-260, cy-110)], fill=light)
+        # left face
+        d.polygon([(cx-260, cy-110),(cx, cy+40),(cx, cy+320),(cx-260, cy+170)], fill=silver)
+        # right face (luminous)
+        d.polygon([(cx+260, cy-110),(cx, cy+40),(cx, cy+320),(cx+260, cy+170)],
+                  fill=(green[0],green[1],green[2],255))
+        d.line([(cx, cy+40),(cx, cy+320)], fill=(top[0],top[1],top[2],180), width=8)
 
     img = img.filter(ImageFilter.GaussianBlur(0.4))
     img = img.convert("RGBA")
