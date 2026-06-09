@@ -284,6 +284,69 @@ def make_icon(path):
         d.polygon([(cx+260, cy-110),(cx, cy+40),(cx, cy+320),(cx+260, cy+170)],
                   fill=(green[0],green[1],green[2],255))
         d.line([(cx, cy+40),(cx, cy+320)], fill=(top[0],top[1],top[2],180), width=8)
+    elif motif == "dumbbell":  # workouts — a dumbbell at a slight angle, one weight luminous
+        # bar
+        d.line([(cx-300, cy+120),(cx+300, cy-120)], fill=silver, width=44)
+        # plates at each end (rounded rects); right end luminous
+        d.rounded_rectangle([cx-330, cy+70, cx-250, cy+210], radius=24, fill=light)
+        d.rounded_rectangle([cx-280, cy+30, cx-200, cy+170], radius=24, fill=silver)
+        d.rounded_rectangle([cx+250, cy-210, cx+330, cy-70], radius=24, fill=(green[0],green[1],green[2],255))
+        d.rounded_rectangle([cx+200, cy-170, cx+280, cy-30], radius=24, fill=light)
+    elif motif == "racket":  # racket sports — a paddle/racket with a luminous ball
+        # handle
+        d.line([(cx-30, cy+300),(cx-30, cy+120)], fill=silver, width=40)
+        # head (oval)
+        d.ellipse([cx-200, cy-280, cx+140, cy+140], outline=light, width=40)
+        # strings
+        for k in range(-2, 3):
+            d.line([(cx-30+k*55, cy-250),(cx-30+k*55, cy+110)], fill=(light[0],light[1],light[2],120), width=8)
+        for k in range(-2, 3):
+            d.line([(cx-170, cy-70+k*55),(cx+110, cy-70+k*55)], fill=(light[0],light[1],light[2],120), width=8)
+        # ball
+        d.ellipse([cx+150, cy-240, cx+300, cy-90], fill=(green[0],green[1],green[2],255))
+    elif motif == "heart":  # vitals — a heart outline with a pulse line through it
+        # heart shape via two circles + triangle
+        d.ellipse([cx-220, cy-200, cx-20, cy+0], fill=light)
+        d.ellipse([cx+20, cy-200, cx+220, cy+0], fill=light)
+        d.polygon([(cx-205, cy-60),(cx+205, cy-60),(cx, cy+260)], fill=light)
+        # pulse line (luminous)
+        pts = [(cx-260, cy+20),(cx-120, cy+20),(cx-70, cy-80),(cx-10, cy+120),(cx+60, cy-30),(cx+120, cy+20),(cx+260, cy+20)]
+        d.line(pts, fill=(green[0],green[1],green[2],255), width=22, joint="curve")
+    elif motif == "broom":  # cleaning — a broom with sparkle accents
+        # handle
+        d.line([(cx+170, cy-300),(cx-60, cy+120)], fill=silver, width=34)
+        # head
+        d.polygon([(cx-120, cy+90),(cx+0, cy+60),(cx+90, cy+250),(cx-180, cy+290)], fill=light)
+        for k in range(5):  # bristles
+            x0 = cx-150 + k*55
+            d.line([(cx-60+k*30, cy+95),(x0, cy+285)], fill=(top[0],top[1],top[2],160), width=10)
+        # sparkles (luminous)
+        for (sx, sy, sr) in [(cx+200, cy+40, 40),(cx+120, cy-140, 26),(cx+260, cy-160, 20)]:
+            d.line([(sx-sr, sy),(sx+sr, sy)], fill=(green[0],green[1],green[2],255), width=12)
+            d.line([(sx, sy-sr),(sx, sy+sr)], fill=(green[0],green[1],green[2],255), width=12)
+    elif motif == "fork":  # ear training — a tuning fork with sound rings
+        # stem
+        d.line([(cx, cy+300),(cx, cy+60)], fill=silver, width=40)
+        # two prongs
+        d.line([(cx-70, cy+60),(cx-70, cy-260)], fill=light, width=40)
+        d.line([(cx+70, cy+60),(cx+70, cy-260)], fill=light, width=40)
+        d.arc([cx-70, cy+20, cx+70, cy+120], 0, 180, fill=light, width=40)
+        # sound rings (luminous, to the right)
+        for i, r in enumerate([90, 150, 210]):
+            a = 110 - i*30
+            d.arc([cx+120-r, cy-120-r, cx+120+r, cy-120+r], -55, 55,
+                  fill=(green[0],green[1],green[2],max(a,60)), width=16)
+    elif motif == "halo":  # migraine — a head silhouette with an aura halo
+        # head circle
+        d.ellipse([cx-150, cy-120, cx+150, cy+180], fill=light)
+        # aura halo (broken luminous ring around upper head)
+        bb = [cx-260, cy-260, cx+260, cy+260]
+        d.arc(bb, 180, 360, fill=(green[0],green[1],green[2],255), width=30)
+        # shimmer dots
+        for k in range(5):
+            a = math.radians(200 + k*35)
+            dx = cx + 300*math.cos(a); dy = cy + 300*math.sin(a)
+            d.ellipse([dx-16, dy-16, dx+16, dy+16], fill=(green[0],green[1],green[2],230))
 
     img = img.filter(ImageFilter.GaussianBlur(0.4))
     img = img.convert("RGBA")
