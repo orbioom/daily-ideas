@@ -1,89 +1,25 @@
-# Latest Run — 2026-06-11 23:00 UTC
+# Latest run — 2026-06-11_2253-UTC
 
-**6 production-ready native iOS apps** built and shipped in this run.
+**Folder:** `runs/2026-06-11_2253-UTC/`
+**Shipped:** 6 production-ready native iOS apps (slots 01–06), all built to the Definition of Done, self-reviewed, anti-stub grep clean. Each ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), real 1024 icon, light+dark, onboarding, settings, empty/loading/error states, and SwiftData persistence.
 
----
+## The 6 apps
 
-## Apps Built
+- **Timber** — *built* — `01-timber` — Private snore tracker: overnight mic metering with an adaptive noise-floor detector, transparent Snore Score, night timeline, and a factor-correlation "remedies lab"; audio is discarded at session end (metrics only). — *Monetization: one-time Pro unlock for correlations/trends (SnoreLab proves ~$400k/mo in-category).* — *Boom: SnoreLab is #4 top-grossing Medical with a hated shrinking free tier + cloud anxiety; we're the fair, private version of a proven money-printer.*
+- **Hired** — *built* — `02-hired` — Native job-application tracker: 9-stage pipeline with dated events, interviews/contacts/follow-ups, a real applied→offer funnel with conversions, response-rate/median-reply, and "going quiet" stale detection. — *Monetization: one-time Pro (unlimited apps + insights); undercuts Teal's $9–13/week.* — *Boom: Teal/Huntr validated demand but are web-first, subscription-heavy, and paywall mid-application; nobody owns "fast native offline job tracker."*
+- **Podium** — *built* — `03-podium` — On-device speech coach: live SFSpeechRecognizer transcription with a filler counter (two-word aware), WPM, vocabulary diversity → documented delivery score; transcript with fillers highlighted; 21 prompts + 6 drills; progress charts. — *Monetization: Pro sub/lifetime for drills + history (Speeko $29.99/mo, Orai $39.99/yr proven).* — *Boom: incumbents are pricey, buggy, cloud-based; Apple's on-device speech makes a faster, private, cheaper coach — and "watch your ums get counted live" is a TikTok demo.*
+- **Flipside** — *built* — `04-flipside` — Reseller profit tracker: Death-pile→Listed→Sold flow, true net profit (price−fees−shipping−COGS)/ROI/days-to-sell with per-platform fee prefill across 7 marketplaces, monthly/platform breakdowns, stale-listing accountability. — *Monetization: one-time Pro (insights + unlimited items); tax P&L export upsell.* — *Boom: huge underserved reselling economy; incumbents (Vendoo, My Reseller Genie) are $120–600/yr web subscriptions — r/Flipping wants an honest native tracker.*
+- **Moniker** — *built* — `05-moniker` — Baby-name swipe matcher: two-partner pass-the-phone swipe deck over 230+ curated names (origin/meaning/style), mutual-like detection with heat ranking, agreement rate + style profiling, ShareLink shortlist. — *Monetization: one-time Moniker+ (insights/filters); beats Kinder's per-pack microtransactions.* — *Boom: the swipe-for-names format is viral and proven (Kinder, BabyName) but incumbents are ugly, paywall name packs, and lack meanings — and "it's a match" is built for sharing.*
+- **Coast** — *built* — `06-coast` — Financial-independence planner: 4%-rule FI number, compound years-to-FI, **Coast FI** (the point you can stop investing and still retire on time), dual-path projection chart, real-pace FI date from logged net worth, milestone ladder, animated wave progress. — *Monetization: one-time Pro (multi-scenario + export); no Plaid, no subscription.* — *Boom: "Coast FI" is a beloved shareable concept with no great native iOS home; the FIRE community is large, evangelical, and money-motivated, and wants a private calculator with no bank-linking.*
 
-| # | Name | Folder | One-line description | Monetization | Why it can boom |
-|---|------|--------|----------------------|--------------|-----------------|
-| 154 | **Strength Coach** | `01-strength-coach-ai` | AI-powered strength training progression with Brzycki 1RM estimation and personalized load suggestions | $5.99/mo subscription | 10M+ powerlifters, $3.4B fitness ↑24.5% YoY; JuggernautAI web-first, Hevy tracker-only; our native iOS + on-device ML = uncontested |
-| 155 | **Sleep Debt AI** | `02-sleep-debt-ai` | Sleep debt calculator that learns patterns and predicts optimal bedtime without wearable | Free + $3.99/mo premium | $3.5B sleep category ↑23.5% YoY; RISE $100/yr + needs wearable; our free core + no-wearable = broader appeal |
-| 156 | **Budget Simple** | `03-budget-simple` | Zero-based envelope budgeting mobile-optimized for simplicity over power | Free + $2.99/mo insights | YNAB users exodus due to $14.99/mo + learning curve; our clean UX = instant adoption + Reddit/Twitter virality |
-| 157 | **Portfolio Pulse** | `04-portfolio-pulse` | Personal portfolio tracker with multi-account support and AI rebalancing alerts | Free + $4.99/mo AI | Robinhood $2.4B gap (no bonds/mutual funds/forex); Portfolio Genius web-first; our native iOS + AI = uncontested |
-| 158 | **Meal Genius** | `05-meal-genius` | AI meal planner that learns preferences, generates weekly plans, and aggregates shopping lists with cost tracking | Free + $4.99/mo AI | FoodiePrep AI unmatched but web-first; Mealime 10M+ users seek better UX; our native iOS + unified plan-list-pricing = proven gap |
-| 159 | **Habit Forge** | `06-habit-forge` | Unlimited habit tracking with smart reminders and AI motivation messages | Free + $2.99/mo AI coach | Streaks 24-habit hard cap; Anchor basic tracking; Habitica RPG-bloated; our unlimited + AI = 10M+ users seeking simplicity |
+## Top recommendation
 
----
+**Podium** is the strongest boom candidate. It pairs a proven, high-ARPU category (Speeko/Orai charge $30/mo+) with a genuine technical moat the incumbents lack — fully on-device SFSpeechRecognizer transcription that makes it faster, private, and far cheaper — and it has an irresistible viral demo (live filler-word counting). **Timber** is the close runner-up on pure revenue proof (SnoreLab's ~$400k/mo) with a sharp privacy wedge ("we keep numbers, never your audio").
 
-## Top Recommendation
+## Research signals worth following next run
 
-**Launch in order: Habit Forge → Budget Simple → Sleep Debt AI → Meal Genius → Strength Coach → Portfolio Pulse**
-
-**Why:** Habit Forge scales fastest (minimal onboarding, daily loop), Budget Simple + Sleep Debt AI hit broadest B2C audiences (proven willingness-to-pay), Meal Genius synergizes with Budget, then power-user apps (Strength Coach, Portfolio) drive ARPU up.
-
----
-
-## Market Context
-
-- **App Store:** $152B (iOS 3× Google Play)
-- **Subscriptions:** 78% of revenue; weekly/monthly subscriptions grew 43.3% → 55.5% of revenue in 1 year
-- **Indie sweet spot:** $2–12k/mo from 200–3000 users at $3–8/mo
-- **Category leaders:**
-  - Health/Fitness: $3.5B + $3.4B both ↑23–24.5% YoY
-  - Finance: $3B+ (YNAB, Portfolio Genius, crypto)
-  - Productivity/Habit: $2B+ (Streaks, Anchor)
-  - Meal/Nutrition: $500M+ (Mealime, FoodiePrep, Paprika)
-
-## Incumbent Pain Points Exploited
-
-| Gap | Incumbent | Our Fix | Market Size |
-|-----|-----------|---------|-------------|
-| YNAB complexity + $14.99/mo | YNAB dominates but losing to Lose It!, Nutracheck | Budget Simple: $2.99/mo, zero learning curve | $3B finance |
-| Sleep: wearable required, RISE $100/yr, ad-heavy | Sleep Cycle, RISE | Sleep Debt AI: free + $3.99/mo, no wearable | $3.5B health |
-| Strength training: generator vs tracker gap | JuggernautAI web-first, Hevy tracker-only | Strength Coach: native iOS AI progression | $3.4B fitness |
-| Fitness niches underserved | Strava dominates general ($9M/mo) | Strength Coach niche = $5.99/mo willingness | 10M+ powerlifters |
-| Portfolio: bonds/mutual funds missing | Robinhood gaps (bonds, forex, mutual funds) | Portfolio Pulse: on-device, bonds/crypto-agnostic | $3B+ trackers |
-| Meal planning: AI unmatched, web-first | FoodiePrep AI unique but desktop-only | Meal Genius: native iOS + shopping-list-price integration | $500M+ meals |
-| Habits: 24-habit artificial cap, no AI | Streaks hard cap, Anchor basic | Habit Forge: unlimited + AI reminders | 10M+ trackers |
-
----
-
-## Next-Run Signals
-
-1. **On-device LLM expansion:** Foundation Models framework enables fine-tuning for habits, journaling, coaching
-2. **Live Activities + widgets:** Habit streaks, sleep debt, workouts on lock screen = daily driver
-3. **HealthKit bridges:** Sleep Debt AI ↔ Apple Health, Meal Genius ↔ Plate (Nutrition)
-4. **Fintech regulation:** Portfolio Pulse + Budget Simple could add crypto/stocks lite as custody eases
-5. **Simplicity trend:** 2026 zeitgeist = "dumb, beautiful apps" vs AI-bloated, dark-pattern incumbents — all 6 ride this wave
-
----
-
-## Build Quality
-
-✅ All 6 apps:
-- iOS 17+ SDKs, SwiftUI 5, SwiftData persistence
-- 4+ distinct substantive feature screens (zero stubs)
-- First-run onboarding + persistent flag
-- Full dark + light mode, Dynamic Type accessibility
-- Empty/loading/success/error states
-- Settings screen with 3+ functional options
-- Real AppIcon PNGs, AccentColor, launch screens
-- XcodeGen `project.yml` (no hand-written .xcodeproj)
-- Self-review attestations in READMEs
-- Clean `xcodegen generate` → Xcode 15 compile
-
-**No placeholders, no TODO/FIXME/stubs, no force-unwraps on user paths.**
-
----
-
-## Run Stats
-
-- **Total apps shipped all-time**: 159
-- **This run**: 6 apps (#154–159)
-- **App folders**: `01-strength-coach-ai` through `06-habit-forge`
-- **Third-party dependencies**: 0 (all apps use only system frameworks)
-- **Stub/TODO violations found**: 0
-- **Research hours**: Deep market analysis across health, finance, fitness, productivity, meal planning
-- **Monetization models**: 6 distinct freemium + subscription strategies, each validated against incumbent pricing
+- **Sleep-adjacent hardware-free trackers** keep minting money (SnoreLab); "passive overnight mic analysis" generalizes (sleep-talking, baby-monitor, room-noise).
+- **On-device ML wedges** against cloud incumbents are repeatable: speech (Podium), and next could be on-device photo culling for specific verticals, or Vision-based form/posture coaching.
+- **"De-subscription" plays** — taking a proven SaaS job (job tracking, reseller accounting, FIRE planning) and shipping it native + one-time-purchase + offline — resonate hard with the r/apps / indie crowd. Strong remaining targets: habit-stacking, meal-prep macro planning, freelancer client CRM.
+- **Couples/relationship "two-player" apps** (Moniker's pass-the-phone) are under-built and inherently shareable — date-night, shared-goals, gift-planning variants.
+- FIRE/personal-finance calculators that avoid Plaid bank-linking (privacy) are repeatedly requested; "tax-time export" is a recurring willingness-to-pay trigger across reseller + freelance + finance verticals.
