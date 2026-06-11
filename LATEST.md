@@ -1,42 +1,25 @@
-# Latest Run — 2026-06-11 1800 UTC
+# Latest run — 2026-06-11_2253-UTC
 
-**6 production-ready native iOS apps** built and shipped in this run.
+**Folder:** `runs/2026-06-11_2253-UTC/`
+**Shipped:** 6 production-ready native iOS apps (slots 01–06), all built to the Definition of Done, self-reviewed, anti-stub grep clean. Each ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), real 1024 icon, light+dark, onboarding, settings, empty/loading/error states, and SwiftData persistence.
 
----
+## The 6 apps
 
-## Apps Built
+- **Timber** — *built* — `01-timber` — Private snore tracker: overnight mic metering with an adaptive noise-floor detector, transparent Snore Score, night timeline, and a factor-correlation "remedies lab"; audio is discarded at session end (metrics only). — *Monetization: one-time Pro unlock for correlations/trends (SnoreLab proves ~$400k/mo in-category).* — *Boom: SnoreLab is #4 top-grossing Medical with a hated shrinking free tier + cloud anxiety; we're the fair, private version of a proven money-printer.*
+- **Hired** — *built* — `02-hired` — Native job-application tracker: 9-stage pipeline with dated events, interviews/contacts/follow-ups, a real applied→offer funnel with conversions, response-rate/median-reply, and "going quiet" stale detection. — *Monetization: one-time Pro (unlimited apps + insights); undercuts Teal's $9–13/week.* — *Boom: Teal/Huntr validated demand but are web-first, subscription-heavy, and paywall mid-application; nobody owns "fast native offline job tracker."*
+- **Podium** — *built* — `03-podium` — On-device speech coach: live SFSpeechRecognizer transcription with a filler counter (two-word aware), WPM, vocabulary diversity → documented delivery score; transcript with fillers highlighted; 21 prompts + 6 drills; progress charts. — *Monetization: Pro sub/lifetime for drills + history (Speeko $29.99/mo, Orai $39.99/yr proven).* — *Boom: incumbents are pricey, buggy, cloud-based; Apple's on-device speech makes a faster, private, cheaper coach — and "watch your ums get counted live" is a TikTok demo.*
+- **Flipside** — *built* — `04-flipside` — Reseller profit tracker: Death-pile→Listed→Sold flow, true net profit (price−fees−shipping−COGS)/ROI/days-to-sell with per-platform fee prefill across 7 marketplaces, monthly/platform breakdowns, stale-listing accountability. — *Monetization: one-time Pro (insights + unlimited items); tax P&L export upsell.* — *Boom: huge underserved reselling economy; incumbents (Vendoo, My Reseller Genie) are $120–600/yr web subscriptions — r/Flipping wants an honest native tracker.*
+- **Moniker** — *built* — `05-moniker` — Baby-name swipe matcher: two-partner pass-the-phone swipe deck over 230+ curated names (origin/meaning/style), mutual-like detection with heat ranking, agreement rate + style profiling, ShareLink shortlist. — *Monetization: one-time Moniker+ (insights/filters); beats Kinder's per-pack microtransactions.* — *Boom: the swipe-for-names format is viral and proven (Kinder, BabyName) but incumbents are ugly, paywall name packs, and lack meanings — and "it's a match" is built for sharing.*
+- **Coast** — *built* — `06-coast` — Financial-independence planner: 4%-rule FI number, compound years-to-FI, **Coast FI** (the point you can stop investing and still retire on time), dual-path projection chart, real-pace FI date from logged net worth, milestone ladder, animated wave progress. — *Monetization: one-time Pro (multi-scenario + export); no Plaid, no subscription.* — *Boom: "Coast FI" is a beloved shareable concept with no great native iOS home; the FIRE community is large, evangelical, and money-motivated, and wants a private calculator with no bank-linking.*
 
-| # | Name | Folder | One-line description | Monetization | Why it can boom |
-|---|------|--------|----------------------|--------------|-----------------|
-| 148 | **Reel** | `runs/2026-06-11_1800-UTC/01-reel` | Offline-first TV & movie tracker with season/episode tracking and stats | $2.99/yr Premium — CSV export + watch-time analytics | Letterboxd has 15 M+ users but no great native offline TV tracker |
-| 149 | **Deck** | `runs/2026-06-11_1800-UTC/02-deck` | SM-2 spaced repetition flashcards with Basic + Cloze cards and 3D flip | $4.99/yr Pro — Anki import + iCloud sync | Anki is ugly on iOS; Quizlet went subscription-heavy — there's a gap |
-| 150 | **Cipher** | `runs/2026-06-11_1800-UTC/03-cipher` | Daily cryptogram puzzles from 40 famous quotes, seeded substitution cipher | $1.99/mo Solver's Club — all puzzles + difficulty filter | NYT Spelling Bee proves daily word puzzles are sticky; cryptograms are untapped |
-| 151 | **Flow** | `runs/2026-06-11_1800-UTC/04-flow` | Guided yoga with 8 sessions, 20 poses, PlayerEngine timer, mood journal | $7.99/yr Flow+ — all sessions + custom sequences | Down Dog costs $70/yr; a polished free-first yoga app wins on reviews instantly |
-| 152 | **Drip** | `runs/2026-06-11_1800-UTC/05-drip` | Mindful drinking tracker — standard drinks, weekly goal, money saved | $3.99/yr Mindful — extended history + CSV export | Sober-curious movement is TikTok-viral; existing apps have terrible UX |
-| 153 | **Term** | `runs/2026-06-11_1800-UTC/06-term` | Student planner: weighted GPA, agenda, what-if calculator | $2.99/yr Scholar — iCloud sync + PDF export | "Student planner" 10 M+ App Store impressions/month; top apps are cluttered |
+## Top recommendation
 
----
+**Podium** is the strongest boom candidate. It pairs a proven, high-ARPU category (Speeko/Orai charge $30/mo+) with a genuine technical moat the incumbents lack — fully on-device SFSpeechRecognizer transcription that makes it faster, private, and far cheaper — and it has an irresistible viral demo (live filler-word counting). **Timber** is the close runner-up on pure revenue proof (SnoreLab's ~$400k/mo) with a sharp privacy wedge ("we keep numbers, never your audio").
 
-## Top Recommendation
+## Research signals worth following next run
 
-**Drip** — The sober-curious / mindful drinking trend has sustained virality on social media, yet the App Store has no polished native option. Zero third-party dependencies, 100% on-device, and the standard drink math gives it a credibility edge. Revenue path is clear: free tracking hooks users, then the Mindful tier sells itself once they've invested their data.
-
----
-
-## Research Signals
-
-- Reddit r/stopdrinking (850k members) and r/alcoholism regularly request a "simple tracker that doesn't shame you"
-- App Store: top alcohol tracker apps average 3.2–3.8 stars; reviews call out poor UX and aggressive IAP prompts
-- "Student planner app" App Store search: 10 M+ impressions/month; top apps are 4+ year old with iOS 15-era design
-- Spaced repetition (Anki) has 250 M+ downloads but virtually no competition in the polished native iOS segment
-- Daily word puzzle genre: NYT Games crossed $500 M revenue — cryptograms are a proven but underserved format
-
----
-
-## Run Stats
-
-- **Total apps shipped all-time**: 153
-- **This run**: 6 apps (#148–153)
-- **Run folder**: `runs/2026-06-11_1800-UTC/`
-- **Third-party dependencies**: 0 (all apps use only system frameworks)
-- **Stub/TODO violations found**: 0
+- **Sleep-adjacent hardware-free trackers** keep minting money (SnoreLab); "passive overnight mic analysis" generalizes (sleep-talking, baby-monitor, room-noise).
+- **On-device ML wedges** against cloud incumbents are repeatable: speech (Podium), and next could be on-device photo culling for specific verticals, or Vision-based form/posture coaching.
+- **"De-subscription" plays** — taking a proven SaaS job (job tracking, reseller accounting, FIRE planning) and shipping it native + one-time-purchase + offline — resonate hard with the r/apps / indie crowd. Strong remaining targets: habit-stacking, meal-prep macro planning, freelancer client CRM.
+- **Couples/relationship "two-player" apps** (Moniker's pass-the-phone) are under-built and inherently shareable — date-night, shared-goals, gift-planning variants.
+- FIRE/personal-finance calculators that avoid Plaid bank-linking (privacy) are repeatedly requested; "tax-time export" is a recurring willingness-to-pay trigger across reseller + freelance + finance verticals.

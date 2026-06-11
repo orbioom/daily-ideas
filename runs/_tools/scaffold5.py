@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-"""Orbioom iOS scaffold v5: shared config boilerplate + on-brand 1024 app icon.
+"""Orbioom iOS scaffold v5: config boilerplate + on-brand 1024 app icon.
 
-Motifs for the 2026-06-11_2255 run:
-  prompter (teleprompter), gauge (decibel meter), doc (scanner),
-  horizon (FIRE planner), party (charades), lock (password vault)
+Generates Assets (icon, AccentColor, LaunchBackground), Info.plist, project.yml,
+Preview assets. Swift sources are authored separately.
+
+Motifs for the 2026-06-11_2253 run:
+  moonwave (snore), ladder (job tracker), mic (speech coach),
+  tag (reseller), hearts (baby names), horizon (FIRE planner)
 
 Usage:
-  python3 scaffold5.py <ios_dir> <App> <lower> <accentHexRRGGBB> <motif> [plist_extra] [orientation]
-    plist_extra: comma-separated of mic,camera,faceid,photos  (or "-")
-    orientation: "all" to allow landscape on iPhone (default portrait)
+  python3 scaffold5.py <ios_dir> <App> <lower> <accentHexRRGGBB> <motif> [extras...]
+  extras: mic speech bgaudio
 """
 import os, sys, json, math
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
 ios_dir, App, lower, hexv, motif = sys.argv[1:6]
-plist_extra = sys.argv[6] if len(sys.argv) > 6 else "-"
-orientation = sys.argv[7] if len(sys.argv) > 7 else "portrait"
+extras = sys.argv[6:]
 app_dir = os.path.join(ios_dir, App)
 
 def write(path, content):
@@ -30,237 +31,258 @@ accent = hx(hexv)
 def lerp(a, b, t):
     return tuple(int(a[i] + (b[i]-a[i])*t) for i in range(3))
 
+# ---- Icon (drawn at 2048, LANCZOS-downscaled to 1024 for antialiasing) ----
 def make_icon(path):
-    S = 1024
+    S = 2048
     img = Image.new("RGB", (S, S), (0,0,0))
     px = img.load()
-    top = hx("2A2E3A"); bot = hx("16171D")
-    cx, cy = S*0.5, S*0.46
+    # per-motif background gradient
+    bgs = {
+        "moonwave": ("1A2240", "0C101F"),
+        "ladder":   ("F4F1E8", "E4DFD0"),
+        "mic":      ("241B33", "120D1C"),
+        "tag":      ("FFF4E4", "F4DFC2"),
+        "hearts":   ("FFEFF3", "FBD9E3"),
+        "horizon":  ("0F3A44", "081E24"),
+    }
+    top, bot = (hx(x) for x in bgs.get(motif, ("23262F", "121419")))
     for y in range(S):
+        row = lerp(top, bot, y / S)
         for x in range(S):
-            t = y / S
-            base = lerp(top, bot, t)
-            dd = math.hypot(x-cx, y-cy) / (S*0.75)
-            glow = max(0.0, 1.0 - dd)
-            g = 0.16 * glow*glow
-            px[x,y] = (
-                int(base[0]+(255-base[0])*g*0.10),
-                int(base[1]+(255-base[1])*g*0.10),
-                int(base[2]+(255-base[2])*g*0.12),
-            )
+            px[x, y] = row
     d = ImageDraw.Draw(img, "RGBA")
-    light = (236,238,243,255)
-    silver = (200,205,220,255)
-    acc = (accent[0],accent[1],accent[2],255)
-    green = hx("5EF0B0")
-    gr = (green[0],green[1],green[2],255)
+    cx, cy = S*0.5, S*0.5
+    acc = (accent[0], accent[1], accent[2], 255)
+    light = (245, 247, 252, 255)
+    ink = (32, 36, 48, 255)
 
-    if motif == "prompter":  # teleprompter — scrolling script lines, luminous focus band
-        d.rounded_rectangle([cx-300, cy-300, cx+300, cy+320], radius=56, fill=(light[0],light[1],light[2],26), outline=silver, width=10)
-        # focus band
-        d.rounded_rectangle([cx-300, cy-66, cx+300, cy+66], radius=20, fill=(acc[0],acc[1],acc[2],60))
-        rows = [(-240,170,90),(-180,260,90),(-120,210,90),(0,280,255),(110,230,90),(170,150,90),(230,260,90)]
-        for (oy, w, alpha) in rows:
-            col = acc if alpha == 255 else (silver[0],silver[1],silver[2],alpha)
-            wd = 34 if alpha == 255 else 26
-            d.rounded_rectangle([cx-w, cy+oy-wd/2, cx+w, cy+oy+wd/2], radius=wd//2, fill=col)
-        # play wedge at right of focus band
-        d.polygon([(cx+318, cy-44),(cx+318, cy+44),(cx+396, cy)], fill=acc)
-    elif motif == "gauge":  # decibel meter — semicircular loudness gauge with needle + sound arcs
-        # outer gauge arc
-        d.arc([cx-310, cy-260, cx+310, cy+360], 180, 360, fill=silver, width=26)
-        # colored zones (safe→loud)
-        d.arc([cx-262, cy-212, cx+262, cy+312], 180, 252, fill=gr, width=46)
-        d.arc([cx-262, cy-212, cx+262, cy+312], 252, 308, fill=(255,205,110,255), width=46)
-        d.arc([cx-262, cy-212, cx+262, cy+312], 308, 360, fill=(255,118,118,255), width=46)
-        # ticks
-        for k in range(7):
-            a = math.radians(180 + k*30)
-            x0 = cx + 286*math.cos(a); y0 = cy+50 + 286*math.sin(a)
-            x1 = cx + 322*math.cos(a); y1 = cy+50 + 322*math.sin(a)
-            d.line([(x0,y0),(x1,y1)], fill=(silver[0],silver[1],silver[2],170), width=12)
-        # needle at ~70%
-        ang = math.radians(180 + 0.66*180)
-        nx = cx + 240*math.cos(ang); ny = cy+50 + 240*math.sin(ang)
-        d.line([(cx, cy+50),(nx, ny)], fill=acc, width=22)
-        d.ellipse([cx-34, cy+16, cx+34, cy+84], fill=acc)
-        d.ellipse([cx-14, cy+36, cx+14, cy+64], fill=(20,24,30,255))
-    elif motif == "doc":  # scanner — page with text lines and a luminous scan beam
-        d.rounded_rectangle([cx-220, cy-290, cx+220, cy+300], radius=36, fill=light)
-        # folded corner
-        d.polygon([(cx+220, cy-290),(cx+220, cy-170),(cx+100, cy-290)], fill=(silver[0],silver[1],silver[2],255))
-        d.polygon([(cx+100, cy-290),(cx+220, cy-170),(cx+100, cy-170)], fill=(160,166,184,255))
-        # text lines
-        for k, w in enumerate([250, 300, 280, 180, 300, 260, 140]):
-            yy = cy - 180 + k*64
-            d.rounded_rectangle([cx-160, yy, cx-160+w*0.9, yy+26], radius=13, fill=(70,76,94,255))
-        # luminous scan beam crossing the page
-        d.rectangle([cx-280, cy-26, cx+280, cy+26], fill=(acc[0],acc[1],acc[2],90))
-        d.rectangle([cx-280, cy-6, cx+280, cy+6], fill=acc)
-        # beam end caps
-        d.ellipse([cx-306, cy-22, cx-262, cy+22], fill=acc)
-        d.ellipse([cx+262, cy-22, cx+306, cy+22], fill=acc)
-    elif motif == "horizon":  # FIRE — sun over horizon + compounding growth curve
-        # horizon line
-        d.line([(cx-330, cy+150),(cx+330, cy+150)], fill=silver, width=14)
-        # rising sun (half above horizon)
-        d.pieslice([cx-150, cy-10, cx+150, cy+290], 180, 360, fill=(255,205,110,255))
-        d.rectangle([cx-160, cy+140, cx+160, cy+300], fill=(0,0,0,0))
-        # growth curve sweeping up across the sun
+    if motif == "moonwave":
+        # crescent moon upper-left, soft sound waves lower-right
+        mx, my, r = S*0.40, S*0.36, S*0.205
+        d.ellipse([mx-r, my-r, mx+r, my+r], fill=(247, 222, 165, 255))
+        # bite to make crescent (use bg color)
+        bx, by = mx + r*0.52, my - r*0.42
+        d.ellipse([bx-r*0.92, by-r*0.92, bx+r*0.92, by+r*0.92], fill=lerp(top,bot,0.30)+ (255,))
+        # three breathing arcs
+        for i, (rr, w, al) in enumerate([(S*0.30, 44, 235), (S*0.40, 36, 165), (S*0.50, 30, 100)]):
+            box = [S*0.62-rr, S*0.66-rr, S*0.62+rr, S*0.66+rr]
+            d.arc(box, start=295, end=55, fill=(acc[0],acc[1],acc[2],al), width=w)
+        # zzz dots
+        for i in range(3):
+            zr = 26 - i*5
+            zx, zy = S*0.70 + i*S*0.055, S*0.30 - i*S*0.055
+            d.ellipse([zx-zr, zy-zr, zx+zr, zy+zr], fill=(247,222,165,200-50*i))
+    elif motif == "ladder":
+        # ascending stair-steps with a flag on top — the climb to an offer
+        d.rounded_rectangle([S*0.16, S*0.16, S*0.84, S*0.84], radius=80, fill=(255,255,255,90))
+        steps = 4
+        x0, y0 = S*0.22, S*0.78
+        sw, sh = S*0.14, S*0.14
+        for i in range(steps):
+            d.rounded_rectangle(
+                [x0 + i*sw, y0 - (i+1)*sh, x0 + (i+1)*sw + (S*0.02 if i==steps-1 else 0), y0],
+                radius=24, fill=(acc[0],acc[1],acc[2],255) if i==steps-1 else ink)
+        # flag pole + pennant on the top step
+        fx = x0 + steps*sw - sw*0.30
+        ftop = y0 - steps*sh - S*0.16
+        d.line([(fx, y0 - steps*sh), (fx, ftop)], fill=ink, width=26)
+        d.polygon([(fx+13, ftop), (fx+13+S*0.13, ftop+S*0.045), (fx+13, ftop+S*0.09)], fill=acc)
+    elif motif == "mic":
+        # spotlight cone + microphone
+        d.polygon([(cx, S*0.06), (S*0.10, S*0.96), (S*0.90, S*0.96)], fill=(255,255,255,26))
+        body_w, body_h = S*0.155, S*0.23
+        bx0, by0 = cx-body_w, S*0.30
+        d.rounded_rectangle([bx0, by0, cx+body_w, by0+body_h*1.7], radius=int(body_w), fill=light)
+        # grill lines
+        for i in range(3):
+            yy = by0 + 60 + i*78
+            d.line([(bx0+44, yy), (cx+body_w-44, yy)], fill=(170,176,192,255), width=22)
+        # cradle arc + stem + base
+        ar = body_w*1.55
+        d.arc([cx-ar, by0+body_h*0.62, cx+ar, by0+body_h*0.62+2*ar], start=20, end=160,
+              fill=acc, width=56)
+        d.line([(cx, by0+body_h*0.62+2*ar - 30), (cx, S*0.82)], fill=acc, width=56)
+        d.line([(cx-S*0.11, S*0.82), (cx+S*0.11, S*0.82)], fill=acc, width=56)
+    elif motif == "tag":
+        # rotated price tag with an upward profit arrow
+        tag = Image.new("RGBA", (S, S), (0,0,0,0))
+        td = ImageDraw.Draw(tag)
+        w, h = S*0.52, S*0.34
+        x0, y0 = cx - w*0.42, cy - h*0.5
+        td.rounded_rectangle([x0, y0, x0+w, y0+h], radius=60, fill=acc)
+        td.polygon([(x0, y0), (x0 - h*0.42, y0 + h*0.5), (x0, y0+h)], fill=acc)
+        td.ellipse([x0 - h*0.16 - 38, cy - 38, x0 - h*0.16 + 38, cy + 38], fill=lerp(hx("FFF4E4"),hx("F4DFC2"),0.5)+(255,))
+        tag = tag.rotate(18, center=(cx, cy), resample=Image.BICUBIC)
+        img.paste(tag, (0,0), tag)
+        # profit arrow over the tag
+        pts = [(S*0.33, S*0.66), (S*0.47, S*0.52), (S*0.56, S*0.60), (S*0.72, S*0.40)]
+        d.line(pts, fill=(255,255,255,255), width=52, joint="curve")
+        d.polygon([(S*0.72+70, S*0.40-26), (S*0.72-10, S*0.40-110), (S*0.62, S*0.40+8)], fill=(255,255,255,255))
+    elif motif == "hearts":
+        # two overlapping hearts — partner A and partner B agreeing
+        def heart(dd, hx_, hy, s, col):
+            dd.polygon([(hx_, hy + s*1.02), (hx_-s, hy + s*0.18), (hx_+s, hy + s*0.18)], fill=col)
+            dd.ellipse([hx_-s, hy-s*0.42, hx_, hy+s*0.58], fill=col)
+            dd.ellipse([hx_, hy-s*0.42, hx_+s, hy+s*0.58], fill=col)
+        layer = Image.new("RGBA", (S, S), (0,0,0,0))
+        ld = ImageDraw.Draw(layer)
+        heart(ld, S*0.40, S*0.40, S*0.185, (126, 168, 245, 235))
+        layer2 = Image.new("RGBA", (S, S), (0,0,0,0))
+        ld2 = ImageDraw.Draw(layer2)
+        heart(ld2, S*0.585, S*0.475, S*0.185, (acc[0], acc[1], acc[2], 235))
+        img.paste(layer, (0,0), layer)
+        img.paste(layer2, (0,0), layer2)
+        # sparkle where they overlap
+        sx, sy, sr = S*0.495, S*0.43, S*0.030
+        for ang in range(4):
+            a = math.radians(ang*90)
+            d.line([(sx - sr*2.6*math.cos(a), sy - sr*2.6*math.sin(a)),
+                    (sx + sr*2.6*math.cos(a), sy + sr*2.6*math.sin(a))], fill=(255,255,255,240), width=30)
+        d.ellipse([sx-sr, sy-sr, sx+sr, sy+sr], fill=(255,255,255,255))
+    elif motif == "horizon":
+        # sun over the sea, gentle swell line — coasting to FI
+        d.ellipse([cx-S*0.16, S*0.30-S*0.16, cx+S*0.16, S*0.30+S*0.16], fill=(250, 215, 130, 255))
+        # sea
+        d.rectangle([0, S*0.55, S, S], fill=(13, 60, 70, 255))
+        # reflected shimmer
+        for i in range(4):
+            ww = S*0.20 - i*S*0.035
+            d.line([(cx-ww, S*0.60 + i*S*0.07), (cx+ww, S*0.60 + i*S*0.07)],
+                   fill=(250, 215, 130, 170-35*i), width=34)
+        # swell curve in accent
         pts = []
-        for k in range(61):
-            t = k/60
-            x = cx - 320 + 640*t
-            y = cy + 140 - 360*(math.pow(1.075, t*24)-1)/ (math.pow(1.075,24)-1)
+        for k in range(0, 101):
+            x = S*k/100
+            y = S*0.55 + math.sin(k/100*math.pi*2)*S*0.018
             pts.append((x, y))
-        d.line(pts, fill=acc, width=26, joint="curve")
-        # end dot + small milestone dots
-        d.ellipse([pts[-1][0]-30, pts[-1][1]-30, pts[-1][0]+30, pts[-1][1]+30], fill=acc)
-        for f in (0.35, 0.62, 0.84):
-            p = pts[int(f*60)]
-            d.ellipse([p[0]-16, p[1]-16, p[0]+16, p[1]+16], fill=light)
-    elif motif == "party":  # charades — tilted card with star burst + motion arcs
-        ang = math.radians(-12)
-        def rot(px_, py_):
-            dx, dy = px_-cx, py_-cy
-            return (cx+dx*math.cos(ang)-dy*math.sin(ang), cy+dx*math.sin(ang)+dy*math.cos(ang))
-        corners = [rot(cx-270, cy-180), rot(cx+270, cy-180), rot(cx+270, cy+180), rot(cx-270, cy+180)]
-        d.polygon(corners, fill=light)
-        # word bar on card
-        b0 = rot(cx-170, cy-30); b1 = rot(cx+170, cy+30)
-        d.rounded_rectangle([min(b0[0],b1[0]), min(b0[1],b1[1]), max(b0[0],b1[0]), max(b0[1],b1[1])], radius=28, fill=acc)
-        # tilt arcs above and below (motion)
-        d.arc([cx-360, cy-380, cx+360, cy+340], 230, 290, fill=(silver[0],silver[1],silver[2],190), width=18)
-        d.arc([cx-420, cy-440, cx+420, cy+400], 235, 285, fill=(silver[0],silver[1],silver[2],110), width=14)
-        # star burst (correct!)
-        sx, sy = cx+250, cy-240
-        for a in range(8):
-            r = 86 if a % 2 == 0 else 44
-            aa = math.radians(a*45)
-            x1 = sx + r*math.cos(aa); y1 = sy + r*math.sin(aa)
-            d.line([(sx,sy),(x1,y1)], fill=gr, width=20)
-        d.ellipse([sx-26, sy-26, sx+26, sy+26], fill=gr)
-    elif motif == "lock":  # vault — padlock with luminous keyhole + hasp
-        # shackle
-        d.arc([cx-150, cy-300, cx+150, cy+0], 180, 360, fill=silver, width=56)
-        d.line([(cx-150, cy-150),(cx-150, cy-40)], fill=silver, width=56)
-        d.line([(cx+150, cy-150),(cx+150, cy-40)], fill=silver, width=56)
-        # body
-        d.rounded_rectangle([cx-230, cy-60, cx+230, cy+310], radius=52, fill=light)
-        # keyhole
-        d.ellipse([cx-58, cy+30, cx+58, cy+146], fill=acc)
-        d.polygon([(cx-34, cy+120),(cx+34, cy+120),(cx+18, cy+250),(cx-18, cy+250)], fill=acc)
-        # subtle rivets
-        for (ox, oy) in [(-180, -10),(180, -10),(-180, 260),(180, 260)]:
-            d.ellipse([cx+ox-14, cy+oy-14, cx+ox+14, cy+oy+14], fill=(silver[0],silver[1],silver[2],150))
-    else:
-        d.ellipse([cx-160, cy-160, cx+160, cy+160], outline=light, width=24)
-
-    img = img.filter(ImageFilter.GaussianBlur(0.4))
-    img = img.convert("RGBA")
+        d.line(pts, fill=acc, width=44, joint="curve")
+    img = img.resize((1024, 1024), Image.LANCZOS)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     img.save(path, "PNG")
 
-write(os.path.join(app_dir,"Assets.xcassets","Contents.json"), json.dumps({"info":{"author":"xcode","version":1}}, indent=2))
-write(os.path.join(app_dir,"Assets.xcassets","AppIcon.appiconset","Contents.json"),
-      json.dumps({"images":[{"filename":"icon-1024.png","idiom":"universal","platform":"ios","size":"1024x1024"}],
-                  "info":{"author":"xcode","version":1}}, indent=2))
-make_icon(os.path.join(app_dir,"Assets.xcassets","AppIcon.appiconset","icon-1024.png"))
+assets = os.path.join(app_dir, "Assets.xcassets")
+make_icon(os.path.join(assets, "AppIcon.appiconset", "icon-1024.png"))
+write(os.path.join(assets, "AppIcon.appiconset", "Contents.json"), json.dumps({
+    "images": [{"filename": "icon-1024.png", "idiom": "universal",
+                "platform": "ios", "size": "1024x1024"}],
+    "info": {"author": "xcode", "version": 1}}, indent=2))
+write(os.path.join(assets, "Contents.json"),
+      json.dumps({"info": {"author": "xcode", "version": 1}}, indent=2))
 
-def colorset(name, light, dark):
-    def comp(h):
-        return {"red": f"0x{h[0:2]}", "green": f"0x{h[2:4]}", "blue": f"0x{h[4:6]}", "alpha": "1.000"}
-    obj = {"colors": [
-        {"idiom":"universal","color":{"color-space":"srgb","components":comp(light)}},
-        {"idiom":"universal","appearances":[{"appearance":"luminosity","value":"dark"}],
-         "color":{"color-space":"srgb","components":comp(dark)}},
-    ], "info":{"author":"xcode","version":1}}
-    write(os.path.join(app_dir,"Assets.xcassets",name+".colorset","Contents.json"), json.dumps(obj, indent=2))
+def color_json(rgb_light, rgb_dark):
+    def comp(rgb):
+        return {"color-space": "srgb", "components": {
+            "red": f"{rgb[0]/255:.3f}", "green": f"{rgb[1]/255:.3f}",
+            "blue": f"{rgb[2]/255:.3f}", "alpha": "1.000"}}
+    return json.dumps({
+        "colors": [
+            {"color": comp(rgb_light), "idiom": "universal"},
+            {"appearances": [{"appearance": "luminosity", "value": "dark"}],
+             "color": comp(rgb_dark), "idiom": "universal"},
+        ],
+        "info": {"author": "xcode", "version": 1}}, indent=2)
 
-# AccentColor: accent in light, slightly lifted in dark
-colorset("AccentColor", hexv, hexv)
-colorset("LaunchBackground", "EDEEF3", "14151B")
-write(os.path.join(app_dir,"Preview Content","Preview Assets.xcassets","Contents.json"),
-      json.dumps({"info":{"author":"xcode","version":1}}, indent=2))
+write(os.path.join(assets, "AccentColor.colorset", "Contents.json"),
+      color_json(accent, lerp(accent, (255,255,255), 0.12)))
 
+launch_bgs = {
+    "moonwave": ((250, 250, 252), (12, 16, 31)),
+    "ladder":   ((247, 244, 235), (20, 21, 26)),
+    "mic":      ((250, 249, 252), (18, 13, 28)),
+    "tag":      ((255, 248, 238), (24, 19, 14)),
+    "hearts":   ((255, 247, 249), (26, 18, 22)),
+    "horizon":  ((246, 251, 250), (8, 24, 28)),
+}
+lb = launch_bgs.get(motif, ((250,250,250), (15,16,20)))
+write(os.path.join(assets, "LaunchBackground.colorset", "Contents.json"),
+      color_json(*lb))
+
+write(os.path.join(app_dir, "Preview Content", "Preview Assets.xcassets", "Contents.json"),
+      json.dumps({"info": {"author": "xcode", "version": 1}}, indent=2))
+
+# ---- Info.plist ----
 extra_keys = ""
-if "mic" in plist_extra:
-    extra_keys += "\t<key>NSMicrophoneUsageDescription</key>\n\t<string>%s uses the microphone to measure ambient sound levels. Audio is analyzed live on this device and never recorded or stored.</string>\n" % App
-if "camera" in plist_extra:
-    extra_keys += "\t<key>NSCameraUsageDescription</key>\n\t<string>%s uses the camera to scan paper documents. Scans stay on this device.</string>\n" % App
-if "faceid" in plist_extra:
-    extra_keys += "\t<key>NSFaceIDUsageDescription</key>\n\t<string>%s uses Face ID to unlock your vault quickly without typing your master passcode.</string>\n" % App
-if "speech" in plist_extra:
-    extra_keys += "\t<key>NSSpeechRecognitionUsageDescription</key>\n\t<string>%s transcribes recordings on this device.</string>\n" % App
+if "mic" in extras:
+    extra_keys += """	<key>NSMicrophoneUsageDescription</key>
+	<string>%s uses the microphone to analyze sound levels on your device. Audio is processed locally and never uploaded.</string>
+""" % App
+if "speech" in extras:
+    extra_keys += """	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>%s transcribes your practice speeches on this device so it can count filler words and measure pace. Nothing leaves your iPhone.</string>
+""" % App
+if "bgaudio" in extras:
+    extra_keys += """	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+"""
 
-if orientation == "all":
-    iphone_orients = "\t<key>UISupportedInterfaceOrientations</key>\n\t<array>\n\t\t<string>UIInterfaceOrientationPortrait</string>\n\t\t<string>UIInterfaceOrientationLandscapeLeft</string>\n\t\t<string>UIInterfaceOrientationLandscapeRight</string>\n\t</array>"
-else:
-    iphone_orients = "\t<key>UISupportedInterfaceOrientations</key>\n\t<array>\n\t\t<string>UIInterfaceOrientationPortrait</string>\n\t</array>"
-
-info = f'''<?xml version="1.0" encoding="UTF-8"?>
+write(os.path.join(app_dir, "Info.plist"), """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-\t<key>CFBundleDevelopmentRegion</key>
-\t<string>$(DEVELOPMENT_LANGUAGE)</string>
-\t<key>CFBundleDisplayName</key>
-\t<string>{App}</string>
-\t<key>CFBundleExecutable</key>
-\t<string>$(EXECUTABLE_NAME)</string>
-\t<key>CFBundleIdentifier</key>
-\t<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-\t<key>CFBundleInfoDictionaryVersion</key>
-\t<string>6.0</string>
-\t<key>CFBundleName</key>
-\t<string>$(PRODUCT_NAME)</string>
-\t<key>CFBundlePackageType</key>
-\t<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
-\t<key>CFBundleShortVersionString</key>
-\t<string>$(MARKETING_VERSION)</string>
-\t<key>CFBundleVersion</key>
-\t<string>$(CURRENT_PROJECT_VERSION)</string>
-\t<key>LSRequiresIPhoneOS</key>
-\t<true/>
-{extra_keys}\t<key>UIApplicationSceneManifest</key>
-\t<dict>
-\t\t<key>UIApplicationSupportsMultipleScenes</key>
-\t\t<true/>
-\t</dict>
-\t<key>UILaunchScreen</key>
-\t<dict>
-\t\t<key>UIColorName</key>
-\t\t<string>LaunchBackground</string>
-\t</dict>
-{iphone_orients}
-\t<key>UISupportedInterfaceOrientations~ipad</key>
-\t<array>
-\t\t<string>UIInterfaceOrientationPortrait</string>
-\t\t<string>UIInterfaceOrientationPortraitUpsideDown</string>
-\t\t<string>UIInterfaceOrientationLandscapeLeft</string>
-\t\t<string>UIInterfaceOrientationLandscapeRight</string>
-\t</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>%(App)s</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>%(App)s</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+%(extra)s	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 </dict>
 </plist>
-'''
-write(os.path.join(app_dir,"Info.plist"), info)
+""" % {"App": App, "extra": extra_keys})
 
-proj = f'''name: {App}
+# ---- project.yml ----
+write(os.path.join(ios_dir, "project.yml"), """name: %(App)s
 options:
   bundleIdPrefix: com.orbioom
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
 targets:
-  {App}:
+  %(App)s:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - {App}
+      - %(App)s
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.orbioom.{lower}
-        INFOPLIST_FILE: {App}/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.orbioom.%(lower)s
+        INFOPLIST_FILE: %(App)s/Info.plist
         GENERATE_INFOPLIST_FILE: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
@@ -268,7 +290,7 @@ targets:
         SWIFT_VERSION: "5.0"
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
-        DEVELOPMENT_ASSET_PATHS: "\\"{App}/Preview Content\\""
-'''
-write(os.path.join(ios_dir,"project.yml"), proj)
-print(f"scaffolded {App} ({motif}) accent #{hexv}")
+        DEVELOPMENT_ASSET_PATHS: "\\"%(App)s/Preview Content\\""
+""" % {"App": App, "lower": lower})
+
+print(f"scaffolded {App} ({motif})")
