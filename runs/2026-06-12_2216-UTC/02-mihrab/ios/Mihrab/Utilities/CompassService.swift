@@ -3,9 +3,10 @@ import CoreMotion
 import Observation
 
 /// Magnetic-north heading from CoreMotion's device-motion fusion.
-/// Needs no permission prompt and no location access — frames never leave the device.
+/// Needs no permission prompt and no location access — readings never leave the device.
+/// Updates are delivered on the main OperationQueue, so observable mutations
+/// happen on the main thread without actor annotations.
 @Observable
-@MainActor
 final class CompassService {
     private let manager = CMMotionManager()
     /// Degrees clockwise from magnetic north, or nil while unavailable.

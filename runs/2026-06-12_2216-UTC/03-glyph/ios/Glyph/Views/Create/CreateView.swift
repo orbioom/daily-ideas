@@ -185,9 +185,9 @@ struct CreateView: View {
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(keyboard == .URL || keyboard == .emailAddress ? .never : .sentences)
                 .autocorrectionDisabled(keyboard == .URL || keyboard == .emailAddress)
+                .accessibilityLabel(title)
         }
         .glyphPanel()
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Preview

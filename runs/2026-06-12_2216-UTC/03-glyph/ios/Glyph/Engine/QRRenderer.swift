@@ -27,13 +27,14 @@ enum CorrectionLevel: String, CaseIterable, Identifiable {
 enum QRRenderer {
     private static let context = CIContext()
 
-    /// Renders a crisp QR image at roughly `scale` points per module.
+    /// Renders a crisp QR image. With `scale == nil` the module size is chosen
+    /// so the longest edge lands near 1024 px — sharp enough to print or share.
     static func image(
         for payload: String,
         correction: CorrectionLevel,
         foreground: UIColor,
         background: UIColor,
-        scale: CGFloat = 14
+        scale: CGFloat? = nil
     ) -> UIImage? {
         guard !payload.isEmpty, let data = payload.data(using: .utf8) else { return nil }
         let filter = CIFilter.qrCodeGenerator()
@@ -47,27 +48,21 @@ enum QRRenderer {
             "inputColor1": CIColor(color: background),
         ])
 
-        let transformed = colored.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        let edge = max(colored.extent.width, 1)
+        let effectiveScale = scale ?? max(1, (1024.0 / edge).rounded(.down))
+        let transformed = colored.transformed(by: CGAffineTransform(scaleX: effectiveScale, y: effectiveScale))
         guard let cgImage = context.createCGImage(transformed, from: transformed.extent) else { return nil }
         return UIImage(cgImage: cgImage)
     }
 
-    /// PNG data for sharing/export at a fixed 1024-pixel edge.
+    /// PNG data for sharing/export at the auto-chosen ~1024-pixel edge.
     static func pngData(
         for payload: String,
         correction: CorrectionLevel,
         foreground: UIColor,
         background: UIColor
     ) -> Data? {
-        guard let small = image(for: payload, correction: correction, foreground: foreground, background: background, scale: 1) else {
-            return nil
-        }
-        let edge = max(small.size.width, 1)
-        let factor = (1024.0 / edge).rounded(.down)
-        guard let big = image(for: payload, correction: correction, foreground: foreground, background: background, scale: max(factor, 1)) else {
-            return nil
-        }
-        return big.pngData()
+        image(for: payload, correction: correction, foreground: foreground, background: background)?.pngData()
     }
 }
 
