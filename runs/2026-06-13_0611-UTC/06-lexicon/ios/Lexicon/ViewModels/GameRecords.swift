@@ -3,7 +3,6 @@ import SwiftData
 
 enum GameRecords {
     /// Insert a finished game, deduping daily/archive games by their dayKey.
-    @MainActor
     static func record(_ context: ModelContext, dayKey: String, answer: String,
                        guesses: [String], won: Bool, hardMode: Bool) {
         if !dayKey.isEmpty {

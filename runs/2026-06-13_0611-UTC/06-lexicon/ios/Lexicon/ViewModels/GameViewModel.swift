@@ -1,7 +1,6 @@
 import Foundation
 import SwiftUI
 
-@MainActor
 @Observable
 final class GameViewModel {
     let answer: String

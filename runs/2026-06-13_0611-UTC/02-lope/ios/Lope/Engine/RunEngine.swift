@@ -3,8 +3,8 @@ import SwiftUI
 import UIKit
 
 /// Drives a guided run-walk session off the wall clock so it keeps correct
-/// time even if the app is backgrounded mid-run.
-@MainActor
+/// time even if the app is backgrounded mid-run. All access happens on the
+/// main thread (UI callbacks and a main-runloop timer).
 @Observable
 final class RunEngine {
     let workout: Workout
@@ -48,7 +48,7 @@ final class RunEngine {
         if voiceEnabled { speaker.configureSession() }
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.update() }
+            self?.update()
         }
         update()
     }
@@ -96,12 +96,12 @@ final class RunEngine {
 
     // MARK: derived state
 
-    func elapsed(at now: Date) -> TimeInterval {
+    func elapsedTime(at now: Date) -> TimeInterval {
         var e = now.timeIntervalSince(startDate) - accumulatedPause
         if let pauseStart { e -= now.timeIntervalSince(pauseStart) }
         return max(0, e)
     }
-    var elapsed: TimeInterval { elapsed(at: tick) }
+    var elapsed: TimeInterval { elapsedTime(at: tick) }
 
     var currentIndex: Int {
         let e = elapsed
