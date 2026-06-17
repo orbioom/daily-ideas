@@ -1,27 +1,121 @@
-# Latest run — 2026-06-16_1810-UTC
+# Latest run — 2026-06-17_0012-UTC
 
-Folder: `runs/2026-06-16_1810-UTC/` — 6 production-ready native iOS apps, all **built** (none deferred). Each ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), a real designed 1024 AppIcon (per-app glyph on a gradient) + AccentColor + LaunchBackground (light+dark), SwiftData persistence, onboarding/empty/loading/error/success states, ≥3 persisted Settings prefs, full accessibility (Dynamic Type + VoiceOver + Reduce Motion), first-class light+dark, and a simulated one-time Pro unlock (StoreKit-ready in spirit). **157 Swift files total.**
+Folder: `runs/2026-06-17_0012-UTC/` — 6 production-ready native iOS apps, all **built** (none deferred).
+Each ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), a real designed 1024 AppIcon
+(per-app glyph on a gradient) + AccentColor + LaunchBackground (light+dark), SwiftData persistence,
+onboarding/empty/loading/error/success states, ≥3 persisted Settings prefs, full accessibility
+(Dynamic Type + VoiceOver + Reduce Motion), first-class light+dark, and a simulated one-time Pro
+unlock (StoreKit-ready in spirit). **164 Swift files total** (Spindle 25, Conduit 25, Stub 30,
+Recur 28, Parcel 24, Fuel 32).
 
-Self-reviewed compile-by-inspection (each app by its build agent) and then independently audited at the top level across all six: a string/comment-stripping parser found **zero** brace/paren/bracket imbalances; zero `try!`/`as!`/`NavigationView`/`@Previewable`/`ObservableObject`/single-arg `.onChange`/`fatalError`; no force-unwrap on user paths (one short-circuit-guarded `!` in Galley's `TempEngine` was rewritten to `if let`); every `@Model` registered in its app's `Schema` (verified per app); zero duplicate top-level type names per app; all six `project.yml` parse as valid YAML and are discoverable by `gen.sh`; every `Info.plist` present at the path the project expects. (The only anti-stub-grep hits were Haven's legitimate `TextField` `placeholder` prompt strings — real UI content, not stubs.)
+Self-reviewed compile-by-inspection (each app), then independently audited at the top level across
+all six with `runs/_tools/audit.sh` plus cross-app greps: **zero** `try!`/`as!`/`fatalError`/
+`NavigationView`/`@Previewable`/`ObservableObject`/`@StateObject`/single-arg `.onChange`; no
+force-unwraps on user paths (only the in-memory `ModelContainer` fallback uses `try?`); every
+`@Model` registered in its app's `Schema` (verified per app — Spindle 2, Conduit 3, Stub 1, Recur 2,
+Parcel 2, Fuel 3, all matching); no duplicate top-level type names per app; every `Chart {}` has
+`import Charts`; all six `project.yml` parse as valid YAML and are discoverable by `gen.sh`; every
+`Info.plist` and 1024 AppIcon present. (The audit's per-app "MISSING icon" line is a known path
+quirk — the PNG correctly lives in the inner `<App>/<App>/Assets.xcassets`.) Parcel's build agent
+timed out mid-scaffold (8 files); the top-level agent finished it by hand (engines, all views, app
+entry, the 120-question bank, README) and re-audited it clean.
 
-This batch targets **proven, large, monetizable markets the 249-entry registry had not touched** — two genuinely different casual-game mechanics, a fresh test-prep vertical, a high-willingness-to-pay finance tool, a proven wellness category, and a broad everyday utility — none a repeat or same-mechanic variation of a past build (checked against SHIPPED.md: Klondike/`Palace` ≠ FreeCell; Sudoku/`Lattice`/`Nonet` ≠ arithmetic-cage Calcudoku; DMV/`Permit` ≠ citizenship civics; mileage/`Furlong` & budgets ≠ a self-employment tax estimator; CBT/`Steady` & breathwork/`Lull` ≠ in-the-moment panic SOS; recipe/`Skillet`/`Mise`/`Tote` ≠ a measurement/substitution/timer toolkit).
+This batch targets **proven, large, monetizable markets the 255-entry registry had not touched** —
+two genuinely different casual-game mechanics (Spider cards / Flow-Free path-drawing), two distinct
+finance/work tools (a W-2 paycheck calculator and a subscription tracker), a fresh test-prep vertical
+(real-estate licensing), and a proven health category (adaptive macro coaching). Checked against
+SHIPPED.md: Spider/`Spindle` ≠ Klondike `Palace` / FreeCell `Citadel` / Mahjong `Lantern`;
+Flow-Free/`Conduit` is a new connect mechanic (no prior path-drawing puzzle); a W-2 paycheck
+calculator/`Stub` ≠ self-employed `Quarter`; an iOS subscription tracker/`Recur` ≠ bills `Remit` /
+spending `Tally` (and the old webapp `Renewal`); real-estate exam/`Parcel` ≠ DMV `Permit` / civics
+`Citizen`; adaptive macro coach/`Fuel` (planner, not a food diary) ≠ calorie diary `Plate` / weight
+trend `Tare`.
 
 ## The 6 apps
 
-- **Citadel** — built — `runs/2026-06-16_1810-UTC/01-citadel` — FreeCell solitaire: pure `FreeCellEngine` with a Microsoft-numbered deal generator (LCG that reproduces the canonical deals), opposite-color cascade rules + four free cells + foundations, supermove validation `(free+1)·2^empty` (and `2^(empty−1)` onto an empty column), safe-autoplay collect, and snapshot undo; an `@Observable` `GameViewModel`, JSON board persistence (resume-on-relaunch), a tap-to-move board with a win overlay, a deal-number / today's-deal picker, Stats Swift Charts, Rules; SwiftData. — **Monetization:** one-time Citadel Pro $2.99 (deal-number picker, unlimited undo, extra felt themes, full stats history). — **Why it can boom:** FreeCell is a proven evergreen; the top free incumbents are ad-saturated — Citadel is the calm, ad-free, premium-feeling version with the classic numbered deals and real solver math.
-- **Quotient** — built — `runs/2026-06-16_1810-UTC/02-quotient` — Calcudoku / KenKen-style arithmetic puzzle: a `SplitMix64`-seeded generator (valid Latin square → flood-growth cage partition → solution-consistent +/−/×/÷ operations) paired with a backtracking **uniqueness solver** (counts solutions to 2; a reveal-until-unique fallback guarantees every 4×4–7×7 board is uniquely solvable), computed cage borders, notes/hint/undo/mistake-check, a deterministic Daily with streak + Pro archive, and Stats Charts; SwiftData. — **Monetization:** one-time Quotient Pro $2.99 (6×6/7×7, daily archive, unlimited puzzles, themes). — **Why it can boom:** number puzzles are a massive evergreen category, Sudoku is saturated, and Calcudoku is fresher and under-served by apps with a *real* generator + uniqueness solver — ad-free, one-time.
-- **Citizen** — built — `runs/2026-06-16_1810-UTC/03-citizen` — US naturalization civics test prep: all **100 official USCIS 2008 civics questions** (the 9 state/officeholder-dependent ones flagged with USA.gov guidance rather than auto-graded) plus the official reading & writing vocabulary lists; an `ExamEngine` with five modes (mock 10/pass-6, quick, by-category, review-flagged, weak-area adaptive) using category-aware distractors and a self-check path for varying questions; a `ProgressEngine` (readiness/mastery/streak/coverage), AVSpeech read-aloud, and Progress Charts; SwiftData. — **Monetization:** one-time Citizen Pro $4.99 (unlimited mock exams, all categories + adaptive, full vocab + practice, audio, analytics). — **Why it can boom:** ~800k+ people naturalize each year and the incumbents are ad-heavy/subscription — Citizen is the clean, accurate, one-time app with real exam simulation, adaptivity, and the vocab portions.
-- **Quarter** — built — `runs/2026-06-16_1810-UTC/04-quarter` — Self-employed quarterly tax estimator: a pure **Decimal** `TaxEngine` (2024 & 2025 federal brackets + standard deductions, SE tax 12.4%/2.9% + 0.9% additional Medicare, ½-SE deduction, taxable income, effective & marginal rate, recommended set-aside %) and a `QuarterlyEngine` (the four estimated-payment due dates + safe-harbor 90/100/110% guidance), an Income/Expense ledger that feeds the estimate, saved-scenario compare, a plain-English Learn section, RFC-4180 CSV export, and Charts; SwiftData (money persisted as Double, math in Decimal). — **Monetization:** one-time Quarter Pro $5.99 (unlimited scenarios + compare, multi-year, quarterly tracking + reminders, CSV export). — **Why it can boom:** tens of millions of gig/freelance filers, and the incumbents are subscription (e.g. Keeper) or generic budget apps — Quarter is the private, one-time estimator that does the real SE-tax + quarterly + safe-harbor math.
-- **Haven** — built — `runs/2026-06-16_1810-UTC/05-haven` — Anxiety & panic-attack grounding SOS: an SOS-first home, a wall-clock `BreathEngine` (box / 4-7-8 / calm / coherent with a Reduce-Motion arc fallback), an interactive 5-4-3-2-1 grounding walkthrough, a coping toolbox + reassurance cards + a safety plan, a `PanicEpisode` log (intensity before/after, many-to-many `Trigger`s, what-helped), and a `StatsEngine` (days-since-last, average intensity drop, top triggers, time-of-day, what-helps) with supportive Charts; Reduce-Motion-first; SwiftData. — **Monetization:** one-time Haven Plus $4.99 (all breathing patterns, unlimited custom coping/reassurance/triggers, full Insights, reminders). — **Why it can boom:** anxiety is a huge proven paying market and Rootd/Calm are subscription — Haven is the private, one-time, in-the-moment SOS + grounding + episode-insights companion (with a calm 988 disclaimer).
-- **Galley** — built — `runs/2026-06-16_1810-UTC/06-galley` — Kitchen conversion / scaling / substitution / timer toolkit: a density-aware volume↔weight `ConversionEngine` (~99 ingredient grams-per-cup) with a cooking-fraction formatter, a recipe `ScaleEngine` (by factor or target servings), a 56-entry substitution database, a `TempEngine` (°F/°C/gas mark + oven presets), and a wall-clock multi-timer `TimerEngine` (relaunch-safe, TimelineView-driven), plus a Reference of common equivalents; SwiftData cascades (SavedRecipe→RecipeIngredient, SubstitutionEntry→SubstituteOption). — **Monetization:** one-time Galley Pro $2.99 (unlimited saved recipes, custom substitutions, unlimited timers, metric/imperial extras). — **Why it can boom:** everyone cooks, and conversion/scaling/substitution/timer apps are proven utilities that are usually ad-cluttered or single-purpose — Galley is the warm all-in-one kitchen toolkit with genuinely density-aware conversion.
+- **Spindle** — built — `runs/2026-06-17_0012-UTC/01-spindle` — Spider Solitaire: a pure `Codable`
+  `SpiderEngine` (1/2/4-suit 104-card deck, 54-card deal + 5 deals of 10, same-suit run moves,
+  auto-collect K–A runs to 8 foundations, Microsoft-style scoring, snapshot undo, hint, auto-collect)
+  with an `@Observable` `GameViewModel` (double-tap auto-move, wall-clock timer re-anchored on
+  scenePhase), SplitMix64 daily/numbered/random deals, `GameResult` + single-row `SavedGame` (JSON
+  resume), and five screens (Play / New Game / Stats / How-to-Play / Settings ×8 prefs); SwiftData. —
+  **Monetization:** one-time Spindle Pro $2.99 (4-suit, daily archive, extra felt themes, full stats).
+  — **Why it can boom:** Spider is a proven evergreen and the top free apps are ad-saturated (users
+  resent paying $2/mo just to play solitaire) — Spindle is the calm, ad-free, premium version with
+  classic numbered deals and real engine math.
+- **Conduit** — built — `runs/2026-06-17_0012-UTC/02-conduit` — Flow-Free-style connect puzzle: an
+  `@Observable` `ConduitEngine` (drag-draw pipes, Flow-rule conflict truncation, live coverage %,
+  undo/hint/reset) over a **45-puzzle bank** built from Hamiltonian snakes cut into per-color segments
+  (guarantees a solvable 100%-coverage solution; all 45 simulation-verified), five packs 5×5–9×9,
+  `SavedBoard` resume + date-seeded Daily + streak, and Play / Levels / Daily / Stats / Settings with a
+  color-blind mode; SwiftData. — **Monetization:** one-time Conduit Pro $2.99 (Master/Mind-bender 8×8/
+  9×9 packs, daily archive, color-blind palettes). — **Why it can boom:** Flow Free is a 100M+-download
+  proven mechanic; incumbents are ad-heavy — Conduit is the ad-free, one-time version with a real
+  guaranteed-solvable generator and a calm design.
+- **Stub** — built — `runs/2026-06-17_0012-UTC/03-stub` — Take-home paycheck calculator + job-offer
+  comparator: a pure **Decimal** `PaycheckEngine` (2025 federal brackets per filing status + standard
+  deduction, FICA with the $176,100 SS cap + 0.9% additional Medicare, 50-state+DC approximate rates,
+  documented pre-tax treatment for 401(k)/HSA/§125 premiums), a live net-per-paycheck hero, a breakdown
+  donut with marginal/effective rates, multi-scenario Compare (BarMark), and `PayScenario` CRUD;
+  SwiftData (money in Decimal). — **Monetization:** one-time Stub Pro $4.99 (unlimited scenarios +
+  3-way compare, full state detail, CSV export). — **Why it can boom:** everyone with a job wants to
+  know their real take-home, paycheck/offer calculators are massively used (ADP/SmartAsset), and a
+  private native one-time app that does the real bracket+FICA+state math fills the gap.
+- **Recur** — built — `runs/2026-06-17_0012-UTC/04-recur` — Subscription & recurring-payment tracker:
+  Decimal `CostEngine` (cycle→monthly/annual), a month-end/leap-safe `RenewalEngine` (next/previous
+  renewal + upcoming feed), trial-ending alerts, and a `SummaryEngine` (totals, by-category, by-cycle);
+  `Subscription` cascades `PriceChange`, seeded with 13 realistic subs; Dashboard (donut) /
+  Subscriptions (sort/filter/search/swipe) / Detail+Editor (color + SF-Symbol + price-history
+  sparkline) / Calendar+Insights (Charts) / Settings, with capped local renewal+trial reminders;
+  SwiftData. — **Monetization:** one-time Recur Pro $3.99 (unlimited subs, push reminders, full
+  insights, price logging, CSV). — **Why it can boom:** subscription fatigue is real and the "save you
+  money" trackers are themselves subscriptions; Bobby's one-time model is the praised exception — Recur
+  is the private, one-time, trial-catching version done with taste.
+- **Parcel** — built — `runs/2026-06-17_0012-UTC/05-parcel` — Real-estate license exam prep: **120
+  national-portion questions** across 10 topics (each explained), a `SessionBuilder` + `@Observable`
+  `ExamSession` with five modes (mock / quick / topic / review / adaptive — SplitMix64 option shuffle +
+  mastery-weighted selection), a `ProgressEngine` (readiness / per-topic mastery / pass-rate / streak,
+  all division-guarded), instant-feedback study vs deferred mock grading, a full per-question review +
+  redo-missed, AVSpeech read-aloud, and Home / Exam / Topics(+browse) / Progress(Charts) / Settings;
+  SwiftData. — **Monetization:** one-time Parcel Pro $6.99 (unlimited mocks, adaptive + review, all
+  topics, audio, analytics). — **Why it can boom:** real-estate students routinely pay $50–$200+ for
+  prep and incumbents are short-window subscriptions (PrepAgent) or ad apps — Parcel is the private,
+  native, one-time exam simulator with adaptive weak-area targeting and explanations on every question.
+- **Fuel** — built — `runs/2026-06-17_0012-UTC/06-fuel` — Macro & TDEE adaptive coach: a pure engine
+  (Mifflin/Katch BMR × activity → TDEE; a %-bodyweight goal rate converted via 7700 kcal/kg with
+  safe-rate guardrails + a calorie floor; protein-g/kg macro presets) plus the differentiator — an
+  **adaptive TDEE** that re-estimates true expenditure from EMA-smoothed weigh-ins via energy balance
+  (`avgIntake − Δweight·7700/days`) and recommends a weekly target change with a rationale — a
+  refeed/diet-break scheduler, and a projected finish date; `Profile` / `CheckIn` / `TargetSnapshot`,
+  Today (ring + macro bars) / Plan / Check-ins / Insights(Charts) / Settings, kg-lb units; SwiftData. —
+  **Monetization:** one-time Fuel Pro $5.99 (adaptive recalibration, refeed scheduler, unlimited
+  history, CSV). — **Why it can boom:** MacroFactor proved people pay for adaptive-TDEE coaching, but
+  it's a subscription — Fuel delivers the same on-device adaptive math (without a food diary) for one
+  purchase.
 
 ## Top recommendation
 
-**Quarter.** It has the strongest willingness-to-pay setup in the batch: freelancers and gig workers are a large, money-motivated audience that already pays for inferior tools, and the moat is the proven pattern from prior runs — doing the hard math the incumbents gate or fumble (an all-`Decimal` SE-tax + quarterly + safe-harbor engine with verified 2024/2025 figures), fully private and on-device, for one purchase. High price point ($5.99 Pro), clear expansion path (Schedule-C/E categorization, multi-state, prior-year import). **Haven** is the high-emotion runner-up (a huge proven wellness market with subscription-fatigued users and an obvious one-time wedge), and **Citadel**/**Quotient** are the high-volume top-charts plays where ad-free execution wins.
+**Stub.** Broadest audience in the batch (essentially everyone who earns a W-2 paycheck or is weighing
+a job offer), an instantly-understood value prop ("what's my real take-home?"), and the proven Orbioom
+moat — doing the hard math the free web tools fragment or gate, all-`Decimal` and private, for one
+purchase. Clear expansion path (multi-state precise tables, hourly/overtime nuances, bonus withholding,
+HSA/FSA modeling). **Parcel** is the strongest willingness-to-pay runner-up (a career-investment
+audience that already pays real money for subscription prep, beaten with a one-time native app), and
+**Spindle**/**Conduit** are the high-volume top-charts plays where ad-free execution wins.
 
 ## Research signals worth following next run
 
-- The registry now spans **255 builds**. Proven gaps still open after this run: more **fair casual games** (Spider/Klondike-variant solitaires beyond FreeCell, dominoes, Forty Thieves, bubble-shooter, Flow-Free-style connect, Kakuro), and **"subscription-refugee" pro/finance tools** (an LLC/Schedule-C expense categorizer, a 1099-vs-W-2 take-home comparator, a Roth-conversion or RMD planner).
-- **Test-prep verticals keep paying off with a fresh question bank on a reusable engine** — Permit (DMV) and now Citizen (civics) both landed; adjacent one-time plays: real-estate license, CDL, ASVAB, US/UK theory, NCLEX-style flashcards, or a cosmetology/contractor exam — same `ExamEngine`/`ProgressEngine` pattern, new content.
-- **Engine/accuracy moats remain the durable wedge** — Citadel (deal generator + supermove), Quotient (uniqueness solver), Quarter (Decimal tax engine) reinforce that doing the hard logic the incumbent gates is what differentiates. Candidates: an amortization-aware refinance/recast analyzer, an options P&L modeler, a macro/TDEE planner with cyclical refeeds.
-- **Avoid:** anything resembling our own past builds (now 255, heavily covering health/fitness/finance/food/journaling/games/collections/test-prep) — keep checking SHIPPED.md first and prefer big validated markets executed with taste over niche hobby trackers.
+- The registry now spans **261 builds**. Proven gaps still open: more **fair casual games** (Spider is
+  done now, but Forty Thieves / Pyramid / Tri-Peaks / Golf solitaires, dominoes, Hearts/Spades/Gin
+  with AI, bubble-shooter, Kakuro/cross-sums remain), and **"subscription-refugee" finance tools** (a
+  rent-vs-buy decision calculator, an HSA/FSA optimizer, a Roth-conversion or RMD planner, a 1099-vs-W2
+  comparator that builds on `Stub`'s engine).
+- **Test-prep verticals keep paying off** with a fresh question bank on the reusable `ExamEngine`/
+  `ProgressEngine` pattern — Permit (DMV), Citizen (civics), now Parcel (real estate). Adjacent
+  one-time plays: ASVAB, CDL, NCLEX-style, insurance/series-7, cosmetology/contractor, or a teacher
+  (Praxis) exam — same engine, new content.
+- **Engine/accuracy moats remain the durable wedge** — Spindle (deal generator + supermove), Conduit
+  (guaranteed-solvable Hamiltonian bank), Stub (Decimal tax engine), Fuel (adaptive TDEE) all reinforce
+  that doing the hard logic the incumbent gates is what differentiates. Avoid anything resembling our
+  own past builds (now 261, heavily covering health/fitness/finance/food/journaling/games/collections/
+  test-prep) — keep checking SHIPPED.md first.
