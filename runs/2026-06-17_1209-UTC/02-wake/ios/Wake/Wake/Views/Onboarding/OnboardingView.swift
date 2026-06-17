@@ -1,0 +1,98 @@
+import SwiftUI
+
+/// Three-page onboarding gated by hasOnboarded.
+struct OnboardingView: View {
+    @AppStorage(PrefKey.hasOnboarded) private var hasOnboarded = false
+    @AppStorage(PrefKey.hapticsEnabled) private var hapticsEnabled = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var page = 0
+
+    private struct Page: Identifiable {
+        let id = UUID()
+        let symbol: String
+        let title: String
+        let body: String
+    }
+
+    private let pages: [Page] = [
+        Page(symbol: "figure.pool.swim",
+             title: "Swim with a plan",
+             body: "Wake is a focused pool tracker. Build structured workouts of sets — like 4×100 freestyle on 1:45 — and swim them with a guided interval clock."),
+        Page(symbol: "stopwatch",
+             title: "An in-pool clock that survives the lock",
+             body: "Tap to record each rep's split and watch the rest countdown. The timer is anchored to a real clock time, so locking your phone or a relaunch won't lose your place."),
+        Page(symbol: "chart.xyaxis.line",
+             title: "See your pace improve",
+             body: "Every swim is logged offline on your device. Pace per 100, SWOLF, distance by stroke, and weekly volume — no account, no subscription.")
+    ]
+
+    var body: some View {
+        ZStack {
+            Theme.bg.ignoresSafeArea()
+            VStack(spacing: 0) {
+                TabView(selection: $page) {
+                    ForEach(Array(pages.enumerated()), id: \.element.id) { index, item in
+                        pageView(item).tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .always))
+                .animation(reduceMotion ? nil : .easeInOut, value: page)
+
+                VStack(spacing: 12) {
+                    PrimaryButton(title: page == pages.count - 1 ? "Start swimming" : "Next",
+                                  systemImage: page == pages.count - 1 ? "checkmark" : "arrow.right") {
+                        advance()
+                    }
+                    Button("Skip") { finish() }
+                        .font(Theme.rounded(15))
+                        .foregroundStyle(Theme.inkSoft)
+                        .opacity(page == pages.count - 1 ? 0 : 1)
+                        .disabled(page == pages.count - 1)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+            }
+        }
+    }
+
+    private func pageView(_ item: Page) -> some View {
+        VStack(spacing: 22) {
+            Spacer()
+            ZStack {
+                Circle()
+                    .fill(Theme.accentSoft)
+                    .frame(width: 132, height: 132)
+                Image(systemName: item.symbol)
+                    .font(.system(size: 60, weight: .regular))
+                    .foregroundStyle(Theme.accent)
+            }
+            .accessibilityHidden(true)
+            Text(item.title)
+                .font(Theme.rounded(28, .bold))
+                .foregroundStyle(Theme.ink)
+                .multilineTextAlignment(.center)
+            Text(item.body)
+                .font(.body)
+                .foregroundStyle(Theme.inkSoft)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 32)
+            Spacer()
+        }
+        .padding(.bottom, 40)
+    }
+
+    private func advance() {
+        if page < pages.count - 1 {
+            Haptics.tap(hapticsEnabled)
+            withAnimation(reduceMotion ? nil : .easeInOut) { page += 1 }
+        } else {
+            finish()
+        }
+    }
+
+    private func finish() {
+        Haptics.success(hapticsEnabled)
+        hasOnboarded = true
+    }
+}
