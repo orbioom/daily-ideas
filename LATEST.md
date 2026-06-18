@@ -1,54 +1,27 @@
-# Latest run — 2026-06-17_1806-UTC
+# Latest run — 2026-06-18_0725-UTC
 
-Folder: `runs/2026-06-17_1806-UTC/` — 6 production-ready native iOS apps, all **built** (none deferred).
-Each ships a XcodeGen `project.yml` (no hand-written `.xcodeproj`), a real designed 1024 AppIcon
-(per-app glyph on a gradient) + AccentColor + LaunchBackground (light+dark), SwiftData persistence,
-onboarding/empty/loading/error/success states, ≥3 persisted Settings prefs, full accessibility
-(Dynamic Type + VoiceOver + Reduce Motion), first-class light+dark, and a simulated one-time Pro
-unlock. **217 Swift files total** (Mural 39, Sigma 34, Thump 32, Caliper 34, Trace 41, Tangle 37).
+Folder: `runs/2026-06-18_0725-UTC/` — **6 production-ready native iOS apps** (slots 01–06), each shipped as a XcodeGen `project.yml` + Swift sources + real 1024 AppIcon + README. Generate with `./gen.sh` (or `xcodegen generate` in each `ios/`), open in Xcode 15+, run on an iOS 17 simulator.
 
-Self-reviewed compile-by-inspection per app, then audited at the top level across all six:
-**zero** `try!` / `as!` / `NavigationView` / `@Previewable` / single-arg `.onChange`; the only
-`fatalError` is the documented unreachable in-memory `ModelContainer` fallback (one per app); no
-force-unwrap suspects on user paths; every `@Model` registered in its app's `Schema` (verified per
-app — Mural 2, Sigma 1, Thump 3, Caliper 2, Trace 2, Tangle 3, all matching); no duplicate
-top-level type names per app; all six `project.yml` parse as valid YAML naming the real source
-folder + `Info.plist`; all six `Info.plist` valid XML with `UILaunchScreen`; all six 1024 AppIcons
-present (1024×1024 PNG); all asset `Contents.json` valid. (The only anti-stub/brace-count flags were
-`.redacted(reason: .placeholder)` — a real SwiftUI loading API — and parens/brackets inside string
-literals/comments, all confirmed benign.)
+All six were checked against the 279-entry `SHIPPED.md` registry and are genuinely new concepts in large, proven markets (the registry already covers habit/sleep/finance/most casual games/most health trackers, so this run targets the remaining white space).
 
-This batch deliberately opens **six big, proven, monetizable markets the 273-entry registry had not
-yet touched**: a generative wallpaper studio, a scientific/programmer calculator, a step-sequencer
-drum machine, a body-measurement tracker, a kids letter-tracing app, and a Wordscapes-style word
-puzzle. Each is "the version people wish existed": same proven job, dramatically better terms
-(one-time / generous free core vs the incumbent's ads, watermarks, energy-timers, or subscriptions).
+## The 6 apps
 
-## The six apps
-
-- **Mural** — built — `runs/2026-06-17_1806-UTC/01-mural` — generative aesthetic wallpaper studio: a pure `WallpaperRenderer` draws 7 real styles (linear/mesh-radial/seeded low-poly/stripes/dot-field/layered-sine aurora/quote) into a SwiftUI Canvas with grain/vignette/blur, deterministic SplitMix64 seeds, 4K `ImageRenderer` export to Photos + ShareLink, a SwiftData library (open-in-studio), 18 built-in + custom palettes, and 6 preset packs — Monetization: one-time **$3.99** Pro (unlimited library/palettes/packs, 4K & grain-free export); 7 styles + 12 saves + built-in palettes + 2 packs free — Why it can boom: wallpaper apps have huge top-of-funnel demand but are universally hated for ads/watermarks; a beautiful, on-device, watermark-free generator with a fair one-time unlock is exactly the gap.
-- **Sigma** — built — `runs/2026-06-17_1806-UTC/02-sigma` — scientific + programmer calculator with a persistent history tape and unit converter: a real `ExpressionEvaluator` (tokenizer → shunting-yard → RPN, DEG/RAD, scientific functions, constants, fully guarded), a 9-category `UnitConverter` (factor + affine temperature), and a `BaseConverter` (DEC/HEX/BIN/OCT + bitwise ops, 8/16/32/64-bit), with a searchable SwiftData tape — Monetization: one-time **$2.99** Pro (unlimited history, constants library, themes, high-precision); calculator + history + converter + programmer all free — Why it can boom: PCalc proved people happily pay ~$10 for a great calculator while free ones are ad-ridden; a beautiful one-time scientific+programmer+converter undercuts that directly.
-- **Thump** — built — `runs/2026-06-17_1806-UTC/03-thump` — step-sequencer drum machine / beat maker with **100% code-synthesized** audio (no audio files): `AVAudioEngine` + 8 player nodes, a `DrumSynth` that renders each voice once into an `AVAudioPCMBuffer` via pure DSP (pitch-env kick, tone+noise snare, bright-noise hats, multi-burst clap, rim, cowbell), a `DispatchSourceTimer` step clock with swing, per-track mixing, 5 kits, pattern CRUD, and a song-chain mode — Monetization: one-time **$4.99** Pro (all 5 kits, unlimited patterns, per-step velocity, 32 steps); sequencer + song + 2 kits + 8 patterns free — Why it can boom: music-creation apps have proven viral reach; an instant, offline, ad-free beat maker with synthesized kits and no IAP nags is a delightful, shareable hook.
-- **Caliper** — built — `runs/2026-06-17_1806-UTC/04-caliper` — body-measurement & physique tracker: pure `BodyMath` (US Navy body-fat % with log-guards, BMI, waist-to-hip, normalized FFMI, least-squares weekly rate, smoothing), 14 measurement sites, metric/imperial, goals, and Swift Charts trends, with a 5-month seeded recomp dataset so it looks alive — Monetization: one-time **$4.99** Pro (custom sites, FFMI/advanced insights, CSV export, full history); weight/BF%/waist + core logging + basic charts free — Why it can boom: body-measurement tracking rides the enormous fitness market, pairs with every program, and the incumbents are bloated/ad-laden; a private, beautiful, formula-honest one-time tracker is the clean alternative.
-- **Trace** — built — `runs/2026-06-17_1806-UTC/05-trace` — kids letter/number/shape tracing (ages ~3–6): a `GlyphLibrary` of normalized stroke polylines for A–Z, a–z, 0–9 and 7 shapes (with start directions), a crash-proof `TracingScorer` (coverage + accuracy → 1–3 stars), finger+Pencil capture over a Canvas with road/numbered-dot/arrow guides, multi-profile progress, custom word tracing, and a parent gate — Monetization: one-time **$4.99** Pro (lowercase/numbers/shapes, unlimited profiles, word tracing, no-fail mode); uppercase A–Z + 1 profile free — Why it can boom: parents pay readily for early-learning apps and hate the ad/IAP-nagging incumbents; a calm, private, ad-free tracer with real handwriting scoring is exactly what they want.
-- **Tangle** — built — `runs/2026-06-17_1806-UTC/06-tangle` — Wordscapes-style word-find crossword: a pure, deterministic `CrosswordPacker` (longest-first greedy interlocking layout with full conflict/adjacency validation, drops unplaceable words to bonus, bounds-guarded), a count-aware `LetterMultiset`, a tap/drag letter wheel with animated reveals, 16 machine-validated levels across 3 packs, a date-seeded daily puzzle with a streak, and a bonus-word "Word Jar" — Monetization: one-time **$3.99** Pro (all packs/levels, unlimited hints, relaxed mode); first pack + daily + word jar + limited hints free — Why it can boom: Wordscapes/Word Connect are top-grossing but crammed with ads, pop-ups, and energy-timers; a relaxing, ad-free, offline, one-time version targets the exact complaint in their 1-star reviews.
+- **Pangram** — built — `01-pangram` — Spelling-Bee-style word game: find words from 7 honeycomb letters (must use the center), pangrams, 10-rank ladder, deterministic daily + unlimited practice, streak + Stats. — *Monetization:* one-time Pro (unlimited practice, full daily archive, hints page, themes). — *Why it can boom:* NYT Spelling Bee is wildly popular but locked behind the NYT Games subscription and offline-hostile; ours is free, offline, unlimited, ad-free.
+- **Crest** — built — `02-crest` — TriPeaks solitaire with 3 layouts, combo scoring, undo/hint, wall-clock timer, daily/numbered/random deals, resume-on-relaunch, streak + Stats. — *Monetization:* one-time Pro (Pyramid/Diamond layouts, daily archive, felt themes, export). — *Why it can boom:* solitaire is evergreen top-grossing but the incumbents are ad-saturated and naggy; ours is a clean ad-free one-time buy.
+- **Glimpse** — built — `03-glimpse` — Photo-a-day moment journal (photo + caption + mood + tags), streak, Timeline/Calendar-heatmap/Memories ("on this day")/Stats, montage export, daily reminder. — *Monetization:* one-time Pro (multiple moments/day, multiple journals, montage export, themes). — *Why it can boom:* 1 Second Everyday is video-only + subscription and Day One is subscription; ours is a simple, private, one-time photo-a-day journal with Memories.
+- **Fetch** — built — `04-fetch` — Dog training & tricks coach: 40 step-by-step tricks + 5 programs, multi-dog progress, training-day streak, full-screen session player with a synthesized clicker, Stats. — *Monetization:* one-time Pro (unlimited dogs, all programs, advanced stats, custom tricks). — *Why it can boom:* dog ownership is huge and Dogo/GoodPup charge up to ~$40/mo (some with human trainers); ours is a one-time self-serve trick library.
+- **Assay** — built — `05-assay` — Private bloodwork/lab-results tracker: 36-marker catalog with sex-specific reference + optimal ranges, status/trend engines, history charts with band shading, doctor CSV/text report. — *Monetization:* one-time Pro (unlimited markers/history, report export, custom markers, trend insights). — *Why it can boom:* Function Health ($499/yr) made self-tracked bloodwork go viral in 2024–25 and people have nowhere good to log results; ours is private, on-device, one-time, works with any lab.
+- **Crisp** — built — `06-crisp` — Air-fryer cooking guide + multi-timer: 68-food catalog (fresh/frozen, shake/flip, internal temps), portion scaling, oven→air-fryer + unit conversion, doneness temps, relaunch-safe concurrent timers with notifications. — *Monetization:* one-time Pro (unlimited timers + custom foods, doneness pro). — *Why it can boom:* air fryers are in most kitchens and the App Store options are ad/IAP-junk reference lists; ours is an accurate guide plus a real multi-timer.
 
 ## Top recommendation
 
-**Tangle** is the strongest revenue-quality bet: word-find crossword games (Wordscapes, Word Connect)
-are perennial top-grossing titles with mass appeal, and their 1-star reviews are a wall of complaints
-about ads, interstitials, and energy-timers. A relaxing, fully offline, ad-free version with a real
-deterministic crossword packer and a fair one-time unlock hits that pain squarely and has the broadest
-audience of the six. Runner-up for "boom" is **Mural** — wallpaper demand is enormous and the
-watermark/ads gripe is universal — with **Thump** the most viral/shareable wildcard.
+**Pangram.** Of the six it has the widest, most proven appetite (a daily word game people already play obsessively), the cleanest viral loop (shareable daily score + streak), and the strongest "incumbent is mediocre/paywalled" wedge (NYT Spelling Bee behind a subscription, no good free/offline version). It's also pure on-device logic with no data dependencies, so it ships clean. **Crest** is the safe runner-up (evergreen solitaire demand). **Assay** is the highest-ceiling sleeper, riding the longevity/biohacking wave.
 
 ## Research signals worth following next run
 
-- **Aesthetic home-screen widgets / icon themes** (Widgetsmith, Brass, Color Widgets) remain a proven
-  multi-million-dollar market we have *not* shipped — worth a multi-target WidgetKit build next run.
-- **Live retro/film camera** (Dazz Cam, OldRoll, 1888) is viral and top-charting; distinct from our
-  Lumen *editor* because it's a capture experience (kept off this batch to avoid mechanic overlap).
-- **Wall Pilates / short guided workouts** were 2024–25 revenue monsters but overlap our existing
-  guided-player apps (Flow/Brio/Daybreak/Lace) — would need a genuinely new mechanic to qualify.
-- **Word/anagram puzzle family** is deep (Tangle opens it) — Word Cookies, anagram brain games, and
-  daily word ladders are adjacent proven hits if differentiated from Tangle's mechanic.
+The registry is now ~285 deep and most obvious large markets are taken. Confirmed still-open, proven-demand gaps observed while scoping this run:
+- **Spelling Bee / anagram word finder** — now taken (Pangram); a *crossword* (clue-based) remains open but needs a sizeable clue bank.
+- **TriPeaks/Pyramid solitaire** — now taken (Crest); remaining solitaire families: *Golf*, *Yukon*, *Forty Thieves*.
+- **Air-fryer / cooking-times** — now taken (Crisp); adjacent open: *sous-vide time/temp guide* (explicitly not done yet), *Instant-Pot pressure-cook guide*.
+- **Lab/bloodwork** — now taken (Assay); adjacent open: *supplement-stack / longevity-protocol tracker*.
+- Still genuinely open big-ish markets seen but not built: **adult coloring / mandala** (art-authoring is the hard part), **brain-training mini-games suite** (Elevate/Peak — large build), **manga/webtoon reading tracker**, **award-travel miles & points balance tracker**, **fitness progress-photo / body-transformation** (distinct from the body-measurement tracker already shipped).
