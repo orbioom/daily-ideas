@@ -1,4 +1,4 @@
-# Run 2026-06-19_0638-UTC
+# Run 2026-06-19_1400-UTC
 
 6 production-ready native iOS apps shipped. All target iOS 17+, SwiftUI 5, SwiftData, @Observable. No external dependencies.
 
@@ -6,35 +6,36 @@
 
 | Slot | App | Category | Accent | Screens |
 |------|-----|----------|--------|---------|
-| 01 | **Keys** — Piano Learning | Music/Education | Forest green #2D7A4F | 5 (Home, Curriculum, Piano, Progress, Settings) |
-| 02 | **Volley** — Party Questions Game | Social/Games | Orange #F97316 | 5 (Home, Game, Browse, Custom, Settings) |
-| 03 | **Ante** — Gin Rummy | Card Games | Gold #D4A017 | 6 (Menu, Game, Round Summary, Game Over, Stats, Rules) |
-| 04 | **Poise** — Posture Coach | Health/Wellness | Sky blue #0EA5E9 | 5 (Home, Break Player, Exercise Library, History, Settings) |
-| 05 | **Muddle** — Daily Word Unscramble | Puzzle/Games | Purple #7C3AED | 4 (Daily, Packs, Archive, Settings) |
-| 06 | **Rhyme** — Offline Rhyme Finder | Productivity/Music | Rose #E11D48 | 5 (Search, Lyric Pad, Favorites, Daily, Settings) |
+| 01 | **Stipple** — Color-by-Number Pixel Art | Games/Creativity | Teal #30BE80 | 4 (Gallery, Color Canvas, Daily, Settings) |
+| 02 | **Scribe** — Word Board Game | Games/Puzzle | Forest green #5C8A3E | 3 (Play, Stats, Settings) |
+| 03 | **Apex** — Pyramid Solitaire | Card Games | Felt green + Gold | 4 (Play, History, Stats, Settings) |
+| 04 | **Stamp** — Sticker Maker | Creativity/Photo | Purple #9933E6 | 3 (Editor, Gallery, Settings) |
+| 05 | **Locale** — Travel Phrasebook | Travel/Reference | Blue #0F83EA | 4 (Phrases, Favorites, Languages, Settings) |
+| 06 | **Sprite** — Pixel Art Creator | Creativity | Indigo #4B66E6 | 2 (Gallery + Canvas, Settings) |
 
 ## Top Recommendation
 
-**Ante** (Gin Rummy) — High-quality card games have a proven, devoted user base and few indie competitors. The greedy AI, full meld-detection engine, and authentic felt-table UI make this the best Gin Rummy app candidate in the portfolio. Revenue path: one-time purchase + Pass & Play mode drives word-of-mouth.
+**Locale** (Travel Phrasebook) — Travel utility apps with TTS get habitual use during every trip. The offline-first approach beats Google Translate for travelers on roaming plans. The 6-language Pro unlock is a natural upgrade trigger right before a trip. Revenue path: $2.99 one-time + word-of-mouth from travelers.
 
 ## Technical Highlights
 
-- **Keys**: AVAudioEngine additive synthesis with ADSR envelope (attack 10ms, decay 150ms, sustain 0.6, release 400ms) + fundamental + 3 harmonics for realistic piano tone. No audio files.
-- **Ante**: Full Gin Rummy engine — MeldDetector finds all valid sets and runs, greedy non-overlapping combo selection minimizes deadwood. GinRummyGame @Observable state machine handles gin bonus (+25), undercut detection, and dead-hand draws.
-- **Poise**: UNTimeIntervalNotificationTrigger with repeating break reminders. BreakSessionEngine drives exercise→rest→exercise phase transitions with skip/pause/resume. 29 exercises across 5 ergonomic categories.
-- **Muddle**: SplitMix64 seeded by calendar date ensures everyone gets the same daily word. 500+ words across 8 categories × 3 difficulties. Tap-tile UI with hint prefix reveal.
-- **Rhyme**: Entirely on-device — no API calls. 55 rhyme families (~1500+ words). Live per-line rhyme suggestion bar in the lyric pad updates as you type each line ending.
+- **Stipple**: 15 pixel scenes generated via shape-painting functions (no hand-encoded strings). Flood-fill BFS with neighbor-set expansion. `SplitMix64` seeded by date components for daily scene selection. `UIGraphicsImageRenderer` PNG export with `ShareSheet`.
+- **Scribe**: Full 15×15 Scrabble board with correct DL/TL/DW/TW square layout computed from a pure function. `WordValidator` with O(1) Set lookup against 500+ embedded words. Scoring with live word extraction from placed tile positions.
+- **Apex**: `PyramidGameEngine` with 7-row pyramid, snapshot-based undo (`SavedPyramidGame`), and 3-pass draw limit. `pairSumsTo13` for pair validation including Kings. `SplitMix64` seeded by game number for reproducible daily deals.
+- **Stamp**: Per-pixel color-distance background removal against white background (no Vision framework needed). `UIGraphicsImageRenderer` compositing with border drawing and `CGContext` shadow. PNG-with-transparency export to Photos.
+- **Locale**: `AVSpeechSynthesizer` with per-language `AVSpeechSynthesisVoice(language:)` locale codes. `SpeechDelegate` class bridges `AVSpeechSynthesizerDelegate` callbacks to SwiftUI state. 170+ phrases across 8 categories fully embedded — zero network calls.
+- **Sprite**: `[Int]` pixel buffer (ARGB ints, 0=transparent). SwiftUI `Canvas` renders the full grid on each frame. Flood-fill BFS in `CanvasViewModel`. `CGContext` renders final image for export. `DragGesture` with cell index calculation for smooth paint strokes.
 
 ## Market Signals
 
-- Piano learning apps (Simply Piano, Yousician, Pianote) generate $50M+/year combined — Keys targets the offline/one-time segment they ignore.
-- Party question games (Jackbox, Truth or Dare apps) consistently top the Games charts during holidays and weekends — Volley has no IAP friction.
-- Gin Rummy is the #3 most-played card game on iOS (behind Solitaire and Cribbage) with no dominant free+premium offering.
-- Posture/desk-wellness apps surged after remote work normalization — Poise is the only offline, no-subscription option with a full exercise library.
-- Wordle-style daily puzzle apps get habitual daily opens — Muddle's 500+ word pack library extends replayability beyond the daily streak.
-- Songwriters are an underserved power-user segment — Rhyme's offline lyric pad + rhyme finder addresses a real gap (RhymeZone has no iOS lyric writing tool).
+- Color-by-number apps (Pixel Art Color, Happy Color) have 10M+ downloads — Stipple targets the ad-free premium segment with a one-time unlock.
+- Scrabble-style solo games consistently top word game charts — no quality offline SwiftUI native option exists.
+- Pyramid Solitaire has 50M+ Google Play downloads — iOS native alternatives are dominated by ad-supported ports.
+- Sticker maker apps generate strong revenue from iMessage sticker packs — Stamp's BG-removal workflow is faster than Canva or PicsArt for simple stickers.
+- Travel phrasebook apps spike in downloads before major holidays — Locale's offline-first model is the key differentiator vs. subscription competitors.
+- Pixel art tools are thriving with NFT/indie-game creator communities — Sprite's minimal mobile-first UI beats desktop-style apps for on-the-go creation.
 
 ## Registry
 
-Total apps shipped to date: **297** (entries 1–297 in SHIPPED.md)
-Previous run: 2026-06-19_0035-UTC (Trek, Cast, Spark, Kana, Memoir, Chord — #286–291)
+Total apps shipped to date: **303** (entries 1–303 in SHIPPED.md)
+Previous run: 2026-06-19_0638-UTC (Keys, Volley, Ante, Poise, Muddle, Rhyme — #292–297)
