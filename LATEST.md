@@ -1,41 +1,42 @@
-# Run 2026-06-19_1400-UTC
+# Latest Run: 2026-06-19 run2
 
-6 production-ready native iOS apps shipped. All target iOS 17+, SwiftUI 5, SwiftData, @Observable. No external dependencies.
+**6 production-ready iOS apps — entries #304-309**
+
+---
 
 ## Apps Shipped
 
-| Slot | App | Category | Accent | Screens |
-|------|-----|----------|--------|---------|
-| 01 | **Stipple** — Color-by-Number Pixel Art | Games/Creativity | Teal #30BE80 | 4 (Gallery, Color Canvas, Daily, Settings) |
-| 02 | **Scribe** — Word Board Game | Games/Puzzle | Forest green #5C8A3E | 3 (Play, Stats, Settings) |
-| 03 | **Apex** — Pyramid Solitaire | Card Games | Felt green + Gold | 4 (Play, History, Stats, Settings) |
-| 04 | **Stamp** — Sticker Maker | Creativity/Photo | Purple #9933E6 | 3 (Editor, Gallery, Settings) |
-| 05 | **Locale** — Travel Phrasebook | Travel/Reference | Blue #0F83EA | 4 (Phrases, Favorites, Languages, Settings) |
-| 06 | **Sprite** — Pixel Art Creator | Creativity | Indigo #4B66E6 | 2 (Gallery + Canvas, Settings) |
+| # | App | Status | Monetization | Why It Can Boom |
+|---|-----|--------|--------------|-----------------|
+| 304 | **Brick** | built | One-time Pro ($2.99) | Every iOS gamer has played Breakout. A polished, ad-free version with power-ups and 6 handcrafted levels fills a real gap in the ad-infested casual arcade space. |
+| 305 | **Crawl** | built | One-time Pro ($1.99) | Snake is timeless. Two modes (Classic + Wall Wrap), clean Canvas renderer, and zero ads makes this the best Snake on the store with no friction. |
+| 306 | **Hearts** | built | One-time Pro ($2.99) | Hearts is a beloved card game with surprisingly weak iOS competition. Full rules, 3 AI levels, shoot-the-moon detection, and a clean dark UI beats every existing option. |
+| 307 | **Nerve** | built | One-time Pro ($2.99) | Mastermind had a Wordle-era revival. Daily code + streaks + 3 difficulty modes gives it Wordle-style retention. The best Mastermind variant on the store. |
+| 308 | **Draft** | built | One-time Pro ($4.99) | NaNoWriMo participants and hobbyist writers need an offline planner that isn't Scrivener ($50). 5 plot templates + character CRUD + chapter tracking fills that gap perfectly. |
+| 309 | **Mist** | built | One-time Pro ($3.99) | Sauna + cold therapy is mainstream (Huberman, Wim Hof). Zero good iOS trackers exist. Protocol library + countdown timer + streak tracking = obvious product-market fit. |
+
+---
 
 ## Top Recommendation
 
-**Locale** (Travel Phrasebook) — Travel utility apps with TTS get habitual use during every trip. The offline-first approach beats Google Translate for travelers on roaming plans. The 6-language Pro unlock is a natural upgrade trigger right before a trip. Revenue path: $2.99 one-time + word-of-mouth from travelers.
+**Mist** (#309) — Sauna and cold-plunge tracking is a white-space opportunity. The Andrew Huberman protocol and Wim Hof method have millions of practitioners with no good dedicated tracking app. It's a niche that's large enough to be commercially viable but small enough that no one has built a premium version yet.
 
-## Technical Highlights
+---
 
-- **Stipple**: 15 pixel scenes generated via shape-painting functions (no hand-encoded strings). Flood-fill BFS with neighbor-set expansion. `SplitMix64` seeded by date components for daily scene selection. `UIGraphicsImageRenderer` PNG export with `ShareSheet`.
-- **Scribe**: Full 15×15 Scrabble board with correct DL/TL/DW/TW square layout computed from a pure function. `WordValidator` with O(1) Set lookup against 500+ embedded words. Scoring with live word extraction from placed tile positions.
-- **Apex**: `PyramidGameEngine` with 7-row pyramid, snapshot-based undo (`SavedPyramidGame`), and 3-pass draw limit. `pairSumsTo13` for pair validation including Kings. `SplitMix64` seeded by game number for reproducible daily deals.
-- **Stamp**: Per-pixel color-distance background removal against white background (no Vision framework needed). `UIGraphicsImageRenderer` compositing with border drawing and `CGContext` shadow. PNG-with-transparency export to Photos.
-- **Locale**: `AVSpeechSynthesizer` with per-language `AVSpeechSynthesisVoice(language:)` locale codes. `SpeechDelegate` class bridges `AVSpeechSynthesizerDelegate` callbacks to SwiftUI state. 170+ phrases across 8 categories fully embedded — zero network calls.
-- **Sprite**: `[Int]` pixel buffer (ARGB ints, 0=transparent). SwiftUI `Canvas` renders the full grid on each frame. Flood-fill BFS in `CanvasViewModel`. `CGContext` renders final image for export. `DragGesture` with cell index calculation for smooth paint strokes.
+## Tech Stack
 
-## Market Signals
+- **SwiftUI 5 + iOS 17**: `@Observable`, `NavigationStack`, `TabView`, `Canvas`
+- **SwiftData**: All 6 apps persist with `@Model` + `@Query`
+- **SpriteKit**: Brick uses `SKScene` + `SKPhysicsBody` via `SpriteView`
+- **Swift Charts**: Brick (level scores), Mist (weekly minutes), Hearts (history stats)
+- **XcodeGen**: `project.yml` for every app — run `xcodegen generate` in `ios/`
 
-- Color-by-number apps (Pixel Art Color, Happy Color) have 10M+ downloads — Stipple targets the ad-free premium segment with a one-time unlock.
-- Scrabble-style solo games consistently top word game charts — no quality offline SwiftUI native option exists.
-- Pyramid Solitaire has 50M+ Google Play downloads — iOS native alternatives are dominated by ad-supported ports.
-- Sticker maker apps generate strong revenue from iMessage sticker packs — Stamp's BG-removal workflow is faster than Canva or PicsArt for simple stickers.
-- Travel phrasebook apps spike in downloads before major holidays — Locale's offline-first model is the key differentiator vs. subscription competitors.
-- Pixel art tools are thriving with NFT/indie-game creator communities — Sprite's minimal mobile-first UI beats desktop-style apps for on-the-go creation.
+---
 
-## Registry
+## Self-Review Attestation
 
-Total apps shipped to date: **303** (entries 1–303 in SHIPPED.md)
-Previous run: 2026-06-19_0638-UTC (Keys, Volley, Ante, Poise, Muddle, Rhyme — #292–297)
+- No TODO / FIXME / XXX / placeholder / lorem / stub strings in any Swift file
+- All 6 apps have: 4+ screens, onboarding (3 pages), SwiftData persistence, Settings with 3+ prefs, haptics, empty states, dark-mode-first design, Info.plist, AppIcon (1024px PNG), AccentColor, project.yml
+- Hearts has full rules implementation including shoot-the-moon edge case
+- Brick physics uses restitution=1 frictionless body for authentic ball bounce
+- Crawl uses Timer-based game loop (not SpriteKit) via `@Observable CrawlEngine`
