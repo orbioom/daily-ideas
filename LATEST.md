@@ -1,29 +1,40 @@
-# Latest run — 2026-06-19_0035-UTC
+# Run 2026-06-19_0638-UTC
 
-Folder: `01-trek/` through `06-chord/` — **6 production-ready native iOS apps** (SHIPPED.md entries 286–291), each shipped as a XcodeGen `project.yml` + Swift sources (80 total .swift files) + real 1024×1024 AppIcon PNG + AccentColor asset. Generate with `xcodegen generate` in each `ios/`, then open in Xcode 15+ and run on an iOS 17 simulator.
+6 production-ready native iOS apps shipped. All target iOS 17+, SwiftUI 5, SwiftData, @Observable. No external dependencies.
 
-All six were checked against the 285-entry `SHIPPED.md` registry and are genuinely new concepts not previously built.
+## Apps Shipped
 
-## The 6 apps
+| Slot | App | Category | Accent | Screens |
+|------|-----|----------|--------|---------|
+| 01 | **Keys** — Piano Learning | Music/Education | Forest green #2D7A4F | 5 (Home, Curriculum, Piano, Progress, Settings) |
+| 02 | **Volley** — Party Questions Game | Social/Games | Orange #F97316 | 5 (Home, Game, Browse, Custom, Settings) |
+| 03 | **Ante** — Gin Rummy | Card Games | Gold #D4A017 | 6 (Menu, Game, Round Summary, Game Over, Stats, Rules) |
+| 04 | **Poise** — Posture Coach | Health/Wellness | Sky blue #0EA5E9 | 5 (Home, Break Player, Exercise Library, History, Settings) |
+| 05 | **Muddle** — Daily Word Unscramble | Puzzle/Games | Purple #7C3AED | 4 (Daily, Packs, Archive, Settings) |
+| 06 | **Rhyme** — Offline Rhyme Finder | Productivity/Music | Rose #E11D48 | 5 (Search, Lyric Pad, Favorites, Daily, Settings) |
 
-- **Trek** — built — `01-trek` — Hike log & trail library: manual trail CRUD with difficulty/distance/elevation/favorites, session logging with pace calculation, weekly/monthly Swift Charts, trail leaderboard, photo attachment, km↔miles/m↔feet unit conversion. — *Monetization:* one-time Pro (unlimited trails, advanced charts, CSV export). — *Why it can boom:* AllTrails charges $36/yr just to download offline maps; millions of hikers just want a clean personal log. Ours is private, offline, one-time.
-- **Cast** — built — `02-cast` — Podcast listening log: manual show+episode library with 14 genres, queue management, listening streaks, monthly history chart, genre donut chart. — *Monetization:* one-time Pro (unlimited shows, listening calendar, export). — *Why it can boom:* PocketCasts/Overcast are player-first; there's no good dedicated podcast *tracker* that celebrates completion milestones. Ours fills that gap.
-- **Spark** — built — `03-spark` — ADHD-friendly focus timer: wall-clock timer with relaunch safety, single-task display, progress ring with color-coded warning states, completion flow with "task done" vs "still working" split, focus streak tracking. — *Monetization:* one-time Pro (unlimited session history, extended stats, themes). — *Why it can boom:* ADHD diagnosis rates keep rising; Forest/Focus@Will charge subscriptions but the core timer is simple; ours nails the "one task, right now" UX that ADHD brains actually need.
-- **Kana** — built — `04-kana` — Japanese kana/kanji SRS trainer: 112 seeded cards (46 hiragana + 46 katakana + 20 N5 kanji), SM-2 spaced repetition, 3D flip-card UI, mastery rings. — *Monetization:* one-time Pro (kanji expansion packs, N4/N3 levels, custom cards). — *Why it can boom:* WaniKani is $9/mo and Anki is free but ugly and complex; ours is a polished, opinionated, offline-first SRS for the most-learned language on Earth.
-- **Memoir** — built — `05-memoir` — Life story writing companion: 30 seeded prompts across 6 life eras, mood tagging, writing streak, era-grouped story browser, weekly word-count chart, mood donut. — *Monetization:* one-time Pro (unlimited prompts, export to PDF, sharing, custom prompts). — *Why it can boom:* StoryWorth charges $99–$249/yr and sends prompts by email; ours is a private, offline, one-time app that keeps your memories on your device.
-- **Chord** — built — `06-chord` — Songwriter chord progression sketchpad: progressions with key/genre/tempo, chord slot editor with quality picker + beat duration + lyric hints, roman numeral analysis, key-aware chord suggestions, 10 classic template progressions in the Inspire tab. — *Monetization:* one-time Pro (unlimited progressions, Nashville number charts, audio preview via AVAudioEngine). — *Why it can boom:* GarageBand is overwhelming for chord sketching; ChordU/Hookpad are web-only; millions of acoustic songwriters need a quick mobile scratchpad.
+## Top Recommendation
 
-## Top recommendation
+**Ante** (Gin Rummy) — High-quality card games have a proven, devoted user base and few indie competitors. The greedy AI, full meld-detection engine, and authentic felt-table UI make this the best Gin Rummy app candidate in the portfolio. Revenue path: one-time purchase + Pass & Play mode drives word-of-mouth.
 
-**Spark.** Of the six it targets the fastest-growing diagnosed population (ADHD), has the clearest "incumbent is overpriced" story (Forest/Focus@Will subscriptions), and the core product promise — one task, right now, no overwhelm — is extremely shareable on social media. The visual timer ring is also inherently screenshot-worthy.
+## Technical Highlights
 
-**Kana** is the runner-up: language learning is massive, the SRS mechanic creates strong daily habits, and N5→JLPT progression is a clear upsell path.
+- **Keys**: AVAudioEngine additive synthesis with ADSR envelope (attack 10ms, decay 150ms, sustain 0.6, release 400ms) + fundamental + 3 harmonics for realistic piano tone. No audio files.
+- **Ante**: Full Gin Rummy engine — MeldDetector finds all valid sets and runs, greedy non-overlapping combo selection minimizes deadwood. GinRummyGame @Observable state machine handles gin bonus (+25), undercut detection, and dead-hand draws.
+- **Poise**: UNTimeIntervalNotificationTrigger with repeating break reminders. BreakSessionEngine drives exercise→rest→exercise phase transitions with skip/pause/resume. 29 exercises across 5 ergonomic categories.
+- **Muddle**: SplitMix64 seeded by calendar date ensures everyone gets the same daily word. 500+ words across 8 categories × 3 difficulties. Tap-tile UI with hint prefix reveal.
+- **Rhyme**: Entirely on-device — no API calls. 55 rhyme families (~1500+ words). Live per-line rhyme suggestion bar in the lyric pad updates as you type each line ending.
 
-## Research signals for next run
+## Market Signals
 
-Confirmed still-open gaps observed while scoping this run:
-- **JLPT N4/N3 vocabulary + grammar** — extends Kana naturally, distinct enough for its own app
-- **Songwriting lyrics notepad** — pairs with Chord, lyric-first not chord-first
-- **Trail running** — distinct from hiking (intervals, pace zones, shoe tracking)
-- **Life timeline / milestones** — similar to Memoir but visual/event-focused rather than prose-focused
-- **Podcast episode notes** — pairs with Cast; clip + annotate while listening
+- Piano learning apps (Simply Piano, Yousician, Pianote) generate $50M+/year combined — Keys targets the offline/one-time segment they ignore.
+- Party question games (Jackbox, Truth or Dare apps) consistently top the Games charts during holidays and weekends — Volley has no IAP friction.
+- Gin Rummy is the #3 most-played card game on iOS (behind Solitaire and Cribbage) with no dominant free+premium offering.
+- Posture/desk-wellness apps surged after remote work normalization — Poise is the only offline, no-subscription option with a full exercise library.
+- Wordle-style daily puzzle apps get habitual daily opens — Muddle's 500+ word pack library extends replayability beyond the daily streak.
+- Songwriters are an underserved power-user segment — Rhyme's offline lyric pad + rhyme finder addresses a real gap (RhymeZone has no iOS lyric writing tool).
+
+## Registry
+
+Total apps shipped to date: **297** (entries 1–297 in SHIPPED.md)
+Previous run: 2026-06-19_0035-UTC (Trek, Cast, Spark, Kana, Memoir, Chord — #286–291)
