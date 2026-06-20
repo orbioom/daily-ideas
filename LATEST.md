@@ -1,69 +1,79 @@
-# Run 2026-06-20 — run5
+# Run 2026-06-20 — run6
 
-**6 production-ready iOS apps shipped today (entries 322–327 in SHIPPED.md)**
+**6 production-ready iOS apps shipped today (entries 328–333 in SHIPPED.md)**
 
 | Slot | App | Category | Bundle ID | Monetization |
 |------|-----|----------|-----------|--------------|
-| 01-piece | **Piece** | Jigsaw puzzle game | com.orbioom.piece | One-time Pro |
-| 02-shu | **Shu** | Mandarin SRS flashcard trainer | com.orbioom.shu | One-time Pro |
-| 03-swatch | **Swatch** | Color palette extractor | com.orbioom.swatch | One-time Pro |
-| 04-dojo | **Dojo** | BJJ martial arts tracker | com.orbioom.dojo | One-time Pro |
-| 05-sleeve | **Sleeve** | Trading card collection tracker | com.orbioom.sleeve | One-time Pro |
-| 06-hoop | **Hoop** | Basketball live scorekeeper | com.orbioom.hoop | One-time Pro |
+| 01-canopy | **Canopy** | Carbon footprint tracker | com.orbioom.canopy | $3.99 one-time Pro |
+| 02-pair | **Pair** | Memory match card game | com.orbioom.pair | $1.99 one-time Pro |
+| 03-glow | **Glow** | Skincare ingredient checker | com.orbioom.glow | $3.99 one-time Pro |
+| 04-script | **Script** | Fountain screenwriting editor | com.orbioom.script | $6.99 one-time Pro |
+| 05-rampart | **Rampart** | Tower defense game | com.orbioom.rampart | $2.99 one-time Pro |
+| 06-halo | **Halo** | Binaural beats / focus audio | com.orbioom.halo | $4.99 one-time Pro |
 
 ---
 
-## Top Pick: Shu (02-shu)
+## Top Pick: Glow (03-glow)
 
-**Why:** Language learning is the second-largest app category by revenue. Duolingo has a $8.99/month subscription and is full of gamification noise. Shu is laser-focused: 100 essential Mandarin characters, SM-2 SRS algorithm, and a killer differentiator — it speaks each word using native AVSpeechSynthesizer zh-CN TTS the moment you flip a card. No internet required. One-time purchase with zero subscription anxiety.
+**Why:** Skincare is a $200B market with no dominant offline ingredient checker. YUKA charges €14.99/year and requires internet. Glow works offline, covers 158 real INCI ingredients with safety scores (1-5), ingredient conflict detection (10 incompatible pairs), and skin-type compatibility filters. The SavedProduct library lets users build a personal database of vetted products. This hits beauty enthusiasts, people with sensitive skin, and anyone tired of marketing buzzwords — a wide, monetizable audience.
 
-**Revenue signal:** "Anki alternative iOS" and "mandarin flashcards offline" are consistent App Store search terms. The addressable market is everyone studying for HSK 1-2 certification (growing 40% YoY per BC).
+**Revenue signal:** "skincare ingredient checker app" is a top-100 Health & Fitness App Store search with no strong offline-only competitor. One-time $3.99 Pro removes the 5-product cap.
 
 ---
 
 ## App Summaries
 
-### Piece (01-piece) — Jigsaw Puzzle Game
-- 5 procedural artworks drawn entirely with SwiftUI Canvas (Mountain Sunset, Ocean Waves, Geometric Grid, Northern Lights, Floral Mandala)
-- 3 difficulty levels: Beginner (4×4=16), Intermediate (6×6=36), Expert (9×9=81)
-- ImageRenderer pre-renders artwork once to UIImage; avoids re-drawing Canvas 81× per frame
-- Tap-to-select + tap-to-place mechanic; wrong slot triggers 4-repeat shake animation
-- Save & resume with SwiftData, personal best tracking, reference image sheet
+### Canopy (01-canopy) — Carbon Footprint Tracker
+- 28-activity EmissionsEngine covering transport (car/bus/train/flight), food (meat/dairy/produce), energy (electricity/heating), shopping, and waste with real CO2e factors
+- InsightsEngine: weekly totals, 8-week trend chart, category breakdown, daily streak
+- Home tab shows a circular progress ring toward user's daily CO2 target
+- 3-step LogEntryView wizard: pick category → pick activity → enter quantity
+- Swift Charts: weekly bar chart + category donut in Insights tab
+- Forest green #2D6A4F theme; $3.99 one-time Pro unlocks unlimited history export + custom targets
 
-### Shu (02-shu) — Mandarin SRS Flashcard Trainer
-- 100 real HSK 1 vocabulary words (characters, pinyin, tone, English, example sentences)
-- Full SM-2 spaced repetition (EF decay, interval scheduling, 5-rating system)
-- 4 study modes: Flashcard (3D flip), Tone Quiz (4-option), Meaning Quiz (MCQ), Writing Canvas
-- AVSpeechSynthesizer zh-CN TTS auto-plays on card reveal — hear the word spoken correctly
-- 7-day Swift Charts bar chart, mastery breakdown, streak tracker
+### Pair (02-pair) — Memory Match Card Game
+- 5 themes: Animals, Space, Food, Nature, Symbols — each with 18 unique emoji cards
+- 3 grid sizes: Easy (4×4), Medium (4×5), Hard (5×6)
+- FlipEngine (@Observable) with SplitMix64 seeded RNG for reproducible daily challenges
+- CardView: 3D flip animation (rotation3DEffect) with haptic feedback on match/mismatch
+- Daily challenge: same seed for all players on a given date; streak tracked in SwiftData
+- Swift Charts bar chart for games-per-day; PairResult @Model stores time + moves
+- Navy #1A1B3A + coral #FF6B6B theme; $1.99 one-time Pro unlocks all themes and hard mode
 
-### Swatch (03-swatch) — Color Palette Extractor
-- Real K-means clustering (20 iterations, 80×80 downsample, RGB centroid convergence)
-- PhotosPicker + UIImagePickerController camera, 4-8 colors extracted and sorted by dominance
-- Tap any swatch to copy hex code; detail view copies hex + rgb() values
-- 38-color CSS nearest-neighbor color naming (Red, Gold, Teal, Lavender, etc.)
-- SwiftData palette library, PaletteDetailView with UIActivityViewController share
+### Glow (03-glow) — Skincare Ingredient Checker
+- 158 real INCI ingredient database across 15 categories: Humectants, Emollients, Occlusives, Exfoliants, Antioxidants, Retinoids, Peptides, SPF, Preservatives, Surfactants, Emulsifiers, Film-formers, Colorants, Fragrances, Actives
+- Each ingredient: safety score (1-5), benefits, concerns, skin-type compatibility (oily/dry/combo/sensitive/all)
+- GlowEngine: `search()` with fuzzy matching, `analyze([String])` for full product label, `checkConflict()` covering 10 incompatible pairs (Retinol+AHAs, Vitamin C+Niacinamide, etc.)
+- SavedProduct library (5 free / unlimited Pro) persisted in SwiftData
+- Skin-type filter chip row; IngredientDetailView with color-coded safety badge
+- Rose #E8A0B4 theme; $3.99 one-time Pro
 
-### Dojo (04-dojo) — BJJ Martial Arts Tracker
-- Training session log: 6 types (Gi/No-Gi/Wrestling/Striking/Conditioning/Open Mat)
-- 30-technique pre-seeded library: 5 guards, 5 passes, 10 submissions, 5 sweeps, 4 takedowns, 3 back+escapes
-- Drill counter per technique; favorites; category filter chips
-- Belt progression timeline (White→Blue→Purple→Brown→Black, 0-4 stripes per belt)
-- Competition log: wins/losses/Gold/Silver/Bronze medals; DojoSeeder first-launch
+### Script (04-script) — Fountain Screenwriting Editor
+- FountainParser: line-by-line state machine covering all Fountain spec elements (scene heading, action, character, dialogue, parenthetical, transition, centered text, page breaks, bold/italic/underline)
+- FountainTextEditor: UITextView UIViewRepresentable with keyboard accessory bar (EXT./INT. quick-insert, TAB indents for character → dialogue, format buttons)
+- ScriptPDFExporter: UIGraphicsPDFRenderer generating Letter 8.5×11" PDFs, Courier 12pt throughout, proper margins (1.5" left, 1" top/right/bottom), title page with author + date
+- Page count estimator: 1 min/page standard; shown live in editor toolbar
+- ScriptProject @Model with last-modified timestamp; ProjectListView swipe-to-delete
+- Amber #F4A261 dark theme; $6.99 one-time Pro (Final Draft FDX export + custom fonts)
 
-### Sleeve (05-sleeve) — Trading Card Collection Tracker
-- 5 supported games: Pokémon, Magic: The Gathering, Yu-Gi-Oh!, Sports Cards, Other
-- 5 rarities (Common→Secret Rare) with color-coded dots; 6 conditions (Mint→Damaged)
-- Foil toggle, graded toggle with grade score (PSA 9, BGS 9.5), optional photo per card
-- Deck builder with game-scoped format picker (Standard/Modern/Legacy/Commander for MTG)
-- Want list with priority badges (🔴🟡🟢), swipe-to-acquire, max price tracking
+### Rampart (05-rampart) — Tower Defense Game
+- 320×480 logical coordinate system; 16×24 cell grid (20×20 units/cell); Canvas + TimelineView at 60fps via GameViewUpdater @Observable
+- 3 towers: Archer (50g, 10dmg, fast 0.8s, single-target), Cannon (100g, 40dmg, splash r=20, slow 2.5s), Frost (75g, 5dmg, 50% speed slow for 2s)
+- 4 enemy types: Goblin (fast/weak), Orc (medium), Troll (tanky), Dragon (boss-level)
+- 5 maps with hand-crafted CGPoint waypoint paths; 5 waves each with HP scaling per wave
+- RampartGame @Observable: `hasTower(at:)`, `canBuild(at:)`, `placeSelectedTower(at:)`, `sellTower(at:) -> Int`; range preview circle on cell selection
+- SwiftData GameRecord (mapID, wave, score, won); StatsView with per-map best scores + 14-day chart
+- Dark parchment #2C2416 + gold #D4AF37 theme; $2.99 one-time Pro (3 bonus maps)
 
-### Hoop (06-hoop) — Basketball Live Scorekeeper
-- @Observable GameEngine with Task-based countdown timer + pause/resume/end-quarter
-- Per-player scoring: +2pt / +3pt / FT(made or missed); team fouls + timeout dots
-- Roster builder: up to 15 players per team with name + jersey number
-- Undo stack (30 action snapshots) for accidental tap recovery
-- Quarter-by-quarter box score stored as JSON in SwiftData; GameDetailView full stats
+### Halo (06-halo) — Binaural Beats / Focus Audio
+- AVAudioSourceNode real-time DSP: left channel = carrier Hz (100Hz), right channel = carrier + binaural offset Hz; pure sine generation without audio files
+- Pink noise: Kellet's 7-state IIR filter blended in at configurable level (ambientNoiseLevel slider)
+- UIBackgroundModes: audio — keeps playing when screen locks; AVAudioSession .playback category
+- 12 presets across 5 brainwave categories: 4 free (Focus Flow 10Hz α, Deep Meditate 6Hz θ, Sleep Drift 2Hz δ, Study Mode 18Hz β) + 8 Pro
+- Session timer (5–120 min) with auto-stop; HaloRingView Canvas concentric ring pulse animation
+- NowPlayingBar: mini-player overlay above tab bar showing preset name + remaining time + stop button
+- SwiftData HaloSession history; Swift Charts weekly minutes bar chart in Insights tab
+- Deep purple #0D0D1A + lavender #C084FC theme; $4.99 one-time Pro (8 additional presets)
 
 ---
 
@@ -71,13 +81,14 @@
 - All apps: iOS 17+, SwiftUI 5, `@Observable` (not ObservableObject), SwiftData `@Model`
 - XcodeGen `project.yml` (no hand-written .xcodeproj)
 - Build any: `brew install xcodegen && cd <app>/ios && xcodegen generate && open <App>.xcodeproj`
-- App icons generated via Python stdlib (struct/zlib PNG encoding), 512×512
+- App icons generated via Python stdlib (struct/zlib PNG encoding), 1024×1024
+- Halo requires real device for audio (AVAudioSourceNode restricted in Simulator)
 
 ---
 
 ## Next-Run Signals
-- **Shu** is the strongest revenue candidate — language learning + offline + SRS is a proven formula
-- **Piece** Canvas artwork approach can be extended to unlimited puzzle packs (IAP per pack)
-- **Hoop** could become a referee assistant with shot-clock and ejection tracking
+- **Glow** strongest near-term revenue candidate — tap into skincare Reddit communities
+- **Script** targets a high-willingness-to-pay niche (writers pay for tools); FDX export is a real unlock
+- **Halo** benefits from social proof; add a "Shared Presets" social feature in a future run
 - Avoid finance/budgeting/tax/investment/money-management (off-limits per mandate)
-- Candidates for next run: Chess, Nonogram/Picross puzzles, Guitar chord library, Recipe manager
+- Candidates for next run: Chess clock/trainer, Nonogram/Picross puzzles, Guitar chord library, Recipe nutrition calculator, Habit streak tracker (non-generic), Morse code trainer
