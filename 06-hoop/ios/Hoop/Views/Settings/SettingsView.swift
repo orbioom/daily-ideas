@@ -6,117 +6,110 @@ struct SettingsView: View {
     @AppStorage("defaultTeamB") private var defaultTeamB = "Away"
     @AppStorage("defaultQuarterMinutes") private var defaultQuarterMinutes = 10
     @AppStorage("defaultTimeouts") private var defaultTimeouts = 5
-    @AppStorage("hapticsEnabled") private var hapticsEnabled = true
-
+    
     @Query private var games: [HoopGame]
     @Environment(\.modelContext) private var modelContext
-    @State private var showClearConfirmation = false
-
+    @State private var showingClearConfirm = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 HoopTheme.darkBg.ignoresSafeArea()
-
+                
                 List {
-                    // Defaults Section
                     Section {
-                        LabeledContent("Home Team Name") {
+                        HStack {
+                            Text("Team A Default")
+                                .foregroundStyle(.white)
+                            Spacer()
                             TextField("Home", text: $defaultTeamA)
                                 .multilineTextAlignment(.trailing)
-                                .foregroundColor(HoopTheme.teamAColor)
+                                .foregroundStyle(HoopTheme.subtleText)
                         }
-                        LabeledContent("Away Team Name") {
+                        HStack {
+                            Text("Team B Default")
+                                .foregroundStyle(.white)
+                            Spacer()
                             TextField("Away", text: $defaultTeamB)
                                 .multilineTextAlignment(.trailing)
-                                .foregroundColor(HoopTheme.teamBColor)
+                                .foregroundStyle(HoopTheme.subtleText)
                         }
                     } header: {
                         Text("Default Team Names")
+                            .foregroundStyle(HoopTheme.subtleText)
                     }
                     .listRowBackground(HoopTheme.cardBg)
-
+                    
                     Section {
-                        Picker("Quarter Length", selection: $defaultQuarterMinutes) {
+                        Picker("Period Length", selection: $defaultQuarterMinutes) {
                             Text("8 minutes").tag(8)
                             Text("10 minutes").tag(10)
                             Text("12 minutes").tag(12)
                         }
-
-                        Stepper("Timeouts per Team: \(defaultTimeouts)", value: $defaultTimeouts, in: 3...7)
+                        .foregroundStyle(.white)
+                        
+                        Stepper("Timeouts: \(defaultTimeouts)", value: $defaultTimeouts, in: 3...7)
+                            .foregroundStyle(.white)
                     } header: {
-                        Text("Default Game Settings")
+                        Text("Game Defaults")
+                            .foregroundStyle(HoopTheme.subtleText)
                     }
                     .listRowBackground(HoopTheme.cardBg)
-
-                    // Haptics
+                    
                     Section {
-                        Toggle("Haptic Feedback", isOn: $hapticsEnabled)
-                            .tint(HoopTheme.orange)
-                    } header: {
-                        Text("Feedback")
-                    }
-                    .listRowBackground(HoopTheme.cardBg)
-
-                    // History
-                    Section {
-                        HStack {
-                            Text("Games Saved")
-                            Spacer()
-                            Text("\(games.count)")
-                                .foregroundColor(HoopTheme.subtleText)
-                        }
-
                         Button(role: .destructive) {
-                            showClearConfirmation = true
+                            showingClearConfirm = true
                         } label: {
-                            Label("Clear All History", systemImage: "trash")
-                                .foregroundColor(.red)
+                            HStack {
+                                Image(systemName: "trash.fill")
+                                Text("Clear Game History")
+                            }
                         }
                         .disabled(games.isEmpty)
                     } header: {
-                        Text("History")
+                        Text("Data")
+                            .foregroundStyle(HoopTheme.subtleText)
+                    } footer: {
+                        Text("\(games.count) game\(games.count == 1 ? "" : "s") saved")
+                            .foregroundStyle(HoopTheme.subtleText)
                     }
                     .listRowBackground(HoopTheme.cardBg)
-
-                    // About
+                    
                     Section {
-                        LabeledContent("App", value: "Hoop")
-                        LabeledContent("Version", value: "1.0")
-                        LabeledContent("Developer", value: "Orbioom")
+                        HStack {
+                            Text("Version")
+                                .foregroundStyle(.white)
+                            Spacer()
+                            Text("1.0.0")
+                                .foregroundStyle(HoopTheme.subtleText)
+                        }
+                        HStack {
+                            Text("Stack")
+                                .foregroundStyle(.white)
+                            Spacer()
+                            Text("SwiftUI · SwiftData")
+                                .foregroundStyle(HoopTheme.subtleText)
+                        }
                     } header: {
                         Text("About")
+                            .foregroundStyle(HoopTheme.subtleText)
                     }
                     .listRowBackground(HoopTheme.cardBg)
                 }
+                .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
-                .foregroundColor(.white)
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
-            .confirmationDialog(
-                "Clear all game history?",
-                isPresented: $showClearConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Clear History", role: .destructive) {
-                    clearAllGames()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will permanently delete all \(games.count) saved games. This cannot be undone.")
+        }
+        .alert("Clear History?", isPresented: $showingClearConfirm) {
+            Button("Clear All", role: .destructive) {
+                for game in games { modelContext.delete(game) }
+                try? modelContext.save()
             }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete all \(games.count) saved game\(games.count == 1 ? "" : "s").")
         }
     }
-
-    private func clearAllGames() {
-        for game in games {
-            modelContext.delete(game)
-        }
-        try? modelContext.save()
-    }
-}
-
-#Preview {
-    SettingsView()
-        .preferredColorScheme(.dark)
 }

@@ -1,352 +1,314 @@
 import SwiftUI
+import SwiftData
 
 struct GameSummaryView: View {
     let engine: GameEngine
-    let onSave: () -> Void
-    let onNewGame: () -> Void
-
+    let onDismiss: () -> Void
+    
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var saved = false
-
-    private var winnerName: String {
+    
+    var isATie: Bool { engine.scoreA == engine.scoreB }
+    var winnerName: String {
         if engine.scoreA > engine.scoreB { return engine.teamAName }
         if engine.scoreB > engine.scoreA { return engine.teamBName }
-        return "Tie Game"
+        return "Tie"
     }
-
-    private var winnerColor: Color {
-        if engine.scoreA > engine.scoreB { return HoopTheme.teamAColor }
-        if engine.scoreB > engine.scoreA { return HoopTheme.teamBColor }
+    var winnerColor: Color {
+        if engine.scoreA > engine.scoreB { return HoopTheme.teamA }
+        if engine.scoreB > engine.scoreA { return HoopTheme.teamB }
         return HoopTheme.orange
     }
-
+    
+    var allQuarterScoresA: [Int] {
+        var scores = engine.quarterScoresA
+        if scores.count < engine.totalQuarters {
+            scores.append(engine.currentQScoreA)
+        }
+        return scores
+    }
+    var allQuarterScoresB: [Int] {
+        var scores = engine.quarterScoresB
+        if scores.count < engine.totalQuarters {
+            scores.append(engine.currentQScoreB)
+        }
+        return scores
+    }
+    
     var body: some View {
-        NavigationStack {
-            ZStack {
-                HoopTheme.darkBg.ignoresSafeArea()
-
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Winner Banner
-                        VStack(spacing: 8) {
-                            Image(systemName: engine.scoreA == engine.scoreB ? "equal.circle.fill" : "trophy.fill")
+        ZStack {
+            HoopTheme.darkBg.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Winner banner
+                    VStack(spacing: 8) {
+                        if !isATie {
+                            Image(systemName: "trophy.fill")
                                 .font(.system(size: 48))
-                                .foregroundColor(winnerColor)
-
-                            if engine.scoreA != engine.scoreB {
-                                Text("Winner")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(HoopTheme.subtleText)
-                            }
-
-                            Text(winnerName)
-                                .font(.system(size: 28, weight: .black, design: .rounded))
-                                .foregroundColor(winnerColor)
+                                .foregroundStyle(HoopTheme.orange)
+                        }
+                        Text(isATie ? "It's a Tie!" : "\(winnerName) Wins!")
+                            .font(.largeTitle.bold())
+                            .foregroundStyle(winnerColor)
+                    }
+                    .padding(.top, 32)
+                    
+                    // Final scores
+                    HStack(spacing: 0) {
+                        VStack {
+                            Text(engine.teamAName)
+                                .font(.headline)
+                                .foregroundStyle(HoopTheme.teamA)
+                            Text("\(engine.scoreA)")
+                                .font(.system(size: 72, weight: .black, design: .rounded))
+                                .foregroundStyle(.white)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 24)
-                        .hoopCard()
-                        .padding(.horizontal, 16)
-
-                        // Final Score
-                        HStack(spacing: 0) {
-                            VStack(spacing: 4) {
-                                Text(engine.teamAName)
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(HoopTheme.teamAColor)
-                                    .lineLimit(1)
-                                Text("\(engine.scoreA)")
-                                    .font(.system(size: 64, weight: .black, design: .rounded))
-                                    .foregroundColor(.white)
-                            }
-                            .frame(maxWidth: .infinity)
-
-                            Text("–")
-                                .font(.system(size: 32, weight: .light))
-                                .foregroundColor(HoopTheme.subtleText)
-
-                            VStack(spacing: 4) {
-                                Text(engine.teamBName)
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(HoopTheme.teamBColor)
-                                    .lineLimit(1)
-                                Text("\(engine.scoreB)")
-                                    .font(.system(size: 64, weight: .black, design: .rounded))
-                                    .foregroundColor(.white)
-                            }
-                            .frame(maxWidth: .infinity)
+                        
+                        Text("–")
+                            .font(.title.bold())
+                            .foregroundStyle(HoopTheme.subtleText)
+                        
+                        VStack {
+                            Text(engine.teamBName)
+                                .font(.headline)
+                                .foregroundStyle(HoopTheme.teamB)
+                            Text("\(engine.scoreB)")
+                                .font(.system(size: 72, weight: .black, design: .rounded))
+                                .foregroundStyle(.white)
                         }
-                        .padding(16)
-                        .hoopCard()
-                        .padding(.horizontal, 16)
-
-                        // Quarter Scores
-                        if !engine.quarterScoresA.isEmpty {
-                            quarterScoreGrid
-                                .padding(.horizontal, 16)
-                        }
-
-                        // Player Stats
-                        if !engine.teamAPlayers.isEmpty || !engine.teamBPlayers.isEmpty {
-                            playerStatsTable
-                                .padding(.horizontal, 16)
-                        }
-
-                        // Buttons
-                        VStack(spacing: 12) {
-                            if !saved {
-                                Button {
-                                    onSave()
-                                    saved = true
-                                } label: {
-                                    Label("Save Game", systemImage: "square.and.arrow.down")
-                                        .font(HoopTheme.buttonFont)
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 16)
-                                        .background(HoopTheme.orange)
-                                        .cornerRadius(14)
-                                }
-                            } else {
-                                Label("Game Saved", systemImage: "checkmark.circle.fill")
-                                    .font(HoopTheme.buttonFont)
-                                    .foregroundColor(.green)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .background(HoopTheme.cardBg)
-                                    .cornerRadius(14)
-                            }
-
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding()
+                    .background(HoopTheme.cardBg)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal)
+                    
+                    // Quarter breakdown
+                    quarterBreakdownView
+                        .padding(.horizontal)
+                    
+                    // Player stats - Team A
+                    if !engine.teamAPlayers.isEmpty {
+                        playerStatsTable(
+                            teamName: engine.teamAName,
+                            teamColor: HoopTheme.teamA,
+                            players: engine.teamAPlayers
+                        )
+                        .padding(.horizontal)
+                    }
+                    
+                    // Player stats - Team B
+                    if !engine.teamBPlayers.isEmpty {
+                        playerStatsTable(
+                            teamName: engine.teamBName,
+                            teamColor: HoopTheme.teamB,
+                            players: engine.teamBPlayers
+                        )
+                        .padding(.horizontal)
+                    }
+                    
+                    // Action buttons
+                    VStack(spacing: 12) {
+                        if !saved {
                             Button {
-                                dismiss()
-                                onNewGame()
+                                engine.saveGame(ctx: modelContext)
+                                saved = true
                             } label: {
-                                Label("New Game", systemImage: "plus.circle")
-                                    .font(HoopTheme.buttonFont)
-                                    .foregroundColor(HoopTheme.orange)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .background(HoopTheme.cardBg)
-                                    .cornerRadius(14)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 14)
-                                            .stroke(HoopTheme.orange.opacity(0.4), lineWidth: 1)
-                                    )
+                                HStack {
+                                    Image(systemName: "square.and.arrow.down.fill")
+                                    Text("Save Game")
+                                }
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(HoopTheme.orange)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                            }
+                        } else {
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                Text("Game Saved!")
+                            }
+                            .font(.headline)
+                            .foregroundStyle(HoopTheme.correctGreen)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(HoopTheme.cardBg)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        
+                        Button {
+                            dismiss()
+                            onDismiss()
+                        } label: {
+                            Text("New Game")
+                                .font(.headline)
+                                .foregroundStyle(HoopTheme.orange)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(HoopTheme.cardBg)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 32)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+    
+    @ViewBuilder
+    var quarterBreakdownView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("QUARTER BREAKDOWN")
+                .font(.caption.bold())
+                .foregroundStyle(HoopTheme.subtleText)
+            
+            Grid(alignment: .center, horizontalSpacing: 8, verticalSpacing: 8) {
+                // Header
+                GridRow {
+                    Text("Period")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .gridCellAnchor(.leading)
+                    Text(engine.teamAName)
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.teamA)
+                        .lineLimit(1)
+                    Text(engine.teamBName)
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.teamB)
+                        .lineLimit(1)
+                }
+                
+                Divider()
+                    .gridCellUnsizedAxes(.horizontal)
+                
+                // Quarter rows
+                ForEach(0..<max(allQuarterScoresA.count, allQuarterScoresB.count), id: \.self) { q in
+                    GridRow {
+                        Text("Q\(q + 1)")
+                            .font(.subheadline)
+                            .foregroundStyle(HoopTheme.subtleText)
+                            .gridCellAnchor(.leading)
+                        Text("\(q < allQuarterScoresA.count ? allQuarterScoresA[q] : 0)")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.white)
+                        Text("\(q < allQuarterScoresB.count ? allQuarterScoresB[q] : 0)")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.white)
+                    }
+                }
+                
+                Divider()
+                    .gridCellUnsizedAxes(.horizontal)
+                
+                // Total
+                GridRow {
+                    Text("Total")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
+                        .gridCellAnchor(.leading)
+                    Text("\(engine.scoreA)")
+                        .font(.headline.bold())
+                        .foregroundStyle(engine.scoreA > engine.scoreB ? HoopTheme.teamA : .white)
+                    Text("\(engine.scoreB)")
+                        .font(.headline.bold())
+                        .foregroundStyle(engine.scoreB > engine.scoreA ? HoopTheme.teamB : .white)
+                }
+            }
+            .padding()
+            .background(HoopTheme.cardBg)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+    
+    @ViewBuilder
+    func playerStatsTable(teamName: String, teamColor: Color, players: [PlayerState]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(teamName.uppercased())
+                .font(.caption.bold())
+                .foregroundStyle(teamColor)
+                .padding(.bottom, 8)
+            
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Text("Player")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("PTS")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .frame(width: 36)
+                    Text("2PM")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .frame(width: 36)
+                    Text("3PM")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .frame(width: 36)
+                    Text("FT")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .frame(width: 42)
+                    Text("PF")
+                        .font(.caption.bold())
+                        .foregroundStyle(HoopTheme.subtleText)
+                        .frame(width: 28)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color.white.opacity(0.05))
+                
+                ForEach(players.sorted(by: { $0.totalPoints > $1.totalPoints })) { player in
+                    Divider().background(Color.white.opacity(0.05))
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(player.name)
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                            if !player.number.isEmpty {
+                                Text("#\(player.number)")
+                                    .font(.caption2)
+                                    .foregroundStyle(HoopTheme.subtleText)
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 32)
-                    }
-                    .padding(.top, 24)
-                }
-            }
-            .navigationTitle("Game Summary")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(HoopTheme.orange)
-                }
-            }
-        }
-    }
-
-    // MARK: - Quarter Score Grid
-
-    private var quarterScoreGrid: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Quarter Scores")
-                .font(HoopTheme.labelFont)
-                .foregroundColor(HoopTheme.subtleText)
-
-            let quarterLabels: [String] = {
-                if engine.totalQuarters == 2 {
-                    return ["1H", "2H", "T"]
-                } else {
-                    return ["Q1", "Q2", "Q3", "Q4", "T"]
-                }
-            }()
-
-            VStack(spacing: 0) {
-                // Header
-                HStack(spacing: 0) {
-                    Text("Team")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(HoopTheme.subtleText)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    ForEach(quarterLabels, id: \.self) { label in
-                        Text(label)
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(HoopTheme.subtleText)
+                        Text("\(player.totalPoints)")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(teamColor)
                             .frame(width: 36)
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-
-                Divider().background(HoopTheme.subtleText.opacity(0.3))
-
-                // Team A row
-                HStack(spacing: 0) {
-                    Text(engine.teamAName)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(HoopTheme.teamAColor)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(1)
-
-                    ForEach(0..<engine.quarterScoresA.count, id: \.self) { i in
-                        Text("\(engine.quarterScoresA[i])")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.white)
+                        Text("\(player.points2)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
                             .frame(width: 36)
-                    }
-                    Text("\(engine.scoreA)")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 36)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-
-                Divider().background(HoopTheme.subtleText.opacity(0.2))
-
-                // Team B row
-                HStack(spacing: 0) {
-                    Text(engine.teamBName)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(HoopTheme.teamBColor)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(1)
-
-                    ForEach(0..<engine.quarterScoresB.count, id: \.self) { i in
-                        Text("\(engine.quarterScoresB[i])")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.white)
+                        Text("\(player.points3)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
                             .frame(width: 36)
+                        Text("\(player.ftMade)/\(player.ftAttempted)")
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                            .frame(width: 42)
+                        Text("\(player.fouls)")
+                            .font(.subheadline)
+                            .foregroundStyle(player.fouls >= 5 ? .red : .white)
+                            .frame(width: 28)
                     }
-                    Text("\(engine.scoreB)")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 36)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-            }
-            .hoopCard()
-        }
-    }
-
-    // MARK: - Player Stats Table
-
-    private var playerStatsTable: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Player Stats")
-                .font(HoopTheme.labelFont)
-                .foregroundColor(HoopTheme.subtleText)
-
-            VStack(spacing: 0) {
-                // Header
-                HStack(spacing: 0) {
-                    Text("Player")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    statHeader("PTS")
-                    statHeader("2PM")
-                    statHeader("3PM")
-                    statHeader("FT")
-                    statHeader("PF")
-                }
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(HoopTheme.subtleText)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-
-                Divider().background(HoopTheme.subtleText.opacity(0.3))
-
-                // Team A
-                if !engine.teamAPlayers.isEmpty {
-                    teamSectionHeader(name: engine.teamAName, color: HoopTheme.teamAColor)
-                    ForEach(engine.teamAPlayers.sorted(by: { $0.totalPoints > $1.totalPoints })) { player in
-                        playerStatRow(player: player, color: HoopTheme.teamAColor)
-                    }
-                }
-
-                if !engine.teamAPlayers.isEmpty && !engine.teamBPlayers.isEmpty {
-                    Divider().background(HoopTheme.subtleText.opacity(0.3))
-                }
-
-                // Team B
-                if !engine.teamBPlayers.isEmpty {
-                    teamSectionHeader(name: engine.teamBName, color: HoopTheme.teamBColor)
-                    ForEach(engine.teamBPlayers.sorted(by: { $0.totalPoints > $1.totalPoints })) { player in
-                        playerStatRow(player: player, color: HoopTheme.teamBColor)
-                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
                 }
             }
-            .hoopCard()
+            .background(HoopTheme.cardBg)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
-
-    private func statHeader(_ text: String) -> some View {
-        Text(text)
-            .frame(width: 32, alignment: .center)
-    }
-
-    private func teamSectionHeader(name: String, color: Color) -> some View {
-        HStack {
-            Circle().fill(color).frame(width: 6, height: 6)
-            Text(name)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(color)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 4)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(color.opacity(0.08))
-    }
-
-    private func playerStatRow(player: PlayerState, color: Color) -> some View {
-        HStack(spacing: 0) {
-            HStack(spacing: 4) {
-                Text("#\(player.number)")
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(color)
-                    .frame(width: 24)
-                Text(player.name)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            statCell("\(player.totalPoints)", bold: true)
-            statCell("\(player.points2)")
-            statCell("\(player.points3)")
-            statCell("\(player.ftMade)/\(player.ftAttempted)", small: true)
-            statCell("\(player.fouls)", color: player.fouls >= 5 ? .red : nil)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-    }
-
-    private func statCell(_ text: String, bold: Bool = false, small: Bool = false, color: Color? = nil) -> some View {
-        Text(text)
-            .font(.system(size: small ? 10 : 12, weight: bold ? .bold : .medium))
-            .foregroundColor(color ?? .white)
-            .frame(width: 32, alignment: .center)
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-    }
-}
-
-#Preview {
-    var setup = GameSetup()
-    setup.teamAName = "Lakers"
-    setup.teamBName = "Celtics"
-    setup.teamAPlayers = [("LeBron", "23"), ("AD", "3")]
-    setup.teamBPlayers = [("Tatum", "0"), ("Brown", "7")]
-    let engine = GameEngine(setup: setup)
-    engine.scoreA = 98
-    engine.scoreB = 92
-    return GameSummaryView(engine: engine, onSave: {}, onNewGame: {})
-        .preferredColorScheme(.dark)
 }

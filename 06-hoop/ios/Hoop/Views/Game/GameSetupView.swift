@@ -1,115 +1,155 @@
 import SwiftUI
 
 struct GameSetupView: View {
+    @AppStorage("defaultTeamA") private var defaultTeamA = "Home"
+    @AppStorage("defaultTeamB") private var defaultTeamB = "Away"
+    @AppStorage("defaultQuarterMinutes") private var defaultQuarterMinutes = 10
+    @AppStorage("defaultTimeouts") private var defaultTimeouts = 5
+    
     @State private var setup = GameSetup()
-    @State private var showingLiveGame = false
-
-    // Player entry state
+    @State private var showingGame = false
+    @State private var teamAExpanded = false
+    @State private var teamBExpanded = false
     @State private var newPlayerNameA = ""
     @State private var newPlayerNumberA = ""
+    @State private var addingPlayerA = false
     @State private var newPlayerNameB = ""
     @State private var newPlayerNumberB = ""
-
+    @State private var addingPlayerB = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 HoopTheme.darkBg.ignoresSafeArea()
-
+                
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Teams Section
+                        // Team names
                         HStack(spacing: 12) {
-                            TeamHeaderField(
-                                label: "Home Team",
-                                name: $setup.teamAName,
-                                color: HoopTheme.teamAColor
-                            )
-                            TeamHeaderField(
-                                label: "Away Team",
-                                name: $setup.teamBName,
-                                color: HoopTheme.teamBColor
-                            )
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Team A")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(HoopTheme.teamA)
+                                TextField("Home", text: $setup.teamAName)
+                                    .textFieldStyle(.plain)
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                    .padding(12)
+                                    .background(HoopTheme.cardBg)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            Text("VS")
+                                .font(.caption.bold())
+                                .foregroundStyle(HoopTheme.subtleText)
+                            
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Team B")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(HoopTheme.teamB)
+                                TextField("Away", text: $setup.teamBName)
+                                    .textFieldStyle(.plain)
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                    .padding(12)
+                                    .background(HoopTheme.cardBg)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .padding(.horizontal, 16)
-
-                        // Game Settings
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Game Settings")
-                                .font(HoopTheme.labelFont)
-                                .foregroundColor(HoopTheme.subtleText)
-                                .padding(.horizontal, 16)
-
-                            VStack(spacing: 0) {
-                                // Quarters
-                                SettingRow(label: "Format") {
-                                    Picker("Quarters", selection: $setup.quarters) {
-                                        Text("Half (2)").tag(2)
-                                        Text("Full (4)").tag(4)
+                        .padding(.horizontal)
+                        
+                        // Game format
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("GAME FORMAT")
+                                .font(.caption.bold())
+                                .foregroundStyle(HoopTheme.subtleText)
+                                .padding(.horizontal)
+                            
+                            VStack(spacing: 12) {
+                                // Quarters picker
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Periods")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.white)
+                                    Picker("Periods", selection: $setup.quarters) {
+                                        Text("2 Halves").tag(2)
+                                        Text("4 Quarters").tag(4)
                                     }
                                     .pickerStyle(.segmented)
-                                    .frame(maxWidth: 200)
                                 }
-
-                                Divider().background(HoopTheme.subtleText.opacity(0.3))
-
+                                
                                 // Quarter length
-                                SettingRow(label: "Quarter Length") {
-                                    Picker("Minutes", selection: $setup.quarterMinutes) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Period Length")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.white)
+                                    Picker("Period Length", selection: $setup.quarterMinutes) {
                                         Text("8 min").tag(8)
                                         Text("10 min").tag(10)
                                         Text("12 min").tag(12)
                                     }
                                     .pickerStyle(.segmented)
-                                    .frame(maxWidth: 220)
                                 }
-
-                                Divider().background(HoopTheme.subtleText.opacity(0.3))
-
+                                
                                 // Timeouts
-                                SettingRow(label: "Timeouts per Team") {
+                                HStack {
+                                    Text("Timeouts per Team")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.white)
+                                    Spacer()
                                     Stepper("\(setup.timeoutsPerTeam)", value: $setup.timeoutsPerTeam, in: 3...7)
-                                        .fixedSize()
+                                        .foregroundStyle(.white)
                                 }
                             }
-                            .hoopCard()
-                            .padding(.horizontal, 16)
+                            .padding()
+                            .background(HoopTheme.cardBg)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal)
                         }
-
-                        // Rosters
-                        HStack(spacing: 12) {
-                            RosterSection(
-                                teamName: setup.teamAName,
-                                team: "A",
-                                color: HoopTheme.teamAColor,
-                                players: $setup.teamAPlayers,
-                                newName: $newPlayerNameA,
-                                newNumber: $newPlayerNumberA
-                            )
-                            RosterSection(
-                                teamName: setup.teamBName,
-                                team: "B",
-                                color: HoopTheme.teamBColor,
-                                players: $setup.teamBPlayers,
-                                newName: $newPlayerNameB,
-                                newNumber: $newPlayerNumberB
-                            )
-                        }
-                        .padding(.horizontal, 16)
-
-                        // Start Game Button
+                        
+                        // Team A Roster
+                        rosterSection(
+                            teamName: setup.teamAName.isEmpty ? "Team A" : setup.teamAName,
+                            teamColor: HoopTheme.teamA,
+                            players: $setup.teamAPlayers,
+                            isExpanded: $teamAExpanded,
+                            isAdding: $addingPlayerA,
+                            newName: $newPlayerNameA,
+                            newNumber: $newPlayerNumberA
+                        )
+                        
+                        // Team B Roster
+                        rosterSection(
+                            teamName: setup.teamBName.isEmpty ? "Team B" : setup.teamBName,
+                            teamColor: HoopTheme.teamB,
+                            players: $setup.teamBPlayers,
+                            isExpanded: $teamBExpanded,
+                            isAdding: $addingPlayerB,
+                            newName: $newPlayerNameB,
+                            newNumber: $newPlayerNumberB
+                        )
+                        
+                        // Start Game button
                         Button {
-                            showingLiveGame = true
+                            if setup.teamAName.isEmpty { setup.teamAName = "Home" }
+                            if setup.teamBName.isEmpty { setup.teamBName = "Away" }
+                            showingGame = true
                         } label: {
-                            Label("Start Game", systemImage: "basketball.fill")
-                                .font(HoopTheme.buttonFont)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 18)
-                                .background(HoopTheme.orange)
-                                .cornerRadius(16)
+                            HStack {
+                                Image(systemName: "basketball.fill")
+                                Text("Start Game")
+                                    .font(.headline)
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                            .background(HoopTheme.orange)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 32)
+                        .padding(.horizontal)
+                        .padding(.bottom, 24)
                     }
                     .padding(.top, 16)
                 }
@@ -117,152 +157,142 @@ struct GameSetupView: View {
             .navigationTitle("New Game")
             .navigationBarTitleDisplayMode(.large)
         }
-        .fullScreenCover(isPresented: $showingLiveGame) {
-            LiveGameView(setup: setup)
+        .fullScreenCover(isPresented: $showingGame) {
+            LiveGameView(engine: GameEngine(setup: setup))
         }
-        .tint(HoopTheme.orange)
+        .onAppear {
+            setup.teamAName = defaultTeamA
+            setup.teamBName = defaultTeamB
+            setup.quarterMinutes = defaultQuarterMinutes
+            setup.timeoutsPerTeam = defaultTimeouts
+        }
     }
-}
-
-// MARK: - Sub-components
-
-private struct TeamHeaderField: View {
-    let label: String
-    @Binding var name: String
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(HoopTheme.labelFont)
-                .foregroundColor(HoopTheme.subtleText)
-            TextField("Team Name", text: $name)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(.white)
-                .padding(12)
+    
+    @ViewBuilder
+    func rosterSection(
+        teamName: String,
+        teamColor: Color,
+        players: Binding<[(name: String, number: String)]>,
+        isExpanded: Binding<Bool>,
+        isAdding: Binding<Bool>,
+        newName: Binding<String>,
+        newNumber: Binding<String>
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation { isExpanded.wrappedValue.toggle() }
+            } label: {
+                HStack {
+                    Image(systemName: "person.3.fill")
+                        .foregroundStyle(teamColor)
+                    Text("\(teamName) Roster")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
+                    Spacer()
+                    Text("\(players.wrappedValue.count) players")
+                        .font(.caption)
+                        .foregroundStyle(HoopTheme.subtleText)
+                    Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
+                        .font(.caption)
+                        .foregroundStyle(HoopTheme.subtleText)
+                }
+                .padding()
                 .background(HoopTheme.cardBg)
-                .cornerRadius(12)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            
+            if isExpanded.wrappedValue {
+                VStack(spacing: 0) {
+                    ForEach(players.wrappedValue.indices, id: \.self) { idx in
+                        HStack {
+                            Text("#\(players.wrappedValue[idx].number)")
+                                .font(.caption.bold())
+                                .foregroundStyle(teamColor)
+                                .frame(width: 36)
+                            Text(players.wrappedValue[idx].name)
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                            Spacer()
+                            Button {
+                                players.wrappedValue.remove(at: idx)
+                            } label: {
+                                Image(systemName: "trash")
+                                    .font(.caption)
+                                    .foregroundStyle(.red.opacity(0.7))
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+                        .background(HoopTheme.cardBg.opacity(0.7))
+                        Divider().background(Color.white.opacity(0.05))
+                    }
+                    
+                    if isAdding.wrappedValue {
+                        HStack(spacing: 8) {
+                            TextField("#", text: newNumber)
+                                .textFieldStyle(.plain)
+                                .font(.caption.bold())
+                                .foregroundStyle(teamColor)
+                                .frame(width: 36)
+                                .multilineTextAlignment(.center)
+                                .padding(8)
+                                .background(Color.white.opacity(0.08))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            
+                            TextField("Player name", text: newName)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(.white)
+                            
+                            Button {
+                                if !newName.wrappedValue.isEmpty {
+                                    players.wrappedValue.append((name: newName.wrappedValue, number: newNumber.wrappedValue))
+                                    newName.wrappedValue = ""
+                                    newNumber.wrappedValue = ""
+                                }
+                                isAdding.wrappedValue = false
+                            } label: {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(HoopTheme.correctGreen)
+                            }
+                            
+                            Button {
+                                newName.wrappedValue = ""
+                                newNumber.wrappedValue = ""
+                                isAdding.wrappedValue = false
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.red.opacity(0.7))
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+                        .background(HoopTheme.cardBg.opacity(0.5))
+                    }
+                    
+                    Button {
+                        isAdding.wrappedValue = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(teamColor)
+                            Text("Add Player")
+                                .font(.subheadline)
+                                .foregroundStyle(teamColor)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(HoopTheme.cardBg.opacity(0.5))
+                    }
+                }
+                .background(HoopTheme.cardBg.opacity(0.3))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(color.opacity(0.6), lineWidth: 2)
+                        .stroke(teamColor.opacity(0.2), lineWidth: 1)
                 )
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-private struct SettingRow<Content: View>: View {
-    let label: String
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        HStack {
-            Text(label)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(.white)
-            Spacer()
-            content()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-    }
-}
-
-private struct RosterSection: View {
-    let teamName: String
-    let team: String
-    let color: Color
-    @Binding var players: [(name: String, number: String)]
-    @Binding var newName: String
-    @Binding var newNumber: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Circle()
-                    .fill(color)
-                    .frame(width: 10, height: 10)
-                Text(teamName.isEmpty ? "Team \(team)" : teamName)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(color)
-                Spacer()
-                Text("\(players.count)/15")
-                    .font(HoopTheme.labelFont)
-                    .foregroundColor(HoopTheme.subtleText)
-            }
-
-            // Existing players
-            ForEach(Array(players.enumerated()), id: \.offset) { idx, player in
-                HStack(spacing: 6) {
-                    Text("#\(player.number)")
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
-                        .foregroundColor(color)
-                        .frame(width: 32, alignment: .leading)
-                    Text(player.name)
-                        .font(.system(size: 13))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                    Spacer()
-                    Button {
-                        players.remove(at: idx)
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(HoopTheme.subtleText)
-                    }
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(color.opacity(0.08))
-                .cornerRadius(8)
-            }
-
-            // Add player form
-            if players.count < 15 {
-                HStack(spacing: 6) {
-                    TextField("#", text: $newNumber)
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .frame(width: 36)
-                        .padding(6)
-                        .background(HoopTheme.darkBg)
-                        .cornerRadius(6)
-                        .keyboardType(.numberPad)
-
-                    TextField("Player name", text: $newName)
-                        .font(.system(size: 13))
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .background(HoopTheme.darkBg)
-                        .cornerRadius(6)
-
-                    Button {
-                        addPlayer()
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(newName.isEmpty ? HoopTheme.subtleText : color)
-                            .font(.system(size: 22))
-                    }
-                    .disabled(newName.isEmpty)
-                }
+                .padding(.top, 4)
             }
         }
-        .padding(12)
-        .hoopCard()
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal)
     }
-
-    private func addPlayer() {
-        guard !newName.isEmpty else { return }
-        let num = newNumber.isEmpty ? "\(players.count + 1)" : newNumber
-        players.append((name: newName, number: num))
-        newName = ""
-        newNumber = ""
-    }
-}
-
-#Preview {
-    GameSetupView()
-        .preferredColorScheme(.dark)
 }

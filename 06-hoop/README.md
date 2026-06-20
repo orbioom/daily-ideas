@@ -1,49 +1,26 @@
 # Hoop
 
-Live basketball game scorekeeper and stat tracker for pickup games, youth leagues, and coaching use.
+Live basketball scorekeeper for pickup games and youth leagues.
 
 ## Features
-
-- Track teams, players, scoring (2pt/3pt/FT), quarter scores, fouls, and timeouts in real time
-- Support for 2-quarter (halves) or 4-quarter game formats
-- Configurable quarter length (8, 10, or 12 minutes)
-- Per-player stat tracking: field goals, free throws, fouls
-- Built-in countdown timer with start/pause/end quarter controls
+- Track teams, players, and scoring (2pt / 3pt / free throws)
+- Quarter-by-quarter score tracking with live game clock
+- Per-player stats: points, fouls, free throw %
+- Team fouls and timeout management
 - Undo last action
-- Full game history with box scores
-- Dark hardwood-floor + basketball orange theme
+- Full game history with player stat breakdown
+- Dark hardwood/orange theme
 
-## Tech Stack
-
+## Stack
 - SwiftUI 5
-- SwiftData (persistence)
-- @Observable (GameEngine live state)
-- iOS 17+ deployment target
-- XcodeGen (project.yml → Xcode project)
+- SwiftData (persistent game history)
+- `@Observable` GameEngine (no ObservableObject)
+- iOS 17+ target
 
-## Setup
-
-```bash
+## Build
+```
 cd ios
 xcodegen generate
 open Hoop.xcodeproj
 ```
-
-## Structure
-
-```
-ios/
-├── project.yml
-└── Hoop/
-    ├── HoopApp.swift
-    ├── Theme/HoopTheme.swift
-    ├── Models/
-    │   ├── HoopModels.swift
-    │   └── GameEngine.swift
-    └── Views/
-        ├── MainTabView.swift
-        ├── Onboarding/
-        ├── Game/
-        ├── History/
-        └── Settings/
-```
+Run on simulator or device (iOS 17+).

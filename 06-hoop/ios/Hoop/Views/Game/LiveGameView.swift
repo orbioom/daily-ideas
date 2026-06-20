@@ -1,454 +1,304 @@
 import SwiftUI
-import SwiftData
 
 struct LiveGameView: View {
-    @Environment(\.modelContext) private var modelContext
+    @State var engine: GameEngine
     @Environment(\.dismiss) private var dismiss
-
-    @State private var engine: GameEngine
     @State private var showingSummary = false
-    @State private var gameSaved = false
-
-    init(setup: GameSetup) {
-        _engine = State(initialValue: GameEngine(setup: setup))
+    @State private var showingEndConfirm = false
+    
+    var timeString: String {
+        let m = engine.secondsRemaining / 60
+        let s = engine.secondsRemaining % 60
+        return String(format: "%d:%02d", m, s)
     }
-
+    
     var body: some View {
-        GeometryReader { geo in
-            let isLandscape = geo.size.width > geo.size.height
-
-            ZStack {
-                HoopTheme.darkBg.ignoresSafeArea()
-
-                if isLandscape {
-                    landscapeLayout
-                } else {
-                    portraitLayout
-                }
-            }
-        }
-        .navigationBarBackButtonHidden(true)
-        .sheet(isPresented: $showingSummary) {
-            GameSummaryView(
-                engine: engine,
-                onSave: {
-                    if !gameSaved {
-                        engine.saveToContext(modelContext)
-                        gameSaved = true
-                    }
-                },
-                onNewGame: {
-                    dismiss()
-                }
-            )
-        }
-    }
-
-    // MARK: - Portrait Layout
-
-    private var portraitLayout: some View {
-        VStack(spacing: 0) {
-            // Top bar
-            topBar
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-
-            // Scoreboard
-            scoreboardHeader
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-
-            // Timer controls
-            timerControls
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-
-            Divider()
-                .background(HoopTheme.subtleText.opacity(0.3))
-
-            // Scoring area
-            ScrollView {
-                HStack(alignment: .top, spacing: 12) {
-                    // Team A
-                    teamColumn(team: "A", players: engine.teamAPlayers, teamName: engine.teamAName, color: HoopTheme.teamAColor)
-                    // Team B
-                    teamColumn(team: "B", players: engine.teamBPlayers, teamName: engine.teamBName, color: HoopTheme.teamBColor)
-                }
-                .padding(16)
-            }
-
-            // Bottom: fouls & timeouts
-            bottomBar
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
-        }
-    }
-
-    // MARK: - Landscape Layout
-
-    private var landscapeLayout: some View {
-        HStack(spacing: 0) {
-            // Left: Team A
-            VStack(spacing: 8) {
-                teamColumnHeader(team: "A", teamName: engine.teamAName, score: engine.scoreA, color: HoopTheme.teamAColor)
-                ScrollView {
-                    VStack(spacing: 6) {
-                        if engine.teamAPlayers.isEmpty {
-                            teamScoringNoRoster(team: "A")
-                        } else {
-                            ForEach(engine.teamAPlayers) { player in
-                                PlayerStatsRow(player: player, team: "A", engine: engine)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 8)
-                }
-                foulTimeoutRow(team: "A", fouls: engine.teamAFouls, timeouts: engine.teamATimeouts, color: HoopTheme.teamAColor)
-                    .padding(.horizontal, 8)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-
-            // Center: controls
-            VStack(spacing: 16) {
-                Text(engine.quarterLabel)
-                    .font(HoopTheme.quarterFont)
-                    .foregroundColor(HoopTheme.subtleText)
-
-                Text(engine.timeString)
-                    .font(HoopTheme.timerFont)
-                    .foregroundColor(.white)
-                    .monospacedDigit()
-
-                Button {
-                    engine.isRunning ? engine.pauseTimer() : engine.startTimer()
-                } label: {
-                    Image(systemName: engine.isRunning ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundColor(HoopTheme.orange)
-                }
-
-                Button("End \(engine.totalQuarters == 2 ? "Half" : "Qtr")") {
-                    engine.endQuarter()
-                    if engine.isGameOver { showingSummary = true }
-                }
-                .font(.system(size: 12, weight: .bold))
-                .foregroundColor(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(HoopTheme.cardBg)
-                .cornerRadius(10)
-
-                if engine.canUndo {
+        ZStack {
+            HoopTheme.darkBg.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Top bar
+                HStack {
+                    // Quarter indicator
+                    Text("Q\(engine.currentQuarter)")
+                        .font(.headline.bold())
+                        .foregroundStyle(HoopTheme.orange)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(HoopTheme.cardBg)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    
+                    Spacer()
+                    
                     Button {
                         engine.undoLastAction()
                     } label: {
-                        Image(systemName: "arrow.uturn.backward.circle")
-                            .font(.system(size: 24))
-                            .foregroundColor(HoopTheme.subtleText)
-                    }
-                }
-
-                Button("End Game") {
-                    showingSummary = true
-                }
-                .font(.system(size: 12, weight: .bold))
-                .foregroundColor(.red)
-            }
-            .frame(width: 120)
-            .padding(.vertical, 16)
-
-            // Right: Team B
-            VStack(spacing: 8) {
-                teamColumnHeader(team: "B", teamName: engine.teamBName, score: engine.scoreB, color: HoopTheme.teamBColor)
-                ScrollView {
-                    VStack(spacing: 6) {
-                        if engine.teamBPlayers.isEmpty {
-                            teamScoringNoRoster(team: "B")
-                        } else {
-                            ForEach(engine.teamBPlayers) { player in
-                                PlayerStatsRow(player: player, team: "B", engine: engine)
-                            }
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.uturn.backward")
+                            Text("Undo")
                         }
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(HoopTheme.cardBg)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    .padding(.horizontal, 8)
+                    
+                    Button {
+                        showingEndConfirm = true
+                    } label: {
+                        Text("End Game")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.red.opacity(0.7))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
                 }
-                foulTimeoutRow(team: "B", fouls: engine.teamBFouls, timeouts: engine.teamBTimeouts, color: HoopTheme.teamBColor)
-                    .padding(.horizontal, 8)
+                .padding(.horizontal)
+                .padding(.top, 12)
+                
+                // Scoreboard
+                HStack(alignment: .center, spacing: 0) {
+                    // Team A
+                    VStack(spacing: 4) {
+                        Text(engine.teamAName)
+                            .font(.headline.bold())
+                            .foregroundStyle(HoopTheme.teamA)
+                            .lineLimit(1)
+                        Text("\(engine.scoreA)")
+                            .font(.system(size: 64, weight: .black, design: .rounded))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(maxWidth: .infinity)
+                    
+                    VStack(spacing: 2) {
+                        Text("VS")
+                            .font(.caption.bold())
+                            .foregroundStyle(HoopTheme.subtleText)
+                        Text("Q\(engine.currentQuarter) of \(engine.totalQuarters)")
+                            .font(.caption2)
+                            .foregroundStyle(HoopTheme.subtleText)
+                    }
+                    .frame(width: 60)
+                    
+                    // Team B
+                    VStack(spacing: 4) {
+                        Text(engine.teamBName)
+                            .font(.headline.bold())
+                            .foregroundStyle(HoopTheme.teamB)
+                            .lineLimit(1)
+                        Text("\(engine.scoreB)")
+                            .font(.system(size: 64, weight: .black, design: .rounded))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal)
+                .background(HoopTheme.cardBg)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal)
+                .padding(.top, 10)
+                
+                // Clock
+                HStack(spacing: 16) {
+                    Text(timeString)
+                        .font(.system(size: 36, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.white)
+                    
+                    Button {
+                        if engine.isRunning { engine.pauseTimer() } else { engine.startTimer() }
+                    } label: {
+                        Image(systemName: engine.isRunning ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundStyle(HoopTheme.orange)
+                    }
+                    
+                    Button {
+                        engine.endQuarter()
+                    } label: {
+                        Text("End Q\(engine.currentQuarter)")
+                            .font(.caption.bold())
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(HoopTheme.orange.opacity(0.8))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+                .padding(.vertical, 10)
+                
+                // Fouls and Timeouts
+                HStack(spacing: 0) {
+                    teamStatusRow(
+                        fouls: engine.teamAFouls,
+                        timeoutsLeft: engine.teamATimeoutsLeft,
+                        teamColor: HoopTheme.teamA,
+                        team: "A"
+                    )
+                    
+                    Divider()
+                        .frame(height: 40)
+                        .background(Color.white.opacity(0.1))
+                    
+                    teamStatusRow(
+                        fouls: engine.teamBFouls,
+                        timeoutsLeft: engine.teamBTimeoutsLeft,
+                        teamColor: HoopTheme.teamB,
+                        team: "B"
+                    )
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(HoopTheme.cardBg.opacity(0.5))
+                
+                // Players grid or simple scoring
+                ScrollView {
+                    if engine.teamAPlayers.isEmpty && engine.teamBPlayers.isEmpty {
+                        // No-player simple scoring
+                        HStack(alignment: .top, spacing: 16) {
+                            simpleTeamScoring(team: "A", teamName: engine.teamAName, teamColor: HoopTheme.teamA)
+                            simpleTeamScoring(team: "B", teamName: engine.teamBName, teamColor: HoopTheme.teamB)
+                        }
+                        .padding()
+                    } else {
+                        HStack(alignment: .top, spacing: 12) {
+                            // Team A players
+                            VStack(spacing: 8) {
+                                Text(engine.teamAName)
+                                    .font(.caption.bold())
+                                    .foregroundStyle(HoopTheme.teamA)
+                                ForEach(engine.teamAPlayers.indices, id: \.self) { idx in
+                                    PlayerScoringRow(playerIndex: idx, team: "A", engine: engine)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            // Team B players
+                            VStack(spacing: 8) {
+                                Text(engine.teamBName)
+                                    .font(.caption.bold())
+                                    .foregroundStyle(HoopTheme.teamB)
+                                ForEach(engine.teamBPlayers.indices, id: \.self) { idx in
+                                    PlayerScoringRow(playerIndex: idx, team: "B", engine: engine)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding()
+                    }
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
         }
-    }
-
-    // MARK: - Components
-
-    private var topBar: some View {
-        HStack {
-            Button {
-                engine.pauseTimer()
+        .preferredColorScheme(.dark)
+        .onChange(of: engine.isGameOver) { _, newValue in
+            if newValue { showingSummary = true }
+        }
+        .fullScreenCover(isPresented: $showingSummary) {
+            GameSummaryView(engine: engine) {
                 dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(HoopTheme.orange)
             }
-
-            Spacer()
-
-            if engine.canUndo {
-                Button {
-                    engine.undoLastAction()
-                } label: {
-                    Label("Undo", systemImage: "arrow.uturn.backward")
-                        .font(HoopTheme.labelFont)
-                        .foregroundColor(HoopTheme.subtleText)
-                }
-            }
-
-            Button("End Game") {
-                engine.pauseTimer()
+        }
+        .alert("End Game?", isPresented: $showingEndConfirm) {
+            Button("End Game", role: .destructive) {
+                engine.endQuarter()
                 showingSummary = true
             }
-            .font(.system(size: 14, weight: .bold))
-            .foregroundColor(.red)
-        }
-        .padding(.vertical, 8)
-    }
-
-    private var scoreboardHeader: some View {
-        HStack(alignment: .center, spacing: 0) {
-            // Team A
-            VStack(spacing: 4) {
-                Text(engine.teamAName)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(HoopTheme.teamAColor)
-                    .lineLimit(1)
-                Text("\(engine.scoreA)")
-                    .font(HoopTheme.scoreFont)
-                    .foregroundColor(.white)
-                    .monospacedDigit()
-            }
-            .frame(maxWidth: .infinity)
-
-            // Center info
-            VStack(spacing: 4) {
-                Text(engine.quarterLabel)
-                    .font(HoopTheme.quarterFont)
-                    .foregroundColor(HoopTheme.subtleText)
-                Text(engine.timeString)
-                    .font(HoopTheme.timerFont)
-                    .foregroundColor(engine.isRunning ? HoopTheme.orange : .white)
-                    .monospacedDigit()
-            }
-            .frame(minWidth: 120)
-
-            // Team B
-            VStack(spacing: 4) {
-                Text(engine.teamBName)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(HoopTheme.teamBColor)
-                    .lineLimit(1)
-                Text("\(engine.scoreB)")
-                    .font(HoopTheme.scoreFont)
-                    .foregroundColor(.white)
-                    .monospacedDigit()
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .padding(16)
-        .hoopCard()
-    }
-
-    private var timerControls: some View {
-        HStack(spacing: 12) {
-            // Play/Pause
-            Button {
-                engine.isRunning ? engine.pauseTimer() : engine.startTimer()
-            } label: {
-                Label(
-                    engine.isRunning ? "Pause" : "Start",
-                    systemImage: engine.isRunning ? "pause.fill" : "play.fill"
-                )
-                .font(HoopTheme.buttonFont)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(engine.isRunning ? Color.gray.opacity(0.4) : HoopTheme.orange)
-                .cornerRadius(12)
-            }
-
-            // End Quarter
-            Button {
-                engine.endQuarter()
-                if engine.isGameOver {
-                    showingSummary = true
-                }
-            } label: {
-                Label(
-                    engine.totalQuarters == 2 ? "End Half" : "End Qtr",
-                    systemImage: "forward.end.fill"
-                )
-                .font(HoopTheme.buttonFont)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(HoopTheme.cardBg)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(HoopTheme.subtleText.opacity(0.3), lineWidth: 1)
-                )
-            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will end the current game and show the summary.")
         }
     }
-
-    private var bottomBar: some View {
-        HStack(spacing: 16) {
-            foulTimeoutRow(team: "A", fouls: engine.teamAFouls, timeouts: engine.teamATimeouts, color: HoopTheme.teamAColor)
-            foulTimeoutRow(team: "B", fouls: engine.teamBFouls, timeouts: engine.teamBTimeouts, color: HoopTheme.teamBColor)
-        }
-        .padding(.vertical, 12)
-    }
-
+    
     @ViewBuilder
-    private func teamColumn(team: String, players: [PlayerState], teamName: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            teamColumnHeader(team: team, teamName: teamName, score: team == "A" ? engine.scoreA : engine.scoreB, color: color)
-
-            if players.isEmpty {
-                teamScoringNoRoster(team: team)
-            } else {
-                ForEach(players) { player in
-                    PlayerStatsRow(player: player, team: team, engine: engine)
+    func teamStatusRow(fouls: Int, timeoutsLeft: Int, teamColor: Color, team: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Button {
+                    engine.addFoul(team: team)
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "hand.raised.fill")
+                            .font(.caption2)
+                        Text("Foul: \(fouls)")
+                            .font(.caption.bold())
+                    }
+                    .foregroundStyle(fouls >= 5 ? .red : .white)
                 }
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func teamColumnHeader(team: String, teamName: String, score: Int, color: Color) -> some View {
-        HStack {
-            Circle()
-                .fill(color)
-                .frame(width: 8, height: 8)
-            Text(teamName)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundColor(color)
-                .lineLimit(1)
-            Spacer()
-            Text("\(score)")
-                .font(.system(size: 20, weight: .black, design: .rounded))
-                .foregroundColor(.white)
-        }
-        .padding(.horizontal, 8)
-    }
-
-    @ViewBuilder
-    private func teamScoringNoRoster(team: String) -> some View {
-        let color = HoopTheme.teamColor(for: team)
-        VStack(spacing: 6) {
-            HStack(spacing: 6) {
-                noRosterButton(label: "+2", color: color) {
-                    addTeamScore(team: team, pts: 2)
-                }
-                noRosterButton(label: "+3", color: color) {
-                    addTeamScore(team: team, pts: 3)
-                }
-                noRosterButton(label: "+1", color: color.opacity(0.7)) {
-                    addTeamScore(team: team, pts: 1)
-                }
-            }
-        }
-        .padding(8)
-        .hoopCard()
-    }
-
-    private func noRosterButton(label: String, color: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(label)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(color)
-                .cornerRadius(10)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func addTeamScore(team: String, pts: Int) {
-        // When no roster, use a synthetic player
-        if team == "A" {
-            if engine.teamAPlayers.isEmpty {
-                engine.teamAPlayers.append(PlayerState(name: engine.teamAName, number: "–"))
-            }
-            let player = engine.teamAPlayers[0]
-            if pts == 2 { engine.add2pt(player: player, team: "A") }
-            else if pts == 3 { engine.add3pt(player: player, team: "A") }
-            else { engine.addFreeThrow(player: player, team: "A", made: true) }
-        } else {
-            if engine.teamBPlayers.isEmpty {
-                engine.teamBPlayers.append(PlayerState(name: engine.teamBName, number: "–"))
-            }
-            let player = engine.teamBPlayers[0]
-            if pts == 2 { engine.add2pt(player: player, team: "B") }
-            else if pts == 3 { engine.add3pt(player: player, team: "B") }
-            else { engine.addFreeThrow(player: player, team: "B", made: true) }
-        }
-    }
-
-    private func foulTimeoutRow(team: String, fouls: Int, timeouts: Int, color: Color) -> some View {
-        let maxTimeouts = 5
-        return VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Text("Fouls:")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(HoopTheme.subtleText)
-                Text("\(fouls)")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(fouls >= 5 ? .red : color)
+                
                 Spacer()
+                
                 Button {
                     engine.useTimeout(team: team)
                 } label: {
-                    Text("Timeout")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(timeouts > 0 ? color : HoopTheme.subtleText)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(timeouts > 0 ? color.opacity(0.15) : Color.clear)
-                        .cornerRadius(6)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(timeouts > 0 ? color.opacity(0.3) : HoopTheme.subtleText.opacity(0.2), lineWidth: 1)
-                        )
+                    Text("TO: \(timeoutsLeft)")
+                        .font(.caption.bold())
+                        .foregroundStyle(teamColor)
                 }
-                .disabled(timeouts == 0)
             }
-            // Timeout indicators
+            
+            // Timeout dots
             HStack(spacing: 4) {
-                ForEach(0..<maxTimeouts, id: \.self) { i in
+                let totalTimeouts = team == "A"
+                    ? (engine.teamATimeoutsLeft + (5 - engine.teamATimeoutsLeft))
+                    : (engine.teamBTimeoutsLeft + (5 - engine.teamBTimeoutsLeft))
+                ForEach(0..<max(totalTimeouts, 1), id: \.self) { i in
                     Circle()
-                        .fill(i < timeouts ? color : HoopTheme.subtleText.opacity(0.3))
+                        .fill(i < timeoutsLeft ? teamColor : Color.white.opacity(0.15))
                         .frame(width: 8, height: 8)
                 }
-                Spacer()
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .hoopCard()
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12)
+    }
+    
+    @ViewBuilder
+    func simpleTeamScoring(team: String, teamName: String, teamColor: Color) -> some View {
+        VStack(spacing: 12) {
+            Text(teamName)
+                .font(.headline.bold())
+                .foregroundStyle(teamColor)
+            
+            Button {
+                engine.addDirectScore(points: 2, team: team)
+            } label: {
+                Text("+2")
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(teamColor.opacity(0.3))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            
+            Button {
+                engine.addDirectScore(points: 3, team: team)
+            } label: {
+                Text("+3")
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(teamColor.opacity(0.3))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            
+            Button {
+                engine.addDirectScore(points: 1, team: team)
+            } label: {
+                Text("FT +1")
+                    .font(.title3.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+        }
         .frame(maxWidth: .infinity)
     }
-}
-
-#Preview {
-    var setup = GameSetup()
-    setup.teamAName = "Lakers"
-    setup.teamBName = "Celtics"
-    setup.teamAPlayers = [("LeBron", "23"), ("AD", "3"), ("Austin", "15")]
-    setup.teamBPlayers = [("Tatum", "0"), ("Brown", "7"), ("Holiday", "4")]
-    return LiveGameView(setup: setup)
-        .preferredColorScheme(.dark)
 }

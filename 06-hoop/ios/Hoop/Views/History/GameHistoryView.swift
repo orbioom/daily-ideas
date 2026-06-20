@@ -4,128 +4,109 @@ import SwiftData
 struct GameHistoryView: View {
     @Query(sort: \HoopGame.date, order: .reverse) private var games: [HoopGame]
     @Environment(\.modelContext) private var modelContext
-    @State private var selectedGame: HoopGame?
-
+    
+    private let dateFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        df.timeStyle = .short
+        return df
+    }()
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 HoopTheme.darkBg.ignoresSafeArea()
-
+                
                 if games.isEmpty {
-                    emptyState
+                    VStack(spacing: 16) {
+                        Image(systemName: "clock.badge.questionmark")
+                            .font(.system(size: 56))
+                            .foregroundStyle(HoopTheme.subtleText)
+                        Text("No Games Yet")
+                            .font(.title3.bold())
+                            .foregroundStyle(.white)
+                        Text("Complete and save a game to see it here.")
+                            .font(.subheadline)
+                            .foregroundStyle(HoopTheme.subtleText)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
                 } else {
                     List {
                         ForEach(games) { game in
-                            Button {
-                                selectedGame = game
+                            NavigationLink {
+                                GameDetailView(game: game)
                             } label: {
-                                GameHistoryRow(game: game)
+                                gameRow(game: game)
                             }
                             .listRowBackground(HoopTheme.cardBg)
-                            .listRowSeparatorTint(HoopTheme.subtleText.opacity(0.2))
+                            .listRowSeparatorTint(Color.white.opacity(0.07))
                         }
-                        .onDelete(perform: deleteGames)
+                        .onDelete { indices in
+                            for idx in indices { modelContext.delete(games[idx]) }
+                            try? modelContext.save()
+                        }
                     }
-                    .scrollContentBackground(.hidden)
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.large)
-            .sheet(item: $selectedGame) { game in
-                GameDetailView(game: game)
+            .toolbar {
+                if !games.isEmpty {
+                    EditButton()
+                        .foregroundStyle(HoopTheme.orange)
+                }
             }
         }
     }
-
-    private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 56))
-                .foregroundColor(HoopTheme.subtleText)
-            Text("No Games Yet")
-                .font(.system(size: 22, weight: .bold))
-                .foregroundColor(.white)
-            Text("Complete a game and save it to see your history here.")
-                .font(.system(size: 15))
-                .foregroundColor(HoopTheme.subtleText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-        }
-    }
-
-    private func deleteGames(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(games[index])
-        }
-        try? modelContext.save()
-    }
-}
-
-struct GameHistoryRow: View {
-    let game: HoopGame
-
-    private var dateString: String {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        f.timeStyle = .short
-        return f.string(from: game.date)
-    }
-
-    private var winnerIsA: Bool { game.finalScoreA > game.finalScoreB }
-    private var winnerIsB: Bool { game.finalScoreB > game.finalScoreA }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(dateString)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(HoopTheme.subtleText)
-
-            HStack(spacing: 12) {
-                // Team A
-                VStack(alignment: .leading, spacing: 2) {
+    
+    @ViewBuilder
+    func gameRow(game: HoopGame) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(dateFormatter.string(from: game.date))
+                .font(.caption)
+                .foregroundStyle(HoopTheme.subtleText)
+            
+            HStack {
+                VStack(alignment: .leading) {
                     Text(game.teamAName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(winnerIsA ? HoopTheme.teamAColor : HoopTheme.subtleText)
+                        .font(.headline)
+                        .foregroundStyle(game.finalScoreA > game.finalScoreB ? HoopTheme.orange : .white)
                     Text("\(game.finalScoreA)")
-                        .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundColor(winnerIsA ? .white : HoopTheme.subtleText)
+                        .font(.title2.bold())
+                        .foregroundStyle(game.finalScoreA > game.finalScoreB ? HoopTheme.orange : .white)
                 }
-
+                
                 Spacer()
-
+                
                 Text("vs")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(HoopTheme.subtleText)
-
+                    .font(.caption)
+                    .foregroundStyle(HoopTheme.subtleText)
+                
                 Spacer()
-
-                // Team B
-                VStack(alignment: .trailing, spacing: 2) {
+                
+                VStack(alignment: .trailing) {
                     Text(game.teamBName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(winnerIsB ? HoopTheme.teamBColor : HoopTheme.subtleText)
+                        .font(.headline)
+                        .foregroundStyle(game.finalScoreB > game.finalScoreA ? HoopTheme.orange : .white)
                     Text("\(game.finalScoreB)")
-                        .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundColor(winnerIsB ? .white : HoopTheme.subtleText)
+                        .font(.title2.bold())
+                        .foregroundStyle(game.finalScoreB > game.finalScoreA ? HoopTheme.orange : .white)
                 }
             }
-
-            if let winner = game.winner {
-                HStack(spacing: 4) {
-                    Image(systemName: "trophy.fill")
-                        .font(.system(size: 10))
-                    Text(winner)
-                        .font(.system(size: 11, weight: .semibold))
-                }
-                .foregroundColor(HoopTheme.orange)
+            
+            if game.winnerName != "Tie" {
+                Text("\(game.winnerName) wins")
+                    .font(.caption.bold())
+                    .foregroundStyle(HoopTheme.orange)
+            } else {
+                Text("Tie game")
+                    .font(.caption.bold())
+                    .foregroundStyle(HoopTheme.subtleText)
             }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 4)
     }
-}
-
-#Preview {
-    GameHistoryView()
-        .preferredColorScheme(.dark)
 }

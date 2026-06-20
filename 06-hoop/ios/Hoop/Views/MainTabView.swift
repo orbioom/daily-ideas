@@ -7,23 +7,16 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Games", systemImage: "basketball.fill")
                 }
-
             GameHistoryView()
                 .tabItem {
-                    Label("History", systemImage: "clock")
+                    Label("History", systemImage: "clock.fill")
                 }
-
             SettingsView()
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+                    Label("Settings", systemImage: "gearshape.fill")
                 }
         }
-        .accentColor(HoopTheme.orange)
-        .background(HoopTheme.darkBg)
-    }
-}
-
-#Preview {
-    MainTabView()
+        .tint(HoopTheme.orange)
         .preferredColorScheme(.dark)
+    }
 }
