@@ -1,72 +1,53 @@
-# Run 3 — 2026-06-21
+# Run 4 — 2026-06-21
 
-**6 apps shipped · entries #346–351 in SHIPPED.md**
-
----
-
-## 01 · Gomoku (`01-gomoku`) — Five-in-a-Row vs AI
-
-Classic 15×15 Gomoku against a minimax AI with three difficulty levels. The AI evaluates candidate cells within 2 squares of existing stones, checks for immediate wins/blocks, then scores open-fours (100K), blocked-fours (10K), open-threes (5K) and smaller patterns. A Canvas-rendered board supports three themes (Classic/Dark/Bamboo), coordinate labels, last-move indicators, and winning-cell highlights. Tap anywhere on the board to place a stone.
-
-**Screens:** Play · History · Stats (win-rate ring + Charts) · Settings  
-**Persistence:** `GomokuResult`, `GomokuPrefs` (SwiftData)  
-**AI:** `Task.detached` minimax with static board scorer, results posted back via `MainActor.run`
+**6 apps shipped · entries #352–357 in SHIPPED.md**
 
 ---
 
-## 02 · Farkle (`02-farkle`) — Push-Your-Luck Dice Game
+## Apps Shipped This Run
 
-Full Farkle with pip-rendered dice, hot dice, farkle detection, and AI opponent. `FarkleEngine` implements the complete scoring table (straight=1500, three pairs=1500, three-of-a-kind, four/five/six-of-a-kind multipliers, singles 1=100/5=50). AI difficulty (Conservative/Normal/Aggressive) controls the banking threshold; AI turn runs async with `Task.sleep` delays for natural feel.
+### 1. Nova — Real-Time Star Map (#352)
+**Slug:** `01-nova` | **Theme:** Deep navy/starlight  
+A live sky guide using Meeus astronomical algorithms. Shows 60 named stars, 4 planets, Moon, and Sun on a stereographic star map. Observing session log with Bortle quality rating. No internet required.  
+**Screens:** Sky Map · Tonight · Catalog · Log · Settings
 
-**Screens:** Play · History · Rules (full scoring chart) · Settings  
-**Persistence:** `FarkleGame`, `FarklePrefs` (SwiftData)  
-**Dice:** Custom `DiceFaceView` + `DicePipsView` with GeometryReader pip layout
+### 2. Flop — Texas Hold'em Trainer (#353)
+**Slug:** `02-flop` | **Theme:** Felt green/gold  
+GTO pre-flop decision trainer for 6-max NL Hold'em. Quizzes all 169 starting hands × 6 positions with streak tracking. Visual range charts, pot odds calculator with Rule of 4&2, session log.  
+**Screens:** Hand Quiz · Pre-flop Charts · Pot Odds · Sessions · Settings
 
----
+### 3. Typo — Typing Speed Trainer (#354)
+**Slug:** `03-typo` | **Theme:** Dark navy-indigo/blue  
+MonkeyType-inspired WPM trainer for iPhone. AttributedString character coloring, 4 modes (Words/Sentences/Code/Numbers), history sparkline chart, 8 expandable typing lessons.  
+**Screens:** Practice · History · Lessons · Settings
 
-## 03 · Rung (`03-rung`) — Word Ladder Puzzle
+### 4. Ink — Tattoo Idea Planner (#355)
+**Slug:** `04-ink` | **Theme:** Dark purple/magenta  
+Private offline tattoo planning notebook. Collect ideas with 12 styles × 16 placements × 6 status stages, save artists with star ratings, book appointments and track deposits/total spent.  
+**Screens:** Ideas · Artists · Sessions · Settings
 
-Transform one 4-letter word into another, one letter at a time. Each step must be a valid word from an 800+ word list. BFS shortest-path engine (runs on background thread) provides directional hints without revealing the word. Thirty curated daily puzzles have seeded par values; practice mode generates random solvable pairs via reachability check.
+### 5. Kata — CrossFit WOD Tracker (#356)
+**Slug:** `05-kata` | **Theme:** Dark brown/orange flame  
+Full-featured CrossFit tracker with built-in WOD timer (countdown + circular ring), 12 benchmark/hero WODs (Fran/Murph/etc.), RX/scaled result logging, personal record board for 40+ movements.  
+**Screens:** WODs · Log · PRs · Settings
 
-**Screens:** Daily · Practice · Stats (Charts performance) · Settings  
-**Persistence:** `RungResult`, `RungPrefs` (SwiftData)  
-**Hint Engine:** `Task.detached` BFS path-tracer → `MainActor.run` to post hint character
-
----
-
-## 04 · Numble (`04-numble`) — Math Equation Guessing
-
-Wordle, but for math. Guess a 5-character equation (`digit op digit = digit`) in 6 tries. Only valid equations from the 90-entry pool are accepted. Feedback is correct (green), present (yellow), absent (gray) — per character. A custom numpad with color-coded key state and a guess distribution chart complete the experience.
-
-**Screens:** Play · Stats (distribution chart) · Settings  
-**Persistence:** `NumbleResult`, `NumblePrefs` (SwiftData)  
-**Engine:** `NumbleEngine.evaluate()` with positional Wordle algorithm
-
----
-
-## 05 · Salvo (`05-salvo`) — Battleship vs AI
-
-Classic 10×10 naval combat. Both fleets shown simultaneously — player fires on the top enemy grid, AI fires on the bottom player grid. Three AI personalities: Easy (pure random), Normal (Hunt & Target queue), Hard (checkerboard sweep + targeting). Ships are placed randomly at game start. Canvas rendering with `DragGesture(minimumDistance:0)` for cell tap detection.
-
-**Screens:** Battle · History (Charts) · Settings  
-**Persistence:** `SalvoResult`, `SalvoPrefs` (SwiftData)  
-**AI:** Hunt & Target with adjacent-cell queue; Hard adds parity checkerboard
+### 6. Seek — Ad-Free Word Search (#357)
+**Slug:** `06-seek` | **Theme:** Dark blue-teal  
+Completely ad-free word search with 8 categories × 3 difficulty levels. On-device puzzle generation in 8 directions, canvas-based grid with color-highlighted found words, game stats.  
+**Screens:** Play · Stats · Settings
 
 ---
 
-## 06 · Spello (`06-spello`) — Kids Spelling Trainer
+## Top Pick This Run
 
-Grade-level spelling practice for kids (Grades 1–5, 40 words per grade). Three modes: Multiple Choice, Type It, and Listen & Spell (uses `AVSpeechSynthesizer` for word pronunciation). Up to five child profiles each with independent grade level and session history. Progress tab shows accuracy trend line chart per active profile.
+**Nova** (#352) — The astronomical algorithm engine (Meeus formulas for real planetary positions, stereographic projection, observing log) is the most technically substantive app of this run and targets a passionate underserved audience (amateur astronomers/stargazers). The offline-first approach and depth of catalog data make it sticky.
 
-**Screens:** Home · Practice · Progress (Charts) · Settings  
-**Persistence:** `SpelloProfile`, `SpelloSession`, `SpelloPrefs` (SwiftData)  
-**Speech:** `AVSpeechSynthesizer` with en-US voice
+**Seek** (#357) is the sleeper pick — the "zero ads" positioning is a hard moat in a category drowning in rewarded video ads.
 
 ---
 
-## Technical Notes
-
-- All six apps: SwiftUI 5 / iOS 17+, `@Observable` + `@MainActor`, XcodeGen `project.yml`, no API keys, fully offline
-- Game AI runs on `Task.detached` background threads; results returned via `await MainActor.run`
-- All icons: 64×64 solid-color PNGs generated via Python `struct`/`zlib` (no PIL dependency)
-- SwiftData models use `@Model` with implicit `UUID` primary keys and default values for forwards-compat
+## Run Stats
+- Finance: 0 apps (category off-limits, rule respected)
+- External dependencies: 0
+- SwiftData models: 13 total across 6 apps
+- Total Swift files: 65
