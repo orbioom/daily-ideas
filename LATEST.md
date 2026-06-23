@@ -1,76 +1,20 @@
-# Run 5 — 2026-06-22
+# LATEST RUN — 2026-06-23_0930-UTC
 
-**6 apps shipped · entries #358–363 in SHIPPED.md**
+Run folder: `runs/2026-06-23_0930-UTC` — 10 production-ready native iOS apps (SwiftUI 5 / iOS 17+ / SwiftData / XcodeGen). Built locally and pushed (cloud on-demand trigger was unavailable).
 
----
+- **Drift** — built — `01-drift` — Chronotype-based sleep coach (offline/free core): plans ideal bedtime by chronotype, computes rolling 14-day sleep debt, circular-statistics bedtime consistency score, nightly-resetting wind-down checklist, Swift Charts (duration/debt/consistency trends), SwiftData (SleepLog/WindDownItem/SleepSettings), Tonight/Log/Trends/Routine/Settings tabs, wearable-free + account-free, one-time Drift Plus (export/extra charts)
+- **Voyage** — built — `02-voyage` — Traveler's phrasebook with real SM-2 spaced repetition (offline): curated survival decks per language (greetings/dining/directions/emergencies/shopping), self-graded flashcard review sessions, AVSpeechSynthesizer on-device pronunciation, per-deck progress, favorites, search, SwiftData (Deck/Phrase/ReviewState/Settings), Decks/Review/Browse/Stats/Settings tabs, $4.99 one-time Pro (premium language packs)
+- **Suppr** — built — `03-suppr` — Weeknight meal planner + auto grocery list (offline): native drag-recipe-onto-week-grid planning, auto-aggregated aisle-sorted shopping list scaled by servings, pantry-aware staple subtraction, 33 seeded recipes, recipe CRUD, SwiftData (Recipe/Ingredient/PlannedMeal/GroceryItem/PantryStaple/AppSettings), Plan/Recipes/Grocery/Pantry/Settings tabs, $4.99 one-time Suppr Plus
+- **Sprig** — built — `04-sprig` — One-tap newborn/baby tracker (offline/free core): feeds (breast L/R timer or bottle oz), sleep sessions, diaper changes, chronological timeline, multi-baby profiles, growth log (weight/length) charts, daily summary counts, Swift Charts (feeds/sleep/diaper trends), unit-aware conversions, SwiftData (Baby/FeedLog/SleepLog/DiaperLog/GrowthEntry), Today/Timeline/Trends/Growth/Settings tabs, $4.99 one-time Sprig Pro
+- **Petal** — built — `05-petal` — Multi-pet care & health tracker (offline/private): medication courses with end dates, vaccination/booster records (lot/clinic), vet-visit log (diagnoses/follow-ups), weight trends (Swift Charts), feeding schedules, unified Overdue/Today/Soon/Upcoming care timeline, SwiftData (Pet/Medication/Vaccination/VetVisit/WeightEntry/Settings), Pets/Care/Health/Weight/Settings tabs, $4.99 one-time Petal Plus (unlimited pets/sync/PDF export)
+- **Packwise** — built — `06-packwise` — Smart trip packing-list generator (offline): pure deterministic PackingEngine builds a categorized checklist from trip type/duration/activities/travelers (clothing scaled by nights+style, per-person items multiplied, activity gear de-duped), check-off progress ring, reusable templates, multi-trip, SwiftData (Trip/PackItem/Template/Settings), Trips/Packing/Templates/Settings, one-time Packwise Pro (unlimited trips/templates/sync)
+- **Lockin** — built — `07-lockin` — Deep-work focus timer + analytics (offline): flexible Pomodoro/custom/open-ended flow modes tied to projects+tags, live countdown ring, pause/resume, distraction counter, session log, Swift Charts (minutes-by-day, time-by-project, hour-of-day heatmap), streaks, SwiftData (FocusSession/Project/Settings), Focus/Tasks/Stats/History/Settings tabs, no gimmicks, one-time Lockin Pro (unlimited projects/flow/full analytics/export)
+- **Nook** — built — `08-nook` — Home maintenance scheduler (offline/no-account): recurring upkeep tasks by cadence (monthly/quarterly/seasonal/annual) grouped by room, mark-done advances next-due, overdue+upcoming Due dashboard, equipment/appliance records with warranty active/expiring/expired status, tasks attachable to appliances, service history, seeded starter checklist, SwiftData (Room/Appliance/MaintenanceTask/ServiceRecord/AppSettings), Due/Tasks/Rooms/Equipment/Settings tabs, $4.99 one-time Nook Plus
+- **Tempo** — built — `09-tempo` — Strength set/rep/weight logger (offline): 40+ seeded lifts with muscle groups, fast freeform set logging (weight×reps/RPE), automatic PR detection (Epley e1RM), relaunch-safe rest timer, barbell plate calculator, routine templates, Swift Charts (volume + estimated-1RM trends), workout history, SwiftData (Exercise/Workout/SetEntry/Routine/Settings + RoutineItem), Train/History/Exercises/Stats/Settings tabs, $4.99 one-time Tempo Pro
+- **Ember** — built — `10-ember` — Guided breathwork & calm coach (offline/free core): 5 techniques (Box 4-4-4-4, 4-7-8, Coherent 5-5, Energize, Wim-Hof-style power rounds), animated Canvas breathing pacer synced to phase timings with haptic cues + Reduce-Motion fallback, pre/post mood check-ins (1-5), streaks, Swift Charts (sessions/week + mood-lift trend), favorites, daily reminder, SwiftData (BreathSession/MoodEntry/Settings), Breathe/Patterns/History/Insights/Settings tabs, $4.99 one-time Ember Pro (custom-pattern builder)
 
-## Apps Shipped This Run
+## Top recommendation
+**Suppr** (weeknight meal planner + auto grocery list). Food/cooking is a proven paid category (Mealime, Paprika) and the exact friction users complain about — plan → aggregated, aisle-sorted, pantry-aware shopping list — is a one-sentence App Store pitch with high, recurring intent. Runners-up: **Tempo** (subscription-fatigued Strong/Hevy market, one-time-purchase wedge) and **Sprig** (Huckleberry gates basic logging behind $10-15/mo; free one-tap basics is a word-of-mouth wedge).
 
-### 1. Crescent — Moon Phase Journal (#358)
-**Slug:** `01-crescent` | **Theme:** Dark navy #0D0F1E + crescent gold  
-A private lunar companion app using pure-Swift synodic-cycle math (no location needed). Canvas-drawn moon phases with bezier terminator, guided ritual templates, mood-linked journal, and month-grid calendar.  
-**Screens:** Tonight (live moon) · Calendar · Journal · Rituals · Insights  
-**Monetization:** $3.99 one-time Pro (advanced ritual library, mood charts)  
-**Beats:** Moonly ($30/yr), Moon Calendar ($4/yr) — one payment forever
-
-### 2. Scrawl — Pictionary Party Game (#359)
-**Slug:** `02-scrawl` | **Theme:** Cream + sky blue + coral  
-Pass-the-phone Pictionary for 2–8 teams. Full PencilKit canvas, 5 word packs (200 words), animated timer ring, custom word lists, confetti game-over, and offline-only — no Wi-Fi, no accounts.  
-**Screens:** Play · Packs · Custom Words · Stats  
-**Monetization:** Free (ad-free, one-time word pack purchases planned)  
-**Beats:** Gartic ($5/mo subscription) — free forever offline
-
-### 3. Nourish — Food Sensitivity Tracker (#360)
-**Slug:** `03-nourish` | **Theme:** Sage green + terra + corn  
-Tracks every meal and symptom to find food triggers. Supports elimination diets and food-challenge protocols. Food autocomplete, symptom severity scale, 7-day symptom trend chart, and correlation window analysis.  
-**Screens:** Food Log · Symptoms · Protocol · Insights · Settings  
-**Monetization:** $2.99 one-time Pro (correlation analysis, protocol management)  
-**Beats:** Cara Care ($30/yr) — one payment for the full experience
-
-### 4. Surge — Marathon Training Plan (#361)
-**Slug:** `04-surge` | **Theme:** Dark charcoal + electric blue #4A9EFF  
-Full 16-week marathon and 12-week half-marathon training plan generator. Auto-calculates all paces, logs actual runs, compares planned vs actual mileage in a 14-week chart, and includes today's specific workout on launch.  
-**Screens:** Today · Plan · Week · Log · Insights  
-**Monetization:** $3.99 one-time Pro (full plan, insights, pace targets)  
-**Beats:** Garmin Coach (requires Garmin watch), Hal Higdon ($15/plan) — no hardware required
-
-### 5. Bingo — Custom Party Bingo (#362)
-**Slug:** `05-bingo` | **Theme:** Violet + gold + white  
-Fully offline bingo caller with text-to-speech ball announcement, 5 custom word packs, B-I-N-G-O number mode, and win detection for row/column/diagonal/corners/blackout. Create custom word cards for any occasion.  
-**Screens:** Play · Cards · Packs · Stats · Settings  
-**Monetization:** Free (ad-free, premium pack IAP planned)  
-**Beats:** Bingo by Absolute Games (covered in ads) — zero ads forever
-
-### 6. Domino — Draw Dominoes vs AI (#363)
-**Slug:** `06-domino` | **Theme:** Mahogany #4A2C17 + ivory + amber  
-Classic Draw Dominoes with a 3-difficulty adaptive AI. Authentic PipView Canvas rendering, scrollable chain with open-end indicators, and proper blocked-game detection. Full match history and stats.  
-**Screens:** Play · History · Rules · Stats · Settings  
-**Monetization:** Free (ad-free, Hard AI IAP planned)  
-**Beats:** Dominos Gold (subscription) — free forever
-
----
-
-## Top Recommendation
-
-**Nourish (#360)** — The App Store has terrible food-sensitivity apps. Cara Care charges $30/yr and has mediocre UI. A $2.99 one-time unlock for a polished elimination-diet tracker with real correlation analysis will convert strongly. Especially among iOS users who already tried and abandoned Cara Care.
-
----
-
-## Research Signals (App Store Gaps Found This Run)
-
-- Moon journal apps all use subscriptions ($15–30/yr) — huge gap for one-time pricing
-- Pictionary apps online only (Gartic) — offline PencilKit implementation is rare
-- Food sensitivity trackers have poor UX and expensive subscriptions
-- Marathon training: Hal Higdon charges $15/plan PDF — app experience is largely absent
-- Bingo apps are riddled with ads and fake currency systems
-- Domino apps require online play or have cluttered UI
-
----
-
-## Run Stats
-
-- **Date:** 2026-06-22 04:00 UTC  
-- **Apps:** 6 of 6 complete  
-- **Total entries in SHIPPED.md:** 363  
-- **Build system:** XcodeGen (project.yml) for all 6 apps  
-- **Frameworks used:** SwiftUI, SwiftData, Swift Charts, PencilKit, AVFoundation, Canvas  
+## Signals to follow next run
+Subscription-fatigue undercut plays (one-time-purchase vs incumbent monthly walls) keep surfacing as the strongest wedge across pets/baby/fitness. Worth probing: photo-declutter (PhotoKit on-device), recipe-import/scaling, and reading-tracker markets.
