@@ -1,10 +1,8 @@
-# LATEST RUN — 2026-06-26_0330-UTC
+# LATEST RUN — 2026-06-27_0737-UTC
 
-Run folder: `runs/2026-06-26_0330-UTC` — 3 production-ready native iOS apps (SwiftUI 5 / iOS 17+ / SwiftData / XcodeGen).
+Run folder: `runs/2026-06-27_0737-UTC` — production-ready native iOS apps (SwiftUI 5 / iOS 17+ / SwiftData / XcodeGen).
 
-- **Splash** — built — `01-splash` — Swimming session tracker (offline/private, no subscription): log sets with 8 stroke types (freestyle/backstroke/breaststroke/butterfly/IM/kick/pull/drill), pool catalog (indoor/outdoor/open water), weekly goal ring, 4 Swift Charts (weekly distance, stroke distribution donut, pace trend, sessions/month), 25 seeded sessions — Monetization: one-time $3.99 Pro — Why it can boom: MySwimPro charges $79/year for features Splash gives for free; 3M+ US lap swimmers have no beautiful private offline option
-- **Daub** — built — `02-daub` — Color-by-number pixel art relaxation (Happy Color-beater, ad-free): 20 handcrafted puzzles (5 categories, 10×10–14×14 grids), Canvas mini-previews in gallery, numbered-cell tap-to-fill, auto-save, by-category stats — Monetization: one-time $2.99 Pro (additional puzzle packs) — Why it can boom: Happy Color has 50M+ downloads proving massive demand; Daub is the calm zero-dark-pattern alternative
-- **Keg** — built — `03-keg` — Homebrewing recipe calculator & batch log (BrewFather/Brewer's Friend-beater, offline/private): recipe builder with grain bill/hop schedule/yeast, auto-computed ABV/IBU/BU:GU/SRM, 4 calculators (ABV/priming sugar/strike water/refractometer), batch log with fermentation gravity chart, 5 seeded recipes, status workflow from planned to complete — Monetization: one-time $4.99 Pro — Why it can boom: 1.2M US homebrewers; BrewFather charges $10–20/month subscription; no clean native iOS-first app exists
+- **Amp** — built — `01-amp` — EV charging & range tracker (private/offline/one-time): multi-vehicle garage, session log with kWh/cost/SoC/chargerType/location, ChargingEngine with CO₂-offset + gas-equivalent savings, Dashboard, Insights (monthly kWh/cost bars, charger-type donut, cost-per-kWh trend), 55 seeded sessions — Monetization: one-time $3.99 Pro — Why it can boom: 3M+ US EV owners have no beautiful native iOS charging log; Amp is the private offline alternative to cloud dashboards
 
 ## Top recommendation
-**Keg** (homebrewing companion). 1.2M active US homebrewers are stuck on web-based subscription tools with poor mobile UX. A native iOS app with one-time pricing and built-in calculators has an extremely clear product-market fit and loyal word-of-mouth community.
+**Amp** (EV charging tracker). Growing EV market with no great native iOS companion. One-time pricing vs subscription competitors wins instant goodwill from privacy-conscious EV owners.
